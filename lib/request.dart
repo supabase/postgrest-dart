@@ -295,6 +295,10 @@ class Request extends http.BaseClient {
     return this;
   }
 
+  /// Sends the request and returns a Future.
+  /// catch any error and returns with status 500
+  ///
+  /// @returns {Future} Resolves when the request has completed.
   Future<Map<String, dynamic>> end() async {
     try {
       var requestUrl = this.url;
@@ -330,7 +334,7 @@ class Request extends http.BaseClient {
         response = await this.delete(requestUrl);
       }
 
-      return resolveResponse(response);
+      return parseJsonResponse(response);
     } catch (e) {
       return {
         'body': null,
@@ -341,7 +345,10 @@ class Request extends http.BaseClient {
     }
   }
 
-  Map<String, dynamic> resolveResponse(dynamic response) {
+  /// Parse request response to json object
+  ///
+  /// @returns {Map<String, dynamic>}
+  Map<String, dynamic> parseJsonResponse(dynamic response) {
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
