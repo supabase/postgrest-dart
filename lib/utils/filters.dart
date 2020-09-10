@@ -6,6 +6,34 @@ class Filters {
   /// All methods are prefixed with an $ to avoid collisions with reserved keywords (eg: "in")
   /// We can't use underscore (_)  as it's used for private method
 
+  static Function getFunction(String name) {
+    if (name == "eq") return $eq;
+    if (name == "gt") return $gt;
+    if (name == "lt") return $lt;
+    if (name == "gte") return $gte;
+    if (name == "lte") return $lte;
+    if (name == "like") return $like;
+    if (name == "ilike") return $ilike;
+    if (name == "is") return $is;
+    if (name == "in") return $in;
+    if (name == "neq") return $neq;
+    if (name == "fts") return $fts;
+    if (name == "plfts") return $plfts;
+    if (name == "phfts") return $phfts;
+    if (name == "wfts") return $wfts;
+    if (name == "cs") return $cs;
+    if (name == "cd") return $cd;
+    if (name == "ova") return $ova;
+    if (name == "ovr") return $ovr;
+    if (name == "sl") return $sl;
+    if (name == "sr") return $sr;
+    if (name == "nxl") return $nxl;
+    if (name == "nxr") return $nxr;
+    if (name == "adj") return $adj;
+    if (name == "or") return $or;
+    throw ArgumentError.value(name, "name");
+  }
+
   /// Finds all rows whose value on the stated columnName exactly matches the specified filterValue.
   /// @param {string} columnName Name of the database column
   /// @param { string | integer | boolean } filterValue Value to match

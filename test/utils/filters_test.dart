@@ -29,6 +29,12 @@ void main() {
     var result2 = Filters.$like('name', '%United States%');
     expect(result2, 'name=like.*United States*');
   });
+  test('will convert like filter', () {
+    var result = Filters.$ilike('name', '%United%');
+    expect(result, 'name=ilike.*United*');
+    var result2 = Filters.$ilike('name', '%United States%');
+    expect(result2, 'name=ilike.*United States*');
+  });
   test('will convert is filter', () {
     var result = Filters.$is('name', null);
     expect(result, 'name=is.null');
