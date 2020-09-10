@@ -78,11 +78,21 @@ void main() {
         'application/vnd.pgrst.object+json');
     expect(request.headers['Prefer'], 'return=representation');
   });
-  // test('will return a promise from end()', () {
-  //   var request = Request('GET', '/')
-  //     .end()
-  //     .then((x) => {})
-  //     .catch((e) => {});
-  //   expect(request.query, ['foreignTable.offset=1']);
-  // });
+  test('will return a Future<Map> from end()', () {
+    var future = Request('GET', '/').end();
+    expect(future, isInstanceOf<Future<Map>>());
+  });
+  test('can be resolved', () {
+    var future = Request('GET', '/').end();
+    expect(future, isInstanceOf<Future<Map>>());
+    future.then((value) {
+      expect(value['body'], null);
+      expect(value['status'], 500);
+      expect(value['statusCode'], 'ArgumentError');
+    }).catchError((error) => throw error);
+  });
+  test('can be used in an async/await context', () async {
+    var response = await Request('DELETE', '/').end();
+    expect(response['statusCode'], 400);
+  });
 }

@@ -8,11 +8,11 @@ import 'package:postgrest/utils/helpers.dart';
 class Request extends http.BaseClient {
   String method;
   String url;
-  Map headers;
+  Map<String, String> headers;
   List query = [];
   dynamic _body;
 
-  Request(String method, String url, [Map headers]) {
+  Request(String method, String url, [Map<String, String> headers]) {
     this.method = method;
     this.url = url;
     this.headers = headers == null ? {} : headers;
@@ -295,48 +295,62 @@ class Request extends http.BaseClient {
     return this;
   }
 
-  end() async {
-    var requestUrl = this.url;
-    var uppercaseMethod = this.method.toUpperCase();
-    var response;
+  Future<Map<String, dynamic>> end() async {
+    try {
+      var requestUrl = this.url;
+      var uppercaseMethod = this.method.toUpperCase();
+      var response;
 
-    if (['DELETE', 'PATCH'].contains(uppercaseMethod) &&
-        this.query.length == 0) {
-      var methodString =
-          uppercaseMethod == 'DELETE' ? '.delete()' : '.update()';
+      if (['DELETE', 'PATCH'].contains(uppercaseMethod) &&
+          this.query.length == 0) {
+        var methodString =
+            uppercaseMethod == 'DELETE' ? '.delete()' : '.update()';
 
+        return {
+          'body': null,
+          'status': 400,
+          'statusCode': 400,
+          'statusText': "$methodString cannot be invoked without any filters.",
+        };
+      }
+
+      if (uppercaseMethod == "GET") {
+        var params = this.query.length > 0 ? this.query.join('&') : "";
+        if (params != null) requestUrl += "?$params";
+        response = await this.get(requestUrl);
+      } else if (uppercaseMethod == "POST") {
+        response = await this.post(requestUrl, body: _body);
+      } else if (uppercaseMethod == "PUT") {
+        response = await this.put(requestUrl, body: _body);
+      } else if (uppercaseMethod == "PATCH") {
+        response = await this.patch(requestUrl, body: _body);
+      } else if (uppercaseMethod == "DELETE") {
+        var params = this.query.length > 0 ? this.query.join('&') : "";
+        if (params != null) requestUrl += "?$params";
+        response = await this.delete(requestUrl);
+      }
+
+      return resolveResponse(response);
+    } catch (e) {
       return {
         'body': null,
-        'status': 400,
-        'statusCode': 400,
-        'statusText': "$methodString cannot be invoked without any filters.",
+        'status': 500,
+        'statusCode': e.runtimeType.toString(),
+        'statusText': e.toString()
       };
     }
-
-    if (uppercaseMethod == "GET") {
-      var params = this.query.length > 0 ? this.query.join('&') : "";
-      if (params != null) requestUrl += "?$params";
-      response = await this.get(requestUrl);
-    } else if (uppercaseMethod == "POST") {
-      response = await this.post(requestUrl, body: _body);
-    } else if (uppercaseMethod == "PUT") {
-      response = await this.put(requestUrl, body: _body);
-    } else if (uppercaseMethod == "PATCH") {
-      response = await this.patch(requestUrl, body: _body);
-    } else if (uppercaseMethod == "DELETE") {
-      var params = this.query.length > 0 ? this.query.join('&') : "";
-      if (params != null) requestUrl += "?$params";
-      response = await this.delete(requestUrl);
-    }
-
-    return resolveResponse(response);
   }
 
-  Map resolveResponse(dynamic response) {
+  Map<String, dynamic> resolveResponse(dynamic response) {
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      return json.decode(response.body);
+      return {
+        'body': json.decode(response.body),
+        'status': response.statusCode,
+        'statusCode': response.statusCode,
+        'statusText': null,
+      };
     } else {
       return {
         'body': null,
