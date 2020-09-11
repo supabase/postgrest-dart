@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -379,5 +380,26 @@ class Request extends http.BaseClient {
         'statusText': response.body.toString(),
       };
     }
+  }
+
+  /// Makes the Request object then-able. Allows for usage with
+  /// `Promise.resolve` and async/await contexts. Just a proxy for `.then()` on
+  /// the promise returned from `.end()`.
+  ///
+  /// @param {function} Called when the request resolves.
+  /// @param {function} Called when the request errors.
+  /// @returns {Future} Resolves when the resolution resolves.
+  ///
+  then(FutureOr<dynamic> onValue(dynamic value), {Function onError}) {
+    return this.end().then(onValue, onError: onError);
+  }
+
+  /// Just a proxy for `.catch()` on the promise returned from `.end()`.
+  ///
+  /// @param {function} Called when the request errors.
+  /// @returns {Future} Resolves when there is an error.
+  ///
+  catchError(Function onError) {
+    return this.end().catchError(onError);
   }
 }
