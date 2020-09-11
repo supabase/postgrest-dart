@@ -146,7 +146,7 @@ class Request extends http.BaseClient {
     }
 
     if (['fts', 'plfts', 'phfts', 'wfts'].contains(operator) &&
-        criteria['queryText'] == 'undefined') {
+        (criteria is! Map || !criteria.containsKey('queryText'))) {
       return {
         'body': null,
         'status': 400,
@@ -235,7 +235,7 @@ class Request extends http.BaseClient {
   /// @param {Int} criteria The number of rows to return.
   /// @param {string} columnName The columnName name to limit.
   /// @returns {Request} The API request object.
-  limit(int criteria, [String columnName]) {
+  limit(dynamic criteria, [String columnName]) {
     if (criteria is! int) {
       return {
         'body': null,
@@ -256,7 +256,7 @@ class Request extends http.BaseClient {
   /// @param {Int} criteria The number of rows to skip before starting to return.
   /// @param {string} columnName The columnName name to offset.
   /// @returns {Request} The API request object.
-  offset(int criteria, [String columnName]) {
+  offset(dynamic criteria, [String columnName]) {
     if (criteria is! int) {
       return {
         'body': null,
@@ -278,7 +278,7 @@ class Request extends http.BaseClient {
   /// @param {number} from The first object to select.
   /// @param {number} to The last object to select. Value -1 considered as null.
   /// @returns {Request} The API request object.
-  range(int from, [int to = -1]) {
+  range(dynamic from, [dynamic to = -1]) {
     if (from is! int || to is! int) {
       return {
         'body': null,
