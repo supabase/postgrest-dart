@@ -177,12 +177,25 @@ class Request extends http.BaseClient {
     return _query(enrichedQuery);
   }
 
+  /// Filter result rows by adding conditions on columns
+  ///
+  /// @example
+  /// $or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+  ///
+  /// @param {string} filters to satisfy
+  /// @returns {Request} The API request object.
+  or(String filters) {
+    var filterFunction = Filters.getFunction("or");
+    var newQuery = filterFunction(filters);
+    return _query(newQuery);
+  }
+
   /// Takes a query object and translates it to a PostgREST filter query string.
   /// All values are prefixed with `eq.`.
   ///
   /// @param {object} query The object to match against.
   /// @returns {Request} The API request object.
-  match(query) {
+  match(Map query) {
     query.forEach((k, v) => _query("$k=eq.$v"));
     return this;
   }
@@ -192,8 +205,8 @@ class Request extends http.BaseClient {
   ///
   /// @param {string} select The unformatted select string.
   /// @returns {Request} The API request object.
-  select(select) {
-    if (select) {
+  select(String select) {
+    if (select != null) {
       _query({select: select.replaceAll(RegExp(r'\s'), '')});
     }
     return this;
