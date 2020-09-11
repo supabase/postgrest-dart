@@ -26,9 +26,9 @@ class Request extends http.BaseClient {
   }
 
   /// Set `data` as the request body.
-  /// @param {String|Object} data
+  /// @param {String|Object|Array} data
   /// @return {Request} The API request object.
-  body(data) {
+  body(dynamic data) {
     _body = data;
   }
 
@@ -44,7 +44,7 @@ class Request extends http.BaseClient {
   /// @return {Request} for chaining
   /// @api public
 
-  _query(val) {
+  _query(dynamic val) {
     if (val is! String) val = _serialize(val);
     if (val is String) this.query.add("$val");
     return this;
@@ -55,7 +55,7 @@ class Request extends http.BaseClient {
   /// @param {Object} obj
   /// @return {String}
   /// @api private
-  _serialize(obj) {
+  _serialize(Map obj) {
     if (obj == null || obj is! Map) return obj;
     var pairs = [];
     obj.forEach((k, v) => _pushEncodedKeyValuePair(pairs, k, v));
@@ -69,7 +69,7 @@ class Request extends http.BaseClient {
   /// @param {Array} pairs
   /// @param {String} key
   /// @param {Mixed} val
-  _pushEncodedKeyValuePair(pairs, key, val) {
+  _pushEncodedKeyValuePair(List pairs, String key, dynamic val) {
     if (val == null) {
       pairs.add(Uri.encodeFull(key));
       return;
@@ -82,7 +82,7 @@ class Request extends http.BaseClient {
     } else if (val is Map) {
       val.forEach((k, v) => _pushEncodedKeyValuePair(pairs, "$key[$k]", v));
     } else {
-      pairs.push(Uri.encodeFull(key) + '=' + Uri.encodeComponent(val));
+      pairs.add(Uri.encodeFull(key) + '=' + Uri.encodeComponent(val));
     }
   }
 
@@ -234,7 +234,7 @@ class Request extends http.BaseClient {
   /// @param {Int} criteria The number of rows to return.
   /// @param {string} columnName The columnName name to limit.
   /// @returns {Request} The API request object.
-  limit(criteria, [String columnName]) {
+  limit(int criteria, [String columnName]) {
     if (criteria is! int) {
       return {
         'body': null,
@@ -255,7 +255,7 @@ class Request extends http.BaseClient {
   /// @param {Int} criteria The number of rows to skip before starting to return.
   /// @param {string} columnName The columnName name to offset.
   /// @returns {Request} The API request object.
-  offset(criteria, [String columnName]) {
+  offset(int criteria, [String columnName]) {
     if (criteria is! int) {
       return {
         'body': null,
@@ -277,7 +277,7 @@ class Request extends http.BaseClient {
   /// @param {number} from The first object to select.
   /// @param {number} to The last object to select. Value -1 considered as null.
   /// @returns {Request} The API request object.
-  range(from, [int to = -1]) {
+  range(int from, [int to = -1]) {
     if (from is! int || to is! int) {
       return {
         'body': null,

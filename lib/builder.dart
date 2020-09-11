@@ -107,7 +107,7 @@ class Builder {
     return this;
   }
 
-  or(filters) {
+  or(String filters) {
     this.queryFilters.add({
       'filter': 'or',
       'filters': filters,
@@ -116,7 +116,7 @@ class Builder {
     return this;
   }
 
-  match(query) {
+  match(Map query) {
     this.queryFilters.add({
       'filter': 'match',
       'query': query,
@@ -125,7 +125,7 @@ class Builder {
     return this;
   }
 
-  order(columnName, [bool ascending = false, bool nullsFirst = false]) {
+  order(String columnName, [bool ascending = false, bool nullsFirst = false]) {
     this.queryFilters.add({
       'filter': 'order',
       'columnName': columnName,
@@ -136,7 +136,7 @@ class Builder {
     return this;
   }
 
-  limit(criteria, [String columnName]) {
+  limit(int criteria, [String columnName]) {
     this.queryFilters.add({
       'filter': 'limit',
       'criteria': criteria,
@@ -146,7 +146,7 @@ class Builder {
     return this;
   }
 
-  offset(criteria, [String columnName]) {
+  offset(int criteria, [String columnName]) {
     this.queryFilters.add({
       'filter': 'offset',
       'columnName': columnName,
@@ -156,7 +156,7 @@ class Builder {
     return this;
   }
 
-  range(from, [int to = -1]) {
+  range(int from, [int to = -1]) {
     this.queryFilters.add({
       'filter': 'range',
       'from': from,
@@ -202,7 +202,7 @@ class Builder {
         : 'return=representation';
 
     request.set('Prefer', header);
-    request.send(data);
+    request.body(data);
 
     this.addFilters(request);
 
@@ -212,7 +212,7 @@ class Builder {
   ///
   /// Start a "PATCH" request
   ///
-  update(data) {
+  update(dynamic data) {
     var method = 'PATCH';
     var request = this.request(method);
 
@@ -221,12 +221,12 @@ class Builder {
         'body': null,
         'status': 400,
         'statusCode': 400,
-        'statusText': 'Data type should be an object.',
+        'statusText': 'Data type should be an object or a string.',
       };
     }
 
     request.set('Prefer', 'return=representation');
-    request.send(data);
+    request.body(data);
 
     this.addFilters(request);
 
