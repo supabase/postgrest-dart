@@ -25,7 +25,7 @@ class PostgrestClient {
     }
   }
 
-  from(tableName) {
+  Builder from(tableName) {
     var url = "${this.restUrl}/$tableName";
 
     if (this.queryString != null) {
@@ -35,7 +35,7 @@ class PostgrestClient {
     return new Builder(url, this.headers, this.schema);
   }
 
-  rpc(String functionName, [Map functionParameters]) {
+  Request rpc(String functionName, [Map functionParameters]) {
     var url = "${this.restUrl}/rpc/$functionName";
     var headers = this.headers;
 

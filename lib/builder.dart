@@ -26,7 +26,7 @@ class Builder {
     this.schema = schema;
   }
 
-  request(String method) {
+  Request request(String method) {
     if (this.schema != null) {
       if (method == 'GET')
         this.headers['Accept-Profile'] = this.schema;
@@ -85,7 +85,7 @@ class Builder {
     });
   }
 
-  filter(String columnName, String operator, dynamic criteria) {
+  Builder filter(String columnName, String operator, dynamic criteria) {
     this.queryFilters.add({
       'filter': 'filter',
       'columnName': columnName,
@@ -96,7 +96,7 @@ class Builder {
     return this;
   }
 
-  not(String columnName, String operator, dynamic criteria) {
+  Builder not(String columnName, String operator, dynamic criteria) {
     this.queryFilters.add({
       'filter': 'not',
       'columnName': columnName,
@@ -107,7 +107,7 @@ class Builder {
     return this;
   }
 
-  or(String filters) {
+  Builder or(String filters) {
     this.queryFilters.add({
       'filter': 'or',
       'filters': filters,
@@ -116,7 +116,7 @@ class Builder {
     return this;
   }
 
-  match(Map query) {
+  Builder match(Map query) {
     this.queryFilters.add({
       'filter': 'match',
       'query': query,
@@ -125,7 +125,8 @@ class Builder {
     return this;
   }
 
-  order(String columnName, [bool ascending = false, bool nullsFirst = false]) {
+  Builder order(String columnName,
+      [bool ascending = false, bool nullsFirst = false]) {
     this.queryFilters.add({
       'filter': 'order',
       'columnName': columnName,
@@ -136,7 +137,7 @@ class Builder {
     return this;
   }
 
-  limit(int criteria, [String columnName]) {
+  Builder limit(int criteria, [String columnName]) {
     this.queryFilters.add({
       'filter': 'limit',
       'criteria': criteria,
@@ -146,7 +147,7 @@ class Builder {
     return this;
   }
 
-  offset(int criteria, [String columnName]) {
+  Builder offset(int criteria, [String columnName]) {
     this.queryFilters.add({
       'filter': 'offset',
       'columnName': columnName,
@@ -156,7 +157,7 @@ class Builder {
     return this;
   }
 
-  range(int from, [int to = -1]) {
+  Builder range(int from, [int to = -1]) {
     this.queryFilters.add({
       'filter': 'range',
       'from': from,
@@ -166,7 +167,7 @@ class Builder {
     return this;
   }
 
-  single() {
+  Builder single() {
     this.queryFilters.add({
       'filter': 'single',
     });
@@ -201,7 +202,7 @@ class Builder {
         ? 'return=representation,resolution=merge-duplicates'
         : 'return=representation';
 
-    request.set('Prefer', header);
+    request.headers['Prefer'] = header;
     request.body(data);
 
     this.addFilters(request);
@@ -225,7 +226,7 @@ class Builder {
       };
     }
 
-    request.set('Prefer', 'return=representation');
+    request.headers['Prefer'] = 'return=representation';
     request.body(data);
 
     this.addFilters(request);
@@ -243,5 +244,120 @@ class Builder {
     this.addFilters(request);
 
     return request;
+  }
+
+  Builder eq(String columnName, dynamic criteria) {
+    this.filter(columnName, 'eq', criteria);
+    return this;
+  }
+
+  Builder neq(String columnName, dynamic criteria) {
+    this.filter(columnName, 'neq', criteria);
+    return this;
+  }
+
+  Builder gt(String columnName, dynamic criteria) {
+    this.filter(columnName, 'gt', criteria);
+    return this;
+  }
+
+  Builder lt(String columnName, dynamic criteria) {
+    this.filter(columnName, 'lt', criteria);
+    return this;
+  }
+
+  Builder gte(String columnName, dynamic criteria) {
+    this.filter(columnName, 'gte', criteria);
+    return this;
+  }
+
+  Builder lte(String columnName, dynamic criteria) {
+    this.filter(columnName, 'lte', criteria);
+    return this;
+  }
+
+  Builder like(String columnName, dynamic criteria) {
+    this.filter(columnName, 'like', criteria);
+    return this;
+  }
+
+  Builder ilike(String columnName, dynamic criteria) {
+    this.filter(columnName, 'ilike', criteria);
+    return this;
+  }
+
+  Builder $is(String columnName, dynamic criteria) {
+    this.filter(columnName, 'is', criteria);
+    return this;
+  }
+
+  Builder $in(String columnName, dynamic criteria) {
+    this.filter(columnName, 'in', criteria);
+    return this;
+  }
+
+  Builder fts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'fts', criteria);
+    return this;
+  }
+
+  Builder plfts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'plfts', criteria);
+    return this;
+  }
+
+  Builder phfts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'phfts', criteria);
+    return this;
+  }
+
+  Builder wfts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'wfts', criteria);
+    return this;
+  }
+
+  Builder cs(String columnName, dynamic criteria) {
+    this.filter(columnName, 'cs', criteria);
+    return this;
+  }
+
+  Builder cd(String columnName, dynamic criteria) {
+    this.filter(columnName, 'cd', criteria);
+    return this;
+  }
+
+  Builder ova(String columnName, dynamic criteria) {
+    this.filter(columnName, 'ova', criteria);
+    return this;
+  }
+
+  Builder ovr(String columnName, dynamic criteria) {
+    this.filter(columnName, 'ovr', criteria);
+    return this;
+  }
+
+  Builder sl(String columnName, dynamic criteria) {
+    this.filter(columnName, 'sl', criteria);
+    return this;
+  }
+
+  Builder sr(String columnName, dynamic criteria) {
+    this.filter(columnName, 'sr', criteria);
+    return this;
+  }
+
+  Builder nxr(String columnName, dynamic criteria) {
+    this.filter(columnName, 'nxr', criteria);
+    return this;
+  }
+
+  Builder nxl(String columnName, dynamic criteria) {
+    this.filter(columnName, 'nxl', criteria);
+    return this;
+  }
+
+  Builder adj(String columnName, dynamic criteria) {
+    this.filter(columnName, 'adj', criteria);
+    return this;
   }
 }

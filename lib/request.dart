@@ -22,6 +22,7 @@ class Request extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
+    print("trigger send method");
     request.headers.addAll(headers);
     return request.send();
   }
@@ -159,7 +160,7 @@ class Request extends http.BaseClient {
     var filterFunction = Filters.getFunction("${operator.toLowerCase()}");
     var newQuery = filterFunction(columnName, criteria);
 
-    return _query("${this.url}$newQuery");
+    return _query("$newQuery");
   }
 
   /// Provides the inverse of the filter stated.
@@ -208,7 +209,7 @@ class Request extends http.BaseClient {
   /// @returns {Request} The API request object.
   select(String select) {
     if (select != null) {
-      _query({select: select.replaceAll(RegExp(r'\s'), '')});
+      _query({'select': select.replaceAll(RegExp(r'\s'), '')});
     }
     return this;
   }
