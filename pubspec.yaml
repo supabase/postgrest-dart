@@ -1,8 +1,8 @@
 name: postgrest
-description: A new Flutter package project.
+description: A client for PostgREST api.
 version: 0.0.1
-author:
-homepage:
+author: "Supabase"
+homepage: "https://supabase.io"
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

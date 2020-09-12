@@ -5,7 +5,7 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 ## Using
 
 The usage should be the same as postgrest-js except:
-- As Dart doesn't have thenable object as js, you need to finish your query chain with `end()`.
+- As Dart doesn't have thenable object as Javascript, you need to call `end()` to finish your query chain.
 - `$is` and `$in` filter methods are prefixed with `$` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.io/docs/about).
