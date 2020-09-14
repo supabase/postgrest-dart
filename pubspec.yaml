@@ -1,8 +1,8 @@
 name: postgrest
 description: A client for PostgREST api.
-version: 0.0.1
-author: "Supabase"
+version: 0.0.1-dev.1
 homepage: "https://supabase.io"
+repository: "https://github.com/supabase/postgrest-dart"
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
