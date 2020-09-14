@@ -5,12 +5,12 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 ## Using
 
 The usage should be the same as postgrest-js except:
-- As Dart doesn't have thenable object as Javascript, you need to call `end()` to finish your query chain.
+- When using with `async/await`, you need to call `end()` to finish your query chain.
 - `$is` and `$in` filter methods are prefixed with `$` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.io/docs/about).
 
-#### Readding your data
+#### Reading your data
 
 ```dart
 import 'package:postgrest/postgrest.dart' as postgrestClient;
@@ -48,8 +48,8 @@ import 'package:postgrest/postgrest.dart' as postgrestClient;
 var url = 'https://example.com/postgrest/endpoint';
 var client = postgrestClient(url);
 var response = await client.from('users')
-      .eq('username', 'dragarcia')
       .update({ 'status': 'OFFLINE' })
+      .eq('username', 'dragarcia')
       .end();
 print('Updated user status: ${response.body[0]['status']}');
 ```
@@ -63,8 +63,21 @@ var url = 'https://example.com/postgrest/endpoint';
 var client = postgrestClient(url);
 var response = await client.from('users')
       .delete()
+      .eq('username', 'supabot')
       .end();
 print('Response status: ${response.status}');
+```
+
+#### Using with `then()/catchError()`
+
+```dart
+import 'package:postgrest/postgrest.dart' as postgrestClient;
+
+var url = 'https://example.com/postgrest/endpoint';
+var client = postgrestClient(url);
+client.from('users').select('username').eq('status', 'OFFLINE').then((res) {
+      // Do something with the response
+}).catchError((error) => throw (error));
 ```
 
 ## Contributing
