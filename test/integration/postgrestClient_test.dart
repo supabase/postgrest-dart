@@ -16,6 +16,15 @@ void main() {
       {'username': 'kiwicopple'}
     ]);
   });
+  test("should return basic data with future.then", () {
+    var client = PostgrestClient(rootUrl);
+    client.from('users').select('username').eq('status', 'OFFLINE').then((res) {
+      expect(res['body'].length, 1);
+      expect(res['body'], [
+        {'username': 'kiwicopple'}
+      ]);
+    }).catchError((error) => throw (error));
+  });
   test("should return relational joins", () async {
     var client = PostgrestClient(rootUrl);
     var res = await client
