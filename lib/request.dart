@@ -22,7 +22,6 @@ class Request extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
-    print("trigger send method");
     request.headers.addAll(headers);
     return request.send();
   }
@@ -31,7 +30,11 @@ class Request extends http.BaseClient {
   /// @param {String|Object|Array} data
   /// @return {Request} The API request object.
   body(dynamic data) {
-    _body = data;
+    if (data is List || data is Map) {
+      headers['Content-type'] = 'application/json';
+      _body = json.encode(data);
+    } else
+      _body = data;
   }
 
   /// Add query-string `val`.
@@ -310,6 +313,121 @@ class Request extends http.BaseClient {
     return this;
   }
 
+  Request eq(String columnName, dynamic criteria) {
+    this.filter(columnName, 'eq', criteria);
+    return this;
+  }
+
+  Request neq(String columnName, dynamic criteria) {
+    this.filter(columnName, 'neq', criteria);
+    return this;
+  }
+
+  Request gt(String columnName, dynamic criteria) {
+    this.filter(columnName, 'gt', criteria);
+    return this;
+  }
+
+  Request lt(String columnName, dynamic criteria) {
+    this.filter(columnName, 'lt', criteria);
+    return this;
+  }
+
+  Request gte(String columnName, dynamic criteria) {
+    this.filter(columnName, 'gte', criteria);
+    return this;
+  }
+
+  Request lte(String columnName, dynamic criteria) {
+    this.filter(columnName, 'lte', criteria);
+    return this;
+  }
+
+  Request like(String columnName, dynamic criteria) {
+    this.filter(columnName, 'like', criteria);
+    return this;
+  }
+
+  Request ilike(String columnName, dynamic criteria) {
+    this.filter(columnName, 'ilike', criteria);
+    return this;
+  }
+
+  Request $is(String columnName, dynamic criteria) {
+    this.filter(columnName, 'is', criteria);
+    return this;
+  }
+
+  Request $in(String columnName, dynamic criteria) {
+    this.filter(columnName, 'in', criteria);
+    return this;
+  }
+
+  Request fts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'fts', criteria);
+    return this;
+  }
+
+  Request plfts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'plfts', criteria);
+    return this;
+  }
+
+  Request phfts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'phfts', criteria);
+    return this;
+  }
+
+  Request wfts(String columnName, dynamic criteria) {
+    this.filter(columnName, 'wfts', criteria);
+    return this;
+  }
+
+  Request cs(String columnName, dynamic criteria) {
+    this.filter(columnName, 'cs', criteria);
+    return this;
+  }
+
+  Request cd(String columnName, dynamic criteria) {
+    this.filter(columnName, 'cd', criteria);
+    return this;
+  }
+
+  Request ova(String columnName, dynamic criteria) {
+    this.filter(columnName, 'ova', criteria);
+    return this;
+  }
+
+  Request ovr(String columnName, dynamic criteria) {
+    this.filter(columnName, 'ovr', criteria);
+    return this;
+  }
+
+  Request sl(String columnName, dynamic criteria) {
+    this.filter(columnName, 'sl', criteria);
+    return this;
+  }
+
+  Request sr(String columnName, dynamic criteria) {
+    this.filter(columnName, 'sr', criteria);
+    return this;
+  }
+
+  Request nxr(String columnName, dynamic criteria) {
+    this.filter(columnName, 'nxr', criteria);
+    return this;
+  }
+
+  Request nxl(String columnName, dynamic criteria) {
+    this.filter(columnName, 'nxl', criteria);
+    return this;
+  }
+
+  Request adj(String columnName, dynamic criteria) {
+    this.filter(columnName, 'adj', criteria);
+    return this;
+  }
+
   /// Sends the request and returns a Future.
   /// catch any error and returns with status 500
   ///
@@ -333,19 +451,28 @@ class Request extends http.BaseClient {
         };
       }
 
+      var params = this.query.length > 0 ? this.query.join('&') : null;
+      if (params != null) requestUrl += "?$params";
+
       if (uppercaseMethod == "GET") {
-        var params = this.query.length > 0 ? this.query.join('&') : "";
-        if (params != null) requestUrl += "?$params";
         response = await this.get(requestUrl);
       } else if (uppercaseMethod == "POST") {
         response = await this.post(requestUrl, body: _body);
       } else if (uppercaseMethod == "PUT") {
         response = await this.put(requestUrl, body: _body);
       } else if (uppercaseMethod == "PATCH") {
-        response = await this.patch(requestUrl, body: _body);
+        var jsonBody = json.decode(_body);
+        if (jsonBody is Map)
+          response = await this.patch(requestUrl, body: _body);
+        else
+          return {
+            'body': null,
+            'status': 400,
+            'statusCode': 400,
+            'statusText': 'Data type should be an object.',
+          };
       } else if (uppercaseMethod == "DELETE") {
-        var params = this.query.length > 0 ? this.query.join('&') : "";
-        if (params != null) requestUrl += "?$params";
+        print("url: $requestUrl");
         response = await this.delete(requestUrl);
       }
 
@@ -360,25 +487,31 @@ class Request extends http.BaseClient {
     }
   }
 
-  /// Parse request response to json object
+  /// Parse request response to json object if possible
   ///
-  /// @returns {Map<String, dynamic>}
+  /// @returns {Map<String, dynamic> | String}
   Map<String, dynamic> parseJsonResponse(dynamic response) {
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return {
-        'body': json.decode(response.body),
-        'status': response.statusCode,
-        'statusCode': response.statusCode,
-        'statusText': null,
-      };
-    } else {
+    if (response.statusCode >= 400) {
+      // error handling
       return {
         'body': null,
         'status': response.statusCode,
         'statusCode': response.statusCode,
         'statusText': response.body.toString(),
+      };
+    } else {
+      var body;
+      try {
+        body = json.decode(response.body);
+      } on FormatException catch (_) {
+        body = response.body;
+      }
+
+      return {
+        'body': body,
+        'status': response.statusCode,
+        'statusCode': response.statusCode,
+        'statusText': null,
       };
     }
   }

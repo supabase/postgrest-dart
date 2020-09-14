@@ -46,8 +46,8 @@ class PostgrestClient {
       headers['Content-Profile'] = this.schema;
     }
 
-    var request = new Request('post', url, headers);
-    if (functionParameters != null) request.body(functionParameters).send();
+    var request = new Request('POST', url, headers);
+    if (functionParameters != null) request.body(functionParameters);
     return request;
   }
 }

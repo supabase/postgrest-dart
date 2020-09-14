@@ -178,6 +178,7 @@ void main() {
     var client = PostgrestClient(rootUrl);
     var res = client
         .from('countries')
+        .select('*')
         .eq('name', 'New Zealand')
         .gt('id', 20)
         .lt('id', 20)
@@ -201,8 +202,7 @@ void main() {
         .nxl('population_range', [100, 500])
         .nxr('population_range', [100, 500])
         .adj('population_range', [100, 500])
-        .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
-        .select('*');
+        .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
 
     expect(res.query, [
       'select=*',
