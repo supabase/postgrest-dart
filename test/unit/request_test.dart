@@ -79,11 +79,11 @@ void main() {
   });
   test('will return a Future<Map> from end()', () {
     var future = Request('GET', '/').end();
-    expect(future, isInstanceOf<Future<Map>>());
+    expect(future, isA<Future<Map>>());
   });
   test('can be resolved', () {
     var future = Request('GET', '/').end();
-    expect(future, isInstanceOf<Future<Map>>());
+    expect(future, isA<Future<Map>>());
     future.then((value) {
       expect(value['body'], null);
       expect(value['status'], 500);

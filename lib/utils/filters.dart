@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:postgrest/utils/helpers.dart';
 
 class Filters {
