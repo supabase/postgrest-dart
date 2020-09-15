@@ -5,6 +5,8 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 [![pub package](https://img.shields.io/pub/v/postgrest.svg)](https://pub.dev/packages/postgrest)
 [![pub test](https://github.com/supabase/postgrest-dart/workflows/Test/badge.svg)](https://github.com/supabase/postgrest-dart/actions?query=workflow%3ATest)
 
+Pre-release verion! This repo is still under heavy development and the documentation is evolving. You're welcome to try it, but expect some breaking changes.
+
 ## Using
 
 The usage should be the same as postgrest-js except:
