@@ -18,10 +18,10 @@ You can find detail documentation from [here](https://supabase.io/docs/about).
 #### Reading your data
 
 ```dart
-import 'package:postgrest/postgrest.dart' as postgrestClient;
+import 'package:postgrest/postgrest.dart';
 
 var url = 'https://example.com/postgrest/endpoint';
-var client = postgrestClient(url);
+var client = PostgrestClient(url);
 var response = await client.from('users')
       .select('*')
       .eq('username', 'dragarcia')
@@ -33,10 +33,10 @@ print('Response body: ${response.body}');
 #### Insert records
 
 ```dart
-import 'package:postgrest/postgrest.dart' as postgrestClient;
+import 'package:postgrest/postgrest.dart';
 
 var url = 'https://example.com/postgrest/endpoint';
-var client = postgrestClient(url);
+var client = PostgrestClient(url);
 var response = await client.from('users')
       .insert([
         { 'username': 'supabot', 'status': 'ONLINE'}
@@ -48,10 +48,10 @@ print('Created user: ${response.body[0]['username']}');
 #### Update a record
 
 ```dart
-import 'package:postgrest/postgrest.dart' as postgrestClient;
+import 'package:postgrest/postgrest.dart';
 
 var url = 'https://example.com/postgrest/endpoint';
-var client = postgrestClient(url);
+var client = PostgrestClient(url);
 var response = await client.from('users')
       .update({ 'status': 'OFFLINE' })
       .eq('username', 'dragarcia')
@@ -62,10 +62,10 @@ print('Updated user status: ${response.body[0]['status']}');
 #### Delete records
 
 ```dart
-import 'package:postgrest/postgrest.dart' as postgrestClient;
+import 'package:postgrest/postgrest.dart';
 
 var url = 'https://example.com/postgrest/endpoint';
-var client = postgrestClient(url);
+var client = PostgrestClient(url);
 var response = await client.from('users')
       .delete()
       .eq('username', 'supabot')
