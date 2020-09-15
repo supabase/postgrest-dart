@@ -3,6 +3,7 @@
 Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface. 
 
 [![pub package](https://img.shields.io/pub/v/postgrest.svg)](https://pub.dev/packages/postgrest)
+[![pub test](https://github.com/supabase/postgrest-dart/workflows/Test/badge.svg)](https://github.com/supabase/postgrest-dart/actions?query=workflow%3ATest)
 
 ## Using
 
