@@ -2,7 +2,7 @@
 
 Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface. 
 
-[![pub package](https://img.shields.io/pub/v/http.svg)](https://pub.dev/packages/postgrest)
+[![pub package](https://img.shields.io/pub/v/postgrest.svg)](https://pub.dev/packages/postgrest)
 
 ## Using
 
