@@ -280,6 +280,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     this.schema = builder.schema;
   }
 
+  /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
     return filter.map((s) => '"${s}"').join(',');
   }
