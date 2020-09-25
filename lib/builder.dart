@@ -5,19 +5,13 @@ import 'dart:core';
 import 'package:http/http.dart' as http;
 
 /// The base builder class.
-class PostgrestBuilder extends http.BaseClient {
+class PostgrestBuilder {
   dynamic body;
   List query = [];
   Map<String, String> headers;
   String method;
   String schema;
   Uri url;
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    request.headers.addAll(headers);
-    return request.send();
-  }
 
   /// Sends the request and returns a Future.
   /// catch any error and returns with status 500
@@ -40,17 +34,19 @@ class PostgrestBuilder extends http.BaseClient {
         this.headers['Content-Type'] = 'application/json';
       }
 
+      var client = http.Client();
+
       if (uppercaseMethod == "GET") {
-        response = await this.get(this.url);
+        response = await client.get(this.url, headers: this.headers ?? {});
       } else if (uppercaseMethod == "POST") {
-        response = await this.post(this.url, body: this.body);
+        response = await client.post(this.url, headers: this.headers ?? {}, body: this.body);
       } else if (uppercaseMethod == "PUT") {
-        response = await this.put(this.url, body: this.body);
+        response = await client.put(this.url, headers: this.headers ?? {}, body: this.body);
       } else if (uppercaseMethod == "PATCH") {
         var bodyStr = json.encode(this.body);
-        response = await this.patch(this.url, body: bodyStr);
+        response = await client.patch(this.url, headers: this.headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == "DELETE") {
-        response = await this.delete(this.url);
+        response = await client.delete(this.url, headers: this.headers ?? {});
       }
 
       return parseJsonResponse(response);
@@ -61,7 +57,7 @@ class PostgrestBuilder extends http.BaseClient {
 
   /// Parse request response to json object if possible
   ///
-  /// @returns {Map<String, dynamic> | String}
+  /// TODO: return Response class object instead of Map<String, dynamic>
   Map<String, dynamic> parseJsonResponse(dynamic response) {
     if (response.statusCode >= 400) {
       // error handling
@@ -88,27 +84,6 @@ class PostgrestBuilder extends http.BaseClient {
     }
   }
 
-  /// Makes the Request object then-able. Allows for usage with
-  /// `Promise.resolve` and async/await contexts. Just a proxy for `.then()` on
-  /// the promise returned from `.end()`.
-  ///
-  /// @param {function} Called when the request resolves.
-  /// @param {function} Called when the request errors.
-  /// @returns {Future} Resolves when the resolution resolves.
-  ///
-  then(FutureOr<dynamic> onValue(dynamic value), {Function onError}) {
-    return this.end().then(onValue, onError: onError);
-  }
-
-  /// Just a proxy for `.catch()` on the promise returned from `.end()`.
-  ///
-  /// @param {function} Called when the request errors.
-  /// @returns {Future} Resolves when there is an error.
-  ///
-  catchError(Function onError) {
-    return this.end().catchError(onError);
-  }
-
   /// Update Uri queryParameters with new key:value
   appendSearchParams(String key, String value) {
     var searchParams = new Map.from(this.url.queryParameters);
@@ -123,7 +98,7 @@ class PostgrestBuilder extends http.BaseClient {
 /// * select() - "get"
 /// * insert() - "post"
 /// * update() - "patch"
-/// * delete_() - "delete"
+/// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestQueryBuilder(String url, [Map headers, String schema]) {
@@ -189,7 +164,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder delete_() {
+  PostgrestFilterBuilder delete() {
     this.method = 'DELETE';
     this.headers['Prefer'] = 'return=representation';
     return new PostgrestFilterBuilder(this);

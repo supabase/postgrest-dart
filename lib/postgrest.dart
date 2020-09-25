@@ -2,6 +2,7 @@ library postgrest;
 
 import "package:postgrest/builder.dart";
 
+/// A PostgREST api client written in Dartlang. The goal of this library is to make an "ORM-like" restful interface.
 class PostgrestClient {
   Map<String, String> headers = {};
   String url;

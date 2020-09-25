@@ -1,5 +1,5 @@
 name: postgrest
-description: A PostgREST api client written in Dartlang.
+description: PostgREST client for Dart. This library provides an ORM interface to PostgREST.
 version: 0.0.1-dev.3
 homepage: "https://supabase.io"
 repository: "https://github.com/supabase/postgrest-dart"
