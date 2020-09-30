@@ -6,9 +6,9 @@ name: Test
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: ['12']
+        node: ["12"]
 
     runs-on: ${{ matrix.os }}
 
@@ -27,20 +27,19 @@ jobs:
       - name: Setup Dart
         uses: cedx/setup-dart@v2
 
-      - name: Install dependencies 
+      - name: Install dependencies
         run: pub get
-        
+
       - name: Build Docker image
         run: |
           cd test/db
           docker-compose down
           docker-compose up -d
-      
+
       - name: Sleep for 5 seconds
         uses: jakejarvis/wait-action@master
         with:
-          time: '5s'
-        
-      # Run tests
-      - name: Test app
-        run: pub run test test/unit
+          time: "5s"
+
+      - name: Run tests
+        run: pub run test test
