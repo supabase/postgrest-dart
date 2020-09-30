@@ -10,25 +10,36 @@ on:
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+  test:
+    name: Test / OS ${{ matrix.os }} / Node ${{ matrix.node }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: ['12']
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: ${{ matrix.os }}
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checks-out repo
+        uses: actions/checkout@v2
 
-      # Setup Dart
-      - name: Install Dart
+      - name: Setup Dart
         uses: cedx/setup-dart@v2
 
-      # Install dependencies
       - name: Install dependencies 
         run: pub get
+        
+      - name: Build Docker image
+        run: |
+          cd test/db
+          docker-compose down
+          docker-compose up -d
+      
+      - name: Sleep for 5 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '5s'
         
       # Run tests
       - name: Test app
