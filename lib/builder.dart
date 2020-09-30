@@ -56,8 +56,6 @@ class PostgrestBuilder {
   }
 
   /// Parse request response to json object if possible
-  ///
-  /// TODO: return Response class object instead of Map<String, dynamic>
   Map<String, dynamic> parseJsonResponse(dynamic response) {
     if (response.statusCode >= 400) {
       // error handling
@@ -86,7 +84,7 @@ class PostgrestBuilder {
 
   /// Update Uri queryParameters with new key:value
   appendSearchParams(String key, String value) {
-    var searchParams = new Map.from(this.url.queryParameters);
+    Map<String, dynamic> searchParams = new Map.from(this.url.queryParameters);
     searchParams[key] = value;
     this.url.replace(queryParameters: searchParams);
   }
@@ -101,8 +99,8 @@ class PostgrestBuilder {
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url, [Map headers, String schema]) {
-    this.url = url.startsWith('http') ? Uri.http(url, "") : Uri.https(url, "");
+  PostgrestQueryBuilder(String url, [Map<String, String> headers, String schema]) {
+    this.url = Uri.parse(url);
     this.headers = headers == null ? {} : headers;
     this.schema = schema;
   }
@@ -251,8 +249,10 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
 class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   PostgrestFilterBuilder(PostgrestBuilder builder) {
     this.url = builder.url;
+    this.method = builder.method;
     this.headers = builder.headers;
     this.schema = builder.schema;
+    this.body = builder.body;
   }
 
   /// Convert list filter to query params string
