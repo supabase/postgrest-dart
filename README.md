@@ -74,18 +74,6 @@ var response = await client.from('users')
 print('Response status: ${response.status}');
 ```
 
-#### Using with `then()/catchError()`
-
-```dart
-import 'package:postgrest/postgrest.dart' as postgrestClient;
-
-var url = 'https://example.com/postgrest/endpoint';
-var client = postgrestClient(url);
-client.from('users').select('username').eq('status', 'OFFLINE').then((res) {
-      // Do something with the response
-}).catchError((error) => throw (error));
-```
-
 ## Contributing
 
 - Fork the repo on [GitHub](https://github.com/supabase/postgrest-dart)
