@@ -51,7 +51,12 @@ class PostgrestBuilder {
 
       return parseJsonResponse(response);
     } catch (e) {
-      return {'body': null, 'status': 500, 'statusCode': e.runtimeType.toString(), 'statusText': e.toString()};
+      return {
+        'body': null,
+        'status': 500,
+        'statusCode': e.runtimeType.toString(),
+        'statusText': e.toString()
+      };
     }
   }
 
@@ -86,7 +91,7 @@ class PostgrestBuilder {
   appendSearchParams(String key, String value) {
     Map<String, dynamic> searchParams = new Map.from(this.url.queryParameters);
     searchParams[key] = value;
-    this.url.replace(queryParameters: searchParams);
+    this.url = this.url.replace(queryParameters: searchParams);
   }
 }
 
@@ -139,8 +144,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```
   PostgrestBuilder insert(dynamic values, [Map options = const {'upsert': false}]) {
     this.method = 'POST';
-    this.headers['Prefer'] =
-        options['upsert'] ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    this.headers['Prefer'] = options['upsert']
+        ? 'return=representation,resolution=merge-duplicates'
+        : 'return=representation';
     this.body = values;
     return this;
   }
@@ -192,12 +198,13 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// ```
   PostgrestTransformBuilder order(String column,
       [Map options = const {'ascending': false, 'nullsFirst': false, 'foreignTable': null}]) {
-    var ascending = options != null ? options['ascending'] : null;
-    var nullsFirst = options != null ? options['nullsFirst'] : false;
-    var foreignTable = options != null ? options['foreignTable'] : false;
+    var ascending = options != null ? options['ascending'] ?? false : false;
+    var nullsFirst = options != null ? options['nullsFirst'] ?? false : false;
+    var foreignTable = options != null ? options['foreignTable'] : null;
 
     var key = foreignTable == null ? 'order' : '"${foreignTable}".order';
-    var value = '"${column}".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
+    var value =
+        '"${column}".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
     appendSearchParams(key, value);
     return this;
@@ -507,7 +514,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder plfts(String column, String query, [Map options = const {'config': null}]) {
+  PostgrestFilterBuilder plfts(String column, String query,
+      [Map options = const {'config': null}]) {
     var config = options != null ? options['config'] : null;
     var configPart = config == null ? '' : '(${config})';
     appendSearchParams('${column}', 'plfts${configPart}.${query}');
@@ -520,7 +528,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
-  PostgrestFilterBuilder phfts(String column, String query, [Map options = const {'config': null}]) {
+  PostgrestFilterBuilder phfts(String column, String query,
+      [Map options = const {'config': null}]) {
     var config = options != null ? options['config'] : null;
     var configPart = config == null ? '' : '(${config})';
     appendSearchParams('${column}', 'phfts${configPart}.${query}');

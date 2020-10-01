@@ -13,7 +13,7 @@ class PostgrestClient {
   /// You can also provide [options] with `headers` and `schema` key-value if needed
   /// ```dart
   /// new PostgrestClient(REST_URL)
-  /// new PostgrestClient(REST_URL, { headers: { apikey: 'foo' } })
+  /// new PostgrestClient(REST_URL, { 'headers': { 'apikey': 'foo' } })
   /// ```
   PostgrestClient(String url, [Map<String, dynamic> options = const {}]) {
     this.url = url;

@@ -1,6 +1,6 @@
 # Postgrest Dart
 
-Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface. 
+Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface.
 
 [![pub package](https://img.shields.io/pub/v/postgrest.svg)](https://pub.dev/packages/postgrest)
 [![pub test](https://github.com/supabase/postgrest-dart/workflows/Test/badge.svg)](https://github.com/supabase/postgrest-dart/actions?query=workflow%3ATest)
@@ -10,8 +10,9 @@ Pre-release verion! This repo is still under heavy development and the documenta
 ## Using
 
 The usage should be the same as postgrest-js except:
-- When using with `async/await`, you need to call `end()` to finish your query chain.
-- `$is` and `$in` filter methods are prefixed with `$` sign to avoid collisions with reserved keywords.
+
+- You need to call `end()` to finish your query chain.
+- `is_` and `in_` filter methods are prefixed with `_` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.io/docs/about).
 
