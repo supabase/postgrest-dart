@@ -1,6 +1,6 @@
 library postgrest;
 
-import "package:postgrest/builder.dart";
+import 'package:postgrest/builder.dart';
 
 /// A PostgREST api client written in Dartlang. The goal of this library is to make an "ORM-like" restful interface.
 class PostgrestClient {
@@ -18,29 +18,29 @@ class PostgrestClient {
   PostgrestClient(String url, [Map<String, dynamic> options = const {}]) {
     this.url = url;
 
-    if (options != null && options.containsKey("headers")) {
-      this.headers = options['headers'];
+    if (options != null && options.containsKey('headers')) {
+      headers = options['headers'];
     }
-    if (options != null && options.containsKey("schema")) {
-      this.schema = options['schema'];
+    if (options != null && options.containsKey('schema')) {
+      schema = options['schema'];
     }
   }
 
   /// Authenticates the request with JWT.
   PostgrestClient auth(String token) {
-    this.headers['Authorization'] = 'Bearer ${token}';
+    headers['Authorization'] = 'Bearer ${token}';
     return this;
   }
 
   /// Authenticates the request with JWT.
   PostgrestQueryBuilder from(String table) {
     var url = '${this.url}/${table}';
-    return new PostgrestQueryBuilder(url, this.headers, this.schema);
+    return PostgrestQueryBuilder(url, headers, schema);
   }
 
   /// Perform a stored procedure call.
   PostgrestQueryBuilder rpc(String fn, Map params) {
     var url = '${this.url}/rpc/${fn}';
-    return new PostgrestQueryBuilder(url, this.headers, this.schema).rpc(params);
+    return PostgrestQueryBuilder(url, headers, schema).rpc(params);
   }
 }

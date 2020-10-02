@@ -20,33 +20,34 @@ class PostgrestBuilder {
   /// Returns {Future} Resolves when the request has completed.
   Future<Map<String, dynamic>> end() async {
     try {
-      var uppercaseMethod = this.method.toUpperCase();
+      var uppercaseMethod = method.toUpperCase();
       var response;
 
-      if (this.schema == null) {
+      if (schema == null) {
         // skip
-      } else if (['GET', 'HEAD'].contains(this.method)) {
-        this.headers['Accept-Profile'] = this.schema;
+      } else if (['GET', 'HEAD'].contains(method)) {
+        headers['Accept-Profile'] = schema;
       } else {
-        this.headers['Content-Profile'] = this.schema;
+        headers['Content-Profile'] = schema;
       }
-      if (this.method != 'GET' && this.method != 'HEAD') {
-        this.headers['Content-Type'] = 'application/json';
+      if (method != 'GET' && method != 'HEAD') {
+        headers['Content-Type'] = 'application/json';
       }
 
       var client = http.Client();
 
-      if (uppercaseMethod == "GET") {
-        response = await client.get(this.url, headers: this.headers ?? {});
-      } else if (uppercaseMethod == "POST") {
-        response = await client.post(this.url, headers: this.headers ?? {}, body: this.body);
-      } else if (uppercaseMethod == "PUT") {
-        response = await client.put(this.url, headers: this.headers ?? {}, body: this.body);
-      } else if (uppercaseMethod == "PATCH") {
-        var bodyStr = json.encode(this.body);
-        response = await client.patch(this.url, headers: this.headers ?? {}, body: bodyStr);
-      } else if (uppercaseMethod == "DELETE") {
-        response = await client.delete(this.url, headers: this.headers ?? {});
+      if (uppercaseMethod == 'GET') {
+        response = await client.get(url, headers: headers ?? {});
+      } else if (uppercaseMethod == 'POST') {
+        response = await client.post(url, headers: headers ?? {}, body: body);
+      } else if (uppercaseMethod == 'PUT') {
+        response = await client.put(url, headers: headers ?? {}, body: body);
+      } else if (uppercaseMethod == 'PATCH') {
+        var bodyStr = json.encode(body);
+        response =
+            await client.patch(url, headers: headers ?? {}, body: bodyStr);
+      } else if (uppercaseMethod == 'DELETE') {
+        response = await client.delete(url, headers: headers ?? {});
       }
 
       return parseJsonResponse(response);
@@ -88,10 +89,10 @@ class PostgrestBuilder {
   }
 
   /// Update Uri queryParameters with new key:value
-  appendSearchParams(String key, String value) {
-    Map<String, dynamic> searchParams = new Map.from(this.url.queryParameters);
+  void appendSearchParams(String key, String value) {
+    var searchParams = Map<String, dynamic>.from(url.queryParameters);
     searchParams[key] = value;
-    this.url = this.url.replace(queryParameters: searchParams);
+    url = url.replace(queryParameters: searchParams);
   }
 }
 
@@ -104,9 +105,10 @@ class PostgrestBuilder {
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url, [Map<String, String> headers, String schema]) {
+  PostgrestQueryBuilder(String url,
+      [Map<String, String> headers, String schema]) {
     this.url = Uri.parse(url);
-    this.headers = headers == null ? {} : headers;
+    this.headers = headers ?? {};
     this.schema = schema;
   }
 
@@ -116,11 +118,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('users').select('id, messages');
   /// ```
   PostgrestFilterBuilder select([String columns = '*']) {
-    this.method = 'GET';
+    method = 'GET';
 
     // Remove whitespaces except when quoted
     var quoted = false;
-    var re = new RegExp(r'\s');
+    var re = RegExp(r'\s');
     var cleanedColumns = columns.split('').map((c) {
       if (re.hasMatch(c) && !quoted) {
         return '';
@@ -132,7 +134,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }).join('');
 
     appendSearchParams('select', cleanedColumns);
-    return new PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs an INSERT into the table.
@@ -142,12 +144,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
   /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
   /// ```
-  PostgrestBuilder insert(dynamic values, [Map options = const {'upsert': false}]) {
-    this.method = 'POST';
-    this.headers['Prefer'] = options['upsert']
+  PostgrestBuilder insert(dynamic values,
+      [Map options = const {'upsert': false}]) {
+    method = 'POST';
+    headers['Prefer'] = options['upsert']
         ? 'return=representation,resolution=merge-duplicates'
         : 'return=representation';
-    this.body = values;
+    body = values;
     return this;
   }
 
@@ -157,10 +160,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').update({ channel_id: 2 }).eq('message', 'foo')
   /// ```
   PostgrestFilterBuilder update(Map values) {
-    this.method = 'PATCH';
-    this.headers['Prefer'] = 'return=representation';
-    this.body = values;
-    return new PostgrestFilterBuilder(this);
+    method = 'PATCH';
+    headers['Prefer'] = 'return=representation';
+    body = values;
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs a DELETE on the table.
@@ -169,9 +172,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
   PostgrestFilterBuilder delete() {
-    this.method = 'DELETE';
-    this.headers['Prefer'] = 'return=representation';
-    return new PostgrestFilterBuilder(this);
+    method = 'DELETE';
+    headers['Prefer'] = 'return=representation';
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs stored procedures on the database.
@@ -180,8 +183,8 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.rpc('get_status', { name_param: 'supabot' })
   /// ```
   PostgrestBuilder rpc(dynamic params) {
-    this.method = 'POST';
-    this.body = params;
+    method = 'POST';
+    body = params;
     return this;
   }
 }
@@ -197,7 +200,11 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').order('channel_id', { foreignTable: 'messages', ascending: false })
   /// ```
   PostgrestTransformBuilder order(String column,
-      [Map options = const {'ascending': false, 'nullsFirst': false, 'foreignTable': null}]) {
+      [Map options = const {
+        'ascending': false,
+        'nullsFirst': false,
+        'foreignTable': null
+      }]) {
     var ascending = options != null ? options['ascending'] ?? false : false;
     var nullsFirst = options != null ? options['nullsFirst'] ?? false : false;
     var foreignTable = options != null ? options['foreignTable'] : null;
@@ -217,7 +224,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select().limit(1)
   /// postgrest.from('users').select('messages(*)').limit(1, { foreignTable: 'messages' })
   /// ```
-  PostgrestTransformBuilder limit(int count, [Map options = const {'foreignTable': null}]) {
+  PostgrestTransformBuilder limit(int count,
+      [Map options = const {'foreignTable': null}]) {
     var foreignTable = options != null ? options['foreignTable'] : null;
     var key = foreignTable == null ? 'limit' : '"${foreignTable}".limit';
 
@@ -231,9 +239,11 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
   /// ```
-  PostgrestTransformBuilder range(int from, int to, [Map options = const {'foreignTable': null}]) {
+  PostgrestTransformBuilder range(int from, int to,
+      [Map options = const {'foreignTable': null}]) {
     var foreignTable = options != null ? options['foreignTable'] : null;
-    var keyOffset = foreignTable == null ? 'offset' : '"${foreignTable}".offset';
+    var keyOffset =
+        foreignTable == null ? 'offset' : '"${foreignTable}".offset';
     var keyLimit = foreignTable == null ? 'limit' : '"${foreignTable}".limit';
 
     appendSearchParams(keyOffset, '${from}');
@@ -248,18 +258,18 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select().limit(1).single()
   /// ```
   PostgrestTransformBuilder single() {
-    this.headers['Accept'] = 'application/vnd.pgrst.object+json';
+    headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
   }
 }
 
 class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   PostgrestFilterBuilder(PostgrestBuilder builder) {
-    this.url = builder.url;
-    this.method = builder.method;
-    this.headers = builder.headers;
-    this.schema = builder.schema;
-    this.body = builder.body;
+    url = builder.url;
+    method = builder.method;
+    headers = builder.headers;
+    schema = builder.schema;
+    body = builder.body;
   }
 
   /// Convert list filter to query params string
@@ -501,7 +511,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder fts(String column, String query, [Map options = const {'config': null}]) {
+  PostgrestFilterBuilder fts(String column, String query,
+      [Map options = const {'config': null}]) {
     var config = options != null ? options['config'] : null;
     var configPart = config == null ? '' : '(${config})';
     appendSearchParams('${column}', 'fts${configPart}.${query}');
@@ -542,7 +553,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder wfts(String column, String query, [Map options = const {'config': null}]) {
+  PostgrestFilterBuilder wfts(String column, String query,
+      [Map options = const {'config': null}]) {
     var config = options != null ? options['config'] : null;
     var configPart = config == null ? '' : '(${config})';
     appendSearchParams('${column}', 'wfts${configPart}.${query}');
