@@ -90,7 +90,7 @@ class PostgrestBuilder {
 
   /// Update Uri queryParameters with new key:value
   void appendSearchParams(String key, String value) {
-    Map<String, dynamic> searchParams = Map.from(url.queryParameters);
+    var searchParams = Map<String, dynamic>.from(url.queryParameters);
     searchParams[key] = value;
     url = url.replace(queryParameters: searchParams);
   }
@@ -108,7 +108,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestQueryBuilder(String url,
       [Map<String, String> headers, String schema]) {
     this.url = Uri.parse(url);
-    this.headers = headers == null ? {} : headers;
+    this.headers = headers ?? {};
     this.schema = schema;
   }
 
