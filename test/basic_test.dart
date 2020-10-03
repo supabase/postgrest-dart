@@ -7,6 +7,6 @@ void main() {
 
   test('basic select table', () async {
     var res = await postgrest.from('users').select().end();
-    expect(res['body'].length, 4);
+    expect(res.body.length, 4);
   });
 }

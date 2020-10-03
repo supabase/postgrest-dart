@@ -10,7 +10,7 @@ void main() {
         .from('users')
         .select()
         .order('username', {'ascending': false}).end();
-    expect(res['body'][1]['username'], 'kiwicopple');
-    expect(res['body'][3]['username'], 'awailas');
+    expect(res.body[1]['username'], 'kiwicopple');
+    expect(res.body[3]['username'], 'awailas');
   });
 }
