@@ -1,8 +1,10 @@
-// To parse this JSON data, do
-//
-//     final postgrestError = postgrestErrorFromJson(jsonString);
+/// To parse this JSON data, do
+///
+///     final postgrestError = postgrestErrorFromJson(jsonString);
 
 import 'dart:convert';
+
+PostgrestError postgrestErrorFromJson(String str) => PostgrestError.fromJson(json.decode(str));
 
 class PostgrestError {
   PostgrestError({
@@ -16,24 +18,6 @@ class PostgrestError {
   String details;
   String hint;
   String code;
-
-  PostgrestError copyWith({
-    String message,
-    String details,
-    String hint,
-    String code,
-  }) =>
-      PostgrestError(
-        message: message ?? this.message,
-        details: details ?? this.details,
-        hint: hint ?? this.hint,
-        code: code ?? this.code,
-      );
-
-  factory PostgrestError.fromRawJson(String str) =>
-      PostgrestError.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
 
   factory PostgrestError.fromJson(Map<String, dynamic> json) => PostgrestError(
         message: json['message'],
