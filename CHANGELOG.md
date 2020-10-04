@@ -1,3 +1,11 @@
+## [0.0.1-dev.6]
+
+- chore: return PostgrestResponse and PostgrestError instead of a Map obj
+
+## [0.0.1-dev.5]
+
+- fix: lint errors
+
 ## [0.0.1-dev.4]
 
 - Refactor code structure by following postgrest-js TypeScript update.
