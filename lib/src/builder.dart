@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:http/http.dart' as http;
-import 'package:postgrest/models/postgrest_error.dart';
-import 'package:postgrest/models/postgrest_response.dart';
+
+import 'postgrest_error.dart';
+import 'postgrest_response.dart';
 
 /// The base builder class.
 class PostgrestBuilder {

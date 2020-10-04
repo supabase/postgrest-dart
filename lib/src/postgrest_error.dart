@@ -1,11 +1,8 @@
-/// To parse this JSON data, do
-///
-///     final postgrestError = postgrestErrorFromJson(jsonString);
-
 import 'dart:convert';
 
 PostgrestError postgrestErrorFromJson(String str) => PostgrestError.fromJson(json.decode(str));
 
+/// A Postgrest response error
 class PostgrestError {
   PostgrestError({
     this.message,
