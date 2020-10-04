@@ -9,4 +9,9 @@ void main() {
     var res = await postgrest.from('users').select().end();
     expect(res.body.length, 4);
   });
+
+  test('stored procedure', () async {
+    var res = await postgrest.rpc('get_status', {'name_param': 'supabot'}).end();
+    expect(res['body'], 'ONLINE');
+  });
 }
