@@ -59,8 +59,8 @@ void main() {
 
   test('bulk insert', () async {
     var res = await postgrest.from('messages').insert([
-      {'message': 'foo', 'username': 'supabot', 'channel_id': 2},
-      {'message': 'foo', 'username': 'supabot', 'channel_id': 2},
+      {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
+      {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
     ]).end();
     expect(res.body.length, 2);
   });
