@@ -12,6 +12,6 @@ void main() {
 
   test('stored procedure', () async {
     var res = await postgrest.rpc('get_status', {'name_param': 'supabot'}).end();
-    expect(res['body'], 'ONLINE');
+    expect(res.body, 'ONLINE');
   });
 }
