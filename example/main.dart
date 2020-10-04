@@ -13,9 +13,9 @@ void main(List<String> arguments) async {
       .from('countries')
       .select('*')
       .order('name', {'ascending': true}).end();
-  if (response['statusCode'] == 200) {
-    print('Countries List: ${response['body']}.');
+  if (response.status == 200) {
+    print('Countries List: ${response.body}.');
   } else {
-    print('Request failed with status: ${response['statusCode']}.');
+    print('Request failed with status: ${response.status}.');
   }
 }

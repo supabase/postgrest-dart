@@ -11,7 +11,7 @@ void main() {
         .select()
         .not('status', 'eq', 'OFFLINE')
         .end();
-    expect(res['body'].length, 3);
-    expect(res['body'][1]['username'], 'awailas');
+    expect(res.body.length, 3);
+    expect(res.body[1]['username'], 'awailas');
   });
 }

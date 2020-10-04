@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:http/http.dart' as http;
+import 'package:postgrest/models/postgrest_error.dart';
+import 'package:postgrest/models/postgrest_response.dart';
 
 /// The base builder class.
 class PostgrestBuilder {
@@ -18,7 +20,7 @@ class PostgrestBuilder {
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
   /// Returns {Future} Resolves when the request has completed.
-  Future<Map<String, dynamic>> end() async {
+  Future<PostgrestResponse> end() async {
     try {
       var uppercaseMethod = method.toUpperCase();
       var response;
@@ -51,25 +53,25 @@ class PostgrestBuilder {
 
       return parseJsonResponse(response);
     } catch (e) {
-      return {
-        'body': null,
-        'status': 500,
-        'statusCode': e.runtimeType.toString(),
-        'statusText': e.toString()
-      };
+      return PostgrestResponse(
+        body: null,
+        status: 500,
+        error: PostgrestError(code: e.runtimeType.toString()),
+        statusText: e.toString(),
+      );
     }
   }
 
   /// Parse request response to json object if possible
-  Map<String, dynamic> parseJsonResponse(dynamic response) {
+  PostgrestResponse parseJsonResponse(dynamic response) {
     if (response.statusCode >= 400) {
       // error handling
-      return {
-        'body': null,
-        'status': response.statusCode,
-        'statusCode': response.statusCode,
-        'statusText': response.body.toString(),
-      };
+      return PostgrestResponse(
+        body: null,
+        status: response.statusCode,
+        error: PostgrestError(code: response.statusCode.toString()),
+        statusText: response.body.toString(),
+      );
     } else {
       var body;
       try {
@@ -78,12 +80,12 @@ class PostgrestBuilder {
         body = response.body;
       }
 
-      return {
-        'body': body,
-        'status': response.statusCode,
-        'statusCode': response.statusCode,
-        'statusText': null,
-      };
+      return PostgrestResponse(
+        body: body,
+        status: response.statusCode,
+        error: null,
+        statusText: null,
+      );
     }
   }
 
