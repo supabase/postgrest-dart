@@ -23,12 +23,7 @@ import 'package:postgrest/postgrest.dart';
 
 var url = 'https://example.com/postgrest/endpoint';
 var client = PostgrestClient(url);
-var response = await client.from('users')
-      .select('*')
-      .eq('username', 'dragarcia')
-      .end();
-print('Response status: ${response.status}');
-print('Response body: ${response.body}');
+var response = await client.from('users').select().end();
 ```
 
 #### Insert records
@@ -43,7 +38,6 @@ var response = await client.from('users')
         { 'username': 'supabot', 'status': 'ONLINE'}
       ])
       .end();
-print('Created user: ${response.body[0]['username']}');
 ```
 
 #### Update a record
@@ -57,7 +51,6 @@ var response = await client.from('users')
       .update({ 'status': 'OFFLINE' })
       .eq('username', 'dragarcia')
       .end();
-print('Updated user status: ${response.body[0]['status']}');
 ```
 
 #### Delete records
@@ -71,7 +64,6 @@ var response = await client.from('users')
       .delete()
       .eq('username', 'supabot')
       .end();
-print('Response status: ${response.status}');
 ```
 
 ## Contributing
