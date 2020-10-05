@@ -15,8 +15,7 @@ void main() {
   });
 
   test('stored procedure', () async {
-    var res =
-        await postgrest.rpc('get_status', {'name_param': 'supabot'}).end();
+    var res = await postgrest.rpc('get_status', {'name_param': 'supabot'}).end();
     expect(res.body, 'ONLINE');
   });
 
@@ -29,8 +28,7 @@ void main() {
 
   test('auth', () async {
     postgrest = PostgrestClient(rootUrl).auth('foo');
-    expect(postgrest.from('users').select().headers['Authorization'],
-        'Bearer foo');
+    expect(postgrest.from('users').select().headers['Authorization'], 'Bearer foo');
   });
 
   test('switch schema', () async {
@@ -40,8 +38,7 @@ void main() {
   });
 
   test('on_conflict insert', () async {
-    var res = await postgrest.from('users').insert(
-        {'username': 'dragarcia', 'status': 'OFFLINE'},
+    var res = await postgrest.from('users').insert({'username': 'dragarcia', 'status': 'OFFLINE'},
         {'upsert': true, 'onConflict': 'username'}).end();
     expect(res.body[0]['status'], 'OFFLINE');
   });
@@ -66,41 +63,27 @@ void main() {
   });
 
   test('basic update', () async {
-    await postgrest
-        .from('messages')
-        .update({'channel_id': 2})
-        .eq('message', 'foo')
-        .end();
+    await postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo').end();
 
-    var resMsg = await postgrest
-        .from('messages')
-        .select()
-        .filter('message', 'eq', 'foo')
-        .end();
+    var resMsg = await postgrest.from('messages').select().filter('message', 'eq', 'foo').end();
     resMsg.body.forEach((rec) => expect(rec['channel_id'], 2));
   });
 
   test('basic delete', () async {
     await postgrest.from('messages').delete().eq('message', 'foo').end();
 
-    var resMsg = await postgrest
-        .from('messages')
-        .select()
-        .filter('message', 'eq', 'foo')
-        .end();
+    var resMsg = await postgrest.from('messages').select().filter('message', 'eq', 'foo').end();
     expect(resMsg.body.length, 0);
   });
 
   test('missing table', () async {
     var res = await postgrest.from('missing_table').select().end();
-    print(res.toJson());
     expect(res.error.code, '404');
   });
 
   test('connection error', () async {
     var postgrest = PostgrestClient('http://this.url.does.not.exist');
     var res = await postgrest.from('user').select().end();
-    print(res.toJson());
     expect(res.error.code, 'SocketException');
   });
 }

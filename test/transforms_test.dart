@@ -3,17 +3,14 @@ import 'package:postgrest/postgrest.dart';
 
 void main() {
   var rootUrl = 'http://localhost:3000';
-  var postgrest = PostgrestClient(rootUrl);
+  var postgrest;
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
   });
 
   test('order', () async {
-    var res = await postgrest
-        .from('users')
-        .select()
-        .order('username', {'ascending': false}).end();
+    var res = await postgrest.from('users').select().order('username', {'ascending': false}).end();
     expect(res.body[1]['username'], 'kiwicopple');
     expect(res.body[3]['username'], 'awailas');
   });
@@ -41,7 +38,6 @@ void main() {
 
   test('single', () async {
     var res = await postgrest.from('users').select().limit(1).single().end();
-    print(res.toJson());
     expect(res.body['username'], 'supabot');
   });
 }
