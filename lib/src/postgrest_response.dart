@@ -8,26 +8,26 @@ PostgrestResponse postgrestResponseFromJson(String str) =>
 /// A Postgrest response
 class PostgrestResponse {
   PostgrestResponse({
-    this.body,
+    this.data,
     this.status,
     this.statusText,
     this.error,
   });
 
-  dynamic body;
+  dynamic data;
   int status;
   String statusText;
   PostgrestError error;
 
   factory PostgrestResponse.fromJson(Map<String, dynamic> json) => PostgrestResponse(
-        body: json['body'],
+        data: json['body'],
         status: json['status'],
         statusText: json['statusText'],
         error: json['error'] == null ? null : PostgrestError.fromJson(json['error']),
       );
 
   Map<String, dynamic> toJson() => {
-        'body': body,
+        'data': data,
         'status': status,
         'statusText': statusText,
         'error': error == null ? null : error.toJson(),

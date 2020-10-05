@@ -9,12 +9,10 @@ void main(List<String> arguments) async {
     'schema': 'public'
   });
 
-  final response = await client
-      .from('countries')
-      .select('*')
-      .order('name', {'ascending': true}).end();
+  final response =
+      await client.from('countries').select('*').order('name', {'ascending': true}).end();
   if (response.status == 200) {
-    print('Countries List: ${response.body}.');
+    print('Countries List: ${response.data}.');
   } else {
     print('Request failed with status: ${response.status}.');
   }

@@ -11,13 +11,13 @@ void main() {
 
   test('order', () async {
     var res = await postgrest.from('users').select().order('username', {'ascending': false}).end();
-    expect(res.body[1]['username'], 'kiwicopple');
-    expect(res.body[3]['username'], 'awailas');
+    expect(res.data[1]['username'], 'kiwicopple');
+    expect(res.data[3]['username'], 'awailas');
   });
 
   test('limit', () async {
     var res = await postgrest.from('users').select().limit(1).end();
-    expect(res.body.length, 1);
+    expect(res.data.length, 1);
   });
 
   test('range', () async {
@@ -25,7 +25,7 @@ void main() {
     var to = 3;
     var res = await postgrest.from('users').select().range(from, to).end();
     //from -1 so that the index is included
-    expect(res.body.length, to - (from - 1));
+    expect(res.data.length, to - (from - 1));
   });
 
   test('range 1-1', () async {
@@ -33,11 +33,11 @@ void main() {
     var to = 1;
     var res = await postgrest.from('users').select().range(from, to).end();
     //from -1 so that the index is included
-    expect(res.body.length, to - (from - 1));
+    expect(res.data.length, to - (from - 1));
   });
 
   test('single', () async {
     var res = await postgrest.from('users').select().limit(1).single().end();
-    expect(res.body['username'], 'supabot');
+    expect(res.data['username'], 'supabot');
   });
 }
