@@ -1,3 +1,7 @@
+## [0.0.1-dev.7]
+
+- refactor: rename response.body to response.data
+
 ## [0.0.1-dev.6]
 
 - chore: return PostgrestResponse and PostgrestError instead of a Map obj
