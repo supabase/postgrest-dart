@@ -13,17 +13,12 @@ class PostgrestClient {
   /// You can also provide [options] with `headers` and `schema` key-value if needed
   /// ```dart
   /// new PostgrestClient(REST_URL)
-  /// new PostgrestClient(REST_URL, { 'headers': { 'apikey': 'foo' } })
+  /// new PostgrestClient(REST_URL, headers: { 'apikey': 'foo' })
   /// ```
-  PostgrestClient(String url, [Map<String, dynamic> options = const {}]) {
+  PostgrestClient(String url, {Map<String, String> headers = const {}, String schema}) {
     this.url = url;
-
-    if (options != null && options.containsKey('headers')) {
-      headers = options['headers'];
-    }
-    if (options != null && options.containsKey('schema')) {
-      schema = options['schema'];
-    }
+    this.headers = headers;
+    this.schema = schema;
   }
 
   /// Authenticates the request with JWT.

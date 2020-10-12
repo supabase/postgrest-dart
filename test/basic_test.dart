@@ -20,9 +20,9 @@ void main() {
   });
 
   test('custom headers', () async {
-    var postgrest = PostgrestClient(rootUrl, {
-      'headers': {'apikey': 'foo'}
-    });
+    var postgrest = PostgrestClient(rootUrl,
+      headers: {'apikey': 'foo'}
+    );
     expect(postgrest.from('users').select().headers['apikey'], 'foo');
   });
 
@@ -32,7 +32,7 @@ void main() {
   });
 
   test('switch schema', () async {
-    var postgrest = PostgrestClient(rootUrl, {'schema': 'personal'});
+    var postgrest = PostgrestClient(rootUrl, schema: 'personal');
     var res = await postgrest.from('users').select().end();
     expect(res.data.length, 5);
   });
