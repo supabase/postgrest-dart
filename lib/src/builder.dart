@@ -145,7 +145,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
   /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
   /// ```
-  PostgrestBuilder insert(dynamic values, {upsert = false}) {
+  PostgrestBuilder insert(dynamic values, {upsert = false, onConflict}) {
     method = 'POST';
     headers['Prefer'] = upsert
         ? 'return=representation,resolution=merge-duplicates'

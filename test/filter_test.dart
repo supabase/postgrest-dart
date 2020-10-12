@@ -3,7 +3,7 @@ import 'package:postgrest/postgrest.dart';
 
 void main() {
   var rootUrl = 'http://localhost:3000';
-  var postgrest;
+  PostgrestClient postgrest;
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
@@ -146,7 +146,7 @@ void main() {
     var res = await postgrest
         .from('users')
         .select()
-        .fts('catchphrase', '\'fat\' & \'cat\'', {'config': 'english'}).end();
+        .fts('catchphrase', '\'fat\' & \'cat\'', config: 'english').end();
     expect(res.data[0]['username'], 'supabot');
   });
 
@@ -154,7 +154,7 @@ void main() {
     var res = await postgrest
         .from('users')
         .select()
-        .plfts('catchphrase', '\'fat\' & \'cat\'', {'config': 'english'}).end();
+        .plfts('catchphrase', '\'fat\' & \'cat\'', config: 'english').end();
     expect(res.data[0]['username'], 'supabot');
   });
 
@@ -162,7 +162,7 @@ void main() {
     var res = await postgrest
         .from('users')
         .select()
-        .phfts('catchphrase', 'cat', {'config': 'english'}).end();
+        .phfts('catchphrase', 'cat', config: 'english').end();
     expect(res.data.length, 2);
   });
 
@@ -170,7 +170,7 @@ void main() {
     var res = await postgrest
         .from('users')
         .select()
-        .wfts('catchphrase', '\'fat\' & \'cat\'', {'config': 'english'}).end();
+        .wfts('catchphrase', '\'fat\' & \'cat\'', config: 'english').end();
     expect(res.data[0]['username'], 'supabot');
   });
 
