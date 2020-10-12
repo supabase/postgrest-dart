@@ -15,9 +15,9 @@ class PostgrestClient {
   /// new PostgrestClient(REST_URL)
   /// new PostgrestClient(REST_URL, headers: { 'apikey': 'foo' })
   /// ```
-  PostgrestClient(String url, {Map<String, String> headers = const {}, String schema}) {
+  PostgrestClient(String url, {Map<String, String> headers, String schema}) {
     this.url = url;
-    this.headers = headers;
+    this.headers = headers ?? {};
     this.schema = schema;
   }
 
