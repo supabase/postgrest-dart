@@ -30,12 +30,12 @@ class PostgrestClient {
   /// Authenticates the request with JWT.
   PostgrestQueryBuilder from(String table) {
     var url = '${this.url}/${table}';
-    return PostgrestQueryBuilder(url, headers, schema);
+    return PostgrestQueryBuilder(url, headers: headers, schema: schema);
   }
 
   /// Perform a stored procedure call.
   PostgrestQueryBuilder rpc(String fn, Map params) {
     var url = '${this.url}/rpc/${fn}';
-    return PostgrestQueryBuilder(url, headers, schema).rpc(params);
+    return PostgrestQueryBuilder(url, headers: headers, schema: schema).rpc(params);
   }
 }

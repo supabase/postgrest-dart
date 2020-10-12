@@ -107,7 +107,7 @@ class PostgrestBuilder {
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url, [Map<String, String> headers, String schema]) {
+  PostgrestQueryBuilder(String url, {Map<String, String> headers, String schema}) {
     this.url = Uri.parse(url);
     this.headers = headers ?? {};
     this.schema = schema;
