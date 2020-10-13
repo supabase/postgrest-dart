@@ -13,17 +13,12 @@ class PostgrestClient {
   /// You can also provide [options] with `headers` and `schema` key-value if needed
   /// ```dart
   /// new PostgrestClient(REST_URL)
-  /// new PostgrestClient(REST_URL, { 'headers': { 'apikey': 'foo' } })
+  /// new PostgrestClient(REST_URL, headers: { 'apikey': 'foo' })
   /// ```
-  PostgrestClient(String url, [Map<String, dynamic> options = const {}]) {
+  PostgrestClient(String url, {Map<String, String> headers, String schema}) {
     this.url = url;
-
-    if (options != null && options.containsKey('headers')) {
-      headers = options['headers'];
-    }
-    if (options != null && options.containsKey('schema')) {
-      schema = options['schema'];
-    }
+    this.headers = headers ?? {};
+    this.schema = schema;
   }
 
   /// Authenticates the request with JWT.
@@ -35,12 +30,12 @@ class PostgrestClient {
   /// Authenticates the request with JWT.
   PostgrestQueryBuilder from(String table) {
     var url = '${this.url}/${table}';
-    return PostgrestQueryBuilder(url, headers, schema);
+    return PostgrestQueryBuilder(url, headers: headers, schema: schema);
   }
 
   /// Perform a stored procedure call.
   PostgrestQueryBuilder rpc(String fn, Map params) {
     var url = '${this.url}/rpc/${fn}';
-    return PostgrestQueryBuilder(url, headers, schema).rpc(params);
+    return PostgrestQueryBuilder(url, headers: headers, schema: schema).rpc(params);
   }
 }

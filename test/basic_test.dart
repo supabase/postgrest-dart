@@ -3,7 +3,7 @@ import 'package:postgrest/postgrest.dart';
 
 void main() {
   var rootUrl = 'http://localhost:3000';
-  var postgrest;
+  PostgrestClient postgrest;
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
@@ -20,9 +20,9 @@ void main() {
   });
 
   test('custom headers', () async {
-    var postgrest = PostgrestClient(rootUrl, {
-      'headers': {'apikey': 'foo'}
-    });
+    var postgrest = PostgrestClient(rootUrl,
+      headers: {'apikey': 'foo'}
+    );
     expect(postgrest.from('users').select().headers['apikey'], 'foo');
   });
 
@@ -32,21 +32,21 @@ void main() {
   });
 
   test('switch schema', () async {
-    var postgrest = PostgrestClient(rootUrl, {'schema': 'personal'});
+    var postgrest = PostgrestClient(rootUrl, schema: 'personal');
     var res = await postgrest.from('users').select().end();
     expect(res.data.length, 5);
   });
 
   test('on_conflict insert', () async {
     var res = await postgrest.from('users').insert({'username': 'dragarcia', 'status': 'OFFLINE'},
-        {'upsert': true, 'onConflict': 'username'}).end();
+        upsert: true, onConflict: 'username').end();
     expect(res.data[0]['status'], 'OFFLINE');
   });
 
   test('upsert', () async {
     var res = await postgrest.from('messages').insert(
         {'id': 3, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
-        {'upsert': true}).end();
+        upsert: true).end();
     //{id: 3, message: foo, username: supabot, channel_id: 2}
     expect(res.data[0]['id'], 3);
 
