@@ -1,3 +1,8 @@
+## [0.0.1-dev.8]
+
+- chore: replace end() with execute()
+- refactor: options param (map type) into named parameters
+
 ## [0.0.1-dev.7]
 
 - refactor: rename response.body to response.data
