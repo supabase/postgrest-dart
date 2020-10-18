@@ -10,14 +10,14 @@ void main() {
   });
 
   test('embedded select', () async {
-    var res = await postgrest.from('users').select('messages(*)').end();
+    var res = await postgrest.from('users').select('messages(*)').execute();
     expect(res.data[0]['messages'].length, 2);
     expect(res.data[1]['messages'].length, 0);
   });
 
   test('embedded eq', () async {
     var res =
-        await postgrest.from('users').select('messages(*)').eq('messages.channel_id', 1).end();
+        await postgrest.from('users').select('messages(*)').eq('messages.channel_id', 1).execute();
     expect(res.data[0]['messages'].length, 1);
     expect(res.data[1]['messages'].length, 0);
     expect(res.data[2]['messages'].length, 0);
@@ -28,7 +28,8 @@ void main() {
     var res = await postgrest
         .from('users')
         .select('messages(*)')
-        .order('channel_id', foreignTable: 'messages', ascending: false).end();
+        .order('channel_id', foreignTable: 'messages', ascending: false)
+        .execute();
     expect(res.data[0]['messages'].length, 2);
     expect(res.data[1]['messages'].length, 0);
     expect(res.data[2]['messages'].length, 0);
@@ -39,7 +40,8 @@ void main() {
     var res = await postgrest
         .from('users')
         .select('messages(*)')
-        .limit(1, foreignTable: 'messages').end();
+        .limit(1, foreignTable: 'messages')
+        .execute();
     expect(res.data[0]['messages'].length, 1);
     expect(res.data[1]['messages'].length, 0);
     expect(res.data[2]['messages'].length, 0);
@@ -50,7 +52,8 @@ void main() {
     var res = await postgrest
         .from('users')
         .select('messages(*)')
-        .range(1, 1, foreignTable: 'messages').end();
+        .range(1, 1, foreignTable: 'messages')
+        .execute();
     expect(res.data[0]['messages'].length, 1);
     expect(res.data[1]['messages'].length, 0);
     expect(res.data[2]['messages'].length, 0);
