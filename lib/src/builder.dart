@@ -21,7 +21,7 @@ class PostgrestBuilder {
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
   /// Returns {Future} Resolves when the request has completed.
-  Future<PostgrestResponse> end() async {
+  Future<PostgrestResponse> execute() async {
     try {
       var uppercaseMethod = method.toUpperCase();
       var response;
@@ -147,9 +147,8 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```
   PostgrestBuilder insert(dynamic values, {upsert = false, onConflict}) {
     method = 'POST';
-    headers['Prefer'] = upsert
-        ? 'return=representation,resolution=merge-duplicates'
-        : 'return=representation';
+    headers['Prefer'] =
+        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
     body = values;
     return this;
   }
@@ -201,7 +200,6 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// ```
   PostgrestTransformBuilder order(String column,
       {ascending = false, nullsFirst = false, foreignTable}) {
-
     var key = foreignTable == null ? 'order' : '"${foreignTable}".order';
     var value =
         '"${column}".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';

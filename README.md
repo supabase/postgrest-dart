@@ -11,7 +11,7 @@ Pre-release verion! This repo is still under heavy development and the documenta
 
 The usage should be the same as postgrest-js except:
 
-- You need to call `end()` to finish your query chain.
+- You need to call `execute()` to finish your query chain.
 - `is_` and `in_` filter methods are prefixed with `_` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.io/docs/about).
@@ -23,7 +23,7 @@ import 'package:postgrest/postgrest.dart';
 
 var url = 'https://example.com/postgrest/endpoint';
 var client = PostgrestClient(url);
-var response = await client.from('users').select().end();
+var response = await client.from('users').select().execute();
 ```
 
 #### Insert records
@@ -37,7 +37,7 @@ var response = await client.from('users')
       .insert([
         { 'username': 'supabot', 'status': 'ONLINE'}
       ])
-      .end();
+      .execute();
 ```
 
 #### Update a record
@@ -50,7 +50,7 @@ var client = PostgrestClient(url);
 var response = await client.from('users')
       .update({ 'status': 'OFFLINE' })
       .eq('username', 'dragarcia')
-      .end();
+      .execute();
 ```
 
 #### Delete records
@@ -63,7 +63,7 @@ var client = PostgrestClient(url);
 var response = await client.from('users')
       .delete()
       .eq('username', 'supabot')
-      .end();
+      .execute();
 ```
 
 ## Contributing

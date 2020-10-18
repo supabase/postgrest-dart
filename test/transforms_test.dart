@@ -10,20 +10,20 @@ void main() {
   });
 
   test('order', () async {
-    var res = await postgrest.from('users').select().order('username', ascending: false).end();
+    var res = await postgrest.from('users').select().order('username', ascending: false).execute();
     expect(res.data[1]['username'], 'kiwicopple');
     expect(res.data[3]['username'], 'awailas');
   });
 
   test('limit', () async {
-    var res = await postgrest.from('users').select().limit(1).end();
+    var res = await postgrest.from('users').select().limit(1).execute();
     expect(res.data.length, 1);
   });
 
   test('range', () async {
     var from = 1;
     var to = 3;
-    var res = await postgrest.from('users').select().range(from, to).end();
+    var res = await postgrest.from('users').select().range(from, to).execute();
     //from -1 so that the index is included
     expect(res.data.length, to - (from - 1));
   });
@@ -31,13 +31,13 @@ void main() {
   test('range 1-1', () async {
     var from = 1;
     var to = 1;
-    var res = await postgrest.from('users').select().range(from, to).end();
+    var res = await postgrest.from('users').select().range(from, to).execute();
     //from -1 so that the index is included
     expect(res.data.length, to - (from - 1));
   });
 
   test('single', () async {
-    var res = await postgrest.from('users').select().limit(1).single().end();
+    var res = await postgrest.from('users').select().limit(1).single().execute();
     expect(res.data['username'], 'supabot');
   });
 }
