@@ -1,7 +1,7 @@
 import 'package:postgrest/postgrest.dart';
 
 /// Example to use with Supabase API https://supabase.io/
-void main(List<String> arguments) async {
+void main() async {
   var client = PostgrestClient('SUPABASE_API_ENDPOINT/rest/v1',
       headers: {
         'apikey': 'SUPABSE_API_KEY',
