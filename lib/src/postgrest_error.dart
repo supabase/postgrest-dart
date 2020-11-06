@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-PostgrestError postgrestErrorFromJson(String str) => PostgrestError.fromJson(json.decode(str));
+PostgrestError postgrestErrorFromJson(String str) => PostgrestError.fromJson(json.decode(str) as Map<String, dynamic>);
 
 /// A Postgrest response error
 class PostgrestError {
@@ -17,10 +17,10 @@ class PostgrestError {
   String code;
 
   factory PostgrestError.fromJson(Map<String, dynamic> json) => PostgrestError(
-        message: json['message'],
-        details: json['details'],
-        hint: json['hint'],
-        code: json['code'],
+        message: json['message'] as String,
+        details: json['details'] as String,
+        hint: json['hint'] as String,
+        code: json['code'] as String,
       );
 
   Map<String, dynamic> toJson() => {

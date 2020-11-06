@@ -23,8 +23,8 @@ class PostgrestBuilder {
   /// Returns {Future} Resolves when the request has completed.
   Future<PostgrestResponse> execute() async {
     try {
-      var uppercaseMethod = method.toUpperCase();
-      var response;
+      final uppercaseMethod = method.toUpperCase();
+      http.Response response;
 
       if (schema == null) {
         // skip
@@ -37,8 +37,8 @@ class PostgrestBuilder {
         headers['Content-Type'] = 'application/json';
       }
 
-      var client = http.Client();
-      var bodyStr = json.encode(body);
+      final client = http.Client();
+      final bodyStr = json.encode(body);
 
       if (uppercaseMethod == 'GET') {
         response = await client.get(url, headers: headers ?? {});
@@ -64,7 +64,7 @@ class PostgrestBuilder {
   }
 
   /// Parse request response to json object if possible
-  PostgrestResponse parseJsonResponse(dynamic response) {
+  PostgrestResponse parseJsonResponse(http.Response response) {
     if (response.statusCode >= 400) {
       // error handling
       return PostgrestResponse(
@@ -92,7 +92,7 @@ class PostgrestBuilder {
 
   /// Update Uri queryParameters with new key:value
   void appendSearchParams(String key, String value) {
-    var searchParams = Map<String, dynamic>.from(url.queryParameters);
+    final searchParams = Map<String, dynamic>.from(url.queryParameters);
     searchParams[key] = value;
     url = url.replace(queryParameters: searchParams);
   }
@@ -123,8 +123,8 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
     // Remove whitespaces except when quoted
     var quoted = false;
-    var re = RegExp(r'\s');
-    var cleanedColumns = columns.split('').map((c) {
+    final re = RegExp(r'\s');
+    final cleanedColumns = columns.split('').map((c) {
       if (re.hasMatch(c) && !quoted) {
         return '';
       }
@@ -145,10 +145,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
   /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
   /// ```
-  PostgrestBuilder insert(dynamic values, {upsert = false, onConflict}) {
+  PostgrestBuilder insert(dynamic values, {bool upsert = false, onConflict}) {
     method = 'POST';
-    headers['Prefer'] =
-        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    headers['Prefer'] = upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
     body = values;
     return this;
   }
@@ -199,10 +198,9 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').order('channel_id', { foreignTable: 'messages', ascending: false })
   /// ```
   PostgrestTransformBuilder order(String column,
-      {ascending = false, nullsFirst = false, foreignTable}) {
-    var key = foreignTable == null ? 'order' : '"${foreignTable}".order';
-    var value =
-        '"${column}".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
+      {bool ascending = false, bool nullsFirst = false, String foreignTable}) {
+    final key = foreignTable == null ? 'order' : '"$foreignTable".order';
+    final value = '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
     appendSearchParams(key, value);
     return this;
@@ -215,10 +213,10 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select().limit(1)
   /// postgrest.from('users').select('messages(*)').limit(1, { foreignTable: 'messages' })
   /// ```
-  PostgrestTransformBuilder limit(int count, {foreignTable}) {
-    var key = foreignTable == null ? 'limit' : '"${foreignTable}".limit';
+  PostgrestTransformBuilder limit(int count, {String foreignTable}) {
+    final key = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
-    appendSearchParams(key, '${count}');
+    appendSearchParams(key, '$count');
     return this;
   }
 
@@ -228,11 +226,11 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
   /// ```
-  PostgrestTransformBuilder range(int from, int to, {foreignTable}) {
-    var keyOffset = foreignTable == null ? 'offset' : '"${foreignTable}".offset';
-    var keyLimit = foreignTable == null ? 'limit' : '"${foreignTable}".limit';
+  PostgrestTransformBuilder range(int from, int to, {String foreignTable}) {
+    final keyOffset = foreignTable == null ? 'offset' : '"$foreignTable".offset';
+    final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
-    appendSearchParams(keyOffset, '${from}');
+    appendSearchParams(keyOffset, '$from');
     appendSearchParams(keyLimit, '${to - from + 1}');
     return this;
   }
@@ -260,7 +258,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
-    return filter.map((s) => '"${s}"').join(',');
+    return filter.map((s) => '"$s"').join(',');
   }
 
   /// Finds all rows which doesn't satisfy the filter.
@@ -269,7 +267,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().not('status', 'eq', 'OFFLINE')
   /// ```
   PostgrestFilterBuilder not(String column, String operator, dynamic value) {
-    appendSearchParams('${column}', 'not.${operator}.${value}');
+    appendSearchParams(column, 'not.$operator.$value');
     return this;
   }
 
@@ -279,7 +277,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().or('status.eq.OFFLINE,username.eq.supabot')
   /// ```
   PostgrestFilterBuilder or(String filters) {
-    appendSearchParams('or', '(${filters})');
+    appendSearchParams('or', '($filters)');
     return this;
   }
 
@@ -289,7 +287,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().eq('username', 'supabot')
   /// ```
   PostgrestFilterBuilder eq(String column, dynamic value) {
-    appendSearchParams('${column}', 'eq.${value}');
+    appendSearchParams(column, 'eq.$value');
     return this;
   }
 
@@ -299,7 +297,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().neq('username', 'supabot')
   /// ```
   PostgrestFilterBuilder neq(String column, dynamic value) {
-    appendSearchParams('${column}', 'neq.${value}');
+    appendSearchParams(column, 'neq.$value');
     return this;
   }
 
@@ -309,7 +307,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('messages').select().gt('id', 1)
   /// ```
   PostgrestFilterBuilder gt(String column, dynamic value) {
-    appendSearchParams('${column}', 'gt.${value}');
+    appendSearchParams(column, 'gt.$value');
     return this;
   }
 
@@ -319,7 +317,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('messages').select().gte('id', 1)
   /// ```
   PostgrestFilterBuilder gte(String column, dynamic value) {
-    appendSearchParams('${column}', 'gte.${value}');
+    appendSearchParams(column, 'gte.$value');
     return this;
   }
 
@@ -329,7 +327,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('messages').select().lt('id', 2)
   /// ```
   PostgrestFilterBuilder lt(String column, dynamic value) {
-    appendSearchParams('${column}', 'lt.${value}');
+    appendSearchParams(column, 'lt.$value');
     return this;
   }
 
@@ -339,7 +337,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('messages').select().lte('id', 2)
   /// ```
   PostgrestFilterBuilder lte(String column, dynamic value) {
-    appendSearchParams('${column}', 'lte.${value}');
+    appendSearchParams(column, 'lte.$value');
     return this;
   }
 
@@ -349,7 +347,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().like('username', '%supa%')
   /// ```
   PostgrestFilterBuilder like(String column, String pattern) {
-    appendSearchParams('${column}', 'like.${pattern}');
+    appendSearchParams(column, 'like.$pattern');
     return this;
   }
 
@@ -359,7 +357,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().ilike('username', '%SUPA%')
   /// ```
   PostgrestFilterBuilder ilike(String column, String pattern) {
-    appendSearchParams('${column}', 'ilike.${pattern}');
+    appendSearchParams(column, 'ilike.$pattern');
     return this;
   }
 
@@ -370,7 +368,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().$is('data', null)
   /// ```
   PostgrestFilterBuilder is_(String column, dynamic value) {
-    appendSearchParams('${column}', 'is.${value}');
+    appendSearchParams(column, 'is.$value');
     return this;
   }
 
@@ -380,7 +378,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().in('status', ['ONLINE', 'OFFLINE'])
   /// ```
   PostgrestFilterBuilder in_(String column, List values) {
-    appendSearchParams('${column}', 'in.(${_cleanFilterArray(values)})');
+    appendSearchParams(column, 'in.(${_cleanFilterArray(values)})');
     return this;
   }
 
@@ -393,13 +391,13 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
-      appendSearchParams('${column}', 'cs.${value}');
+      appendSearchParams(column, 'cs.$value');
     } else if (value is List) {
       // array
-      appendSearchParams('${column}', 'cs.{${_cleanFilterArray(value)}}');
+      appendSearchParams(column, 'cs.{${_cleanFilterArray(value)}}');
     } else {
       // json
-      appendSearchParams('${column}', 'cs.${json.encode(value)}');
+      appendSearchParams(column, 'cs.${json.encode(value)}');
     }
     return this;
   }
@@ -413,13 +411,13 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
-      appendSearchParams('${column}', 'cd.${value}');
+      appendSearchParams(column, 'cd.$value');
     } else if (value is List) {
       // array
-      appendSearchParams('${column}', 'cd.{${_cleanFilterArray(value)}}');
+      appendSearchParams(column, 'cd.{${_cleanFilterArray(value)}}');
     } else {
       // json
-      appendSearchParams('${column}', 'cd.${json.encode(value)}');
+      appendSearchParams(column, 'cd.${json.encode(value)}');
     }
     return this;
   }
@@ -430,7 +428,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().sl('age_range', '[2,25)')
   /// ```
   PostgrestFilterBuilder sl(String column, String range) {
-    appendSearchParams('${column}', 'sl.${range}');
+    appendSearchParams(column, 'sl.$range');
     return this;
   }
 
@@ -440,7 +438,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().sr('age_range', '[2,25)')
   /// ```
   PostgrestFilterBuilder sr(String column, String range) {
-    appendSearchParams('${column}', 'sr.${range}');
+    appendSearchParams(column, 'sr.$range');
     return this;
   }
 
@@ -450,7 +448,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().nxl('age_range', '[2,25)')
   /// ```
   PostgrestFilterBuilder nxl(String column, String range) {
-    appendSearchParams('${column}', 'nxl.${range}');
+    appendSearchParams(column, 'nxl.$range');
     return this;
   }
 
@@ -460,7 +458,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().nxr('age_range', '[2,25)')
   /// ```
   PostgrestFilterBuilder nxr(String column, String range) {
-    appendSearchParams('${column}', 'nxr.${range}');
+    appendSearchParams(column, 'nxr.$range');
     return this;
   }
 
@@ -470,7 +468,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().adj('age_range', '[2,25)')
   /// ```
   PostgrestFilterBuilder adj(String column, String range) {
-    appendSearchParams('${column}', 'adj.${range}');
+    appendSearchParams(column, 'adj.$range');
     return this;
   }
 
@@ -483,10 +481,10 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
-      appendSearchParams('${column}', 'ov.${value}');
+      appendSearchParams(column, 'ov.$value');
     } else if (value is List) {
       // array
-      appendSearchParams('${column}', 'ov.{${_cleanFilterArray(value)}}');
+      appendSearchParams(column, 'ov.{${_cleanFilterArray(value)}}');
     }
     return this;
   }
@@ -498,8 +496,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
   PostgrestFilterBuilder fts(String column, String query, {config}) {
-    var configPart = config == null ? '' : '(${config})';
-    appendSearchParams('${column}', 'fts${configPart}.${query}');
+    final configPart = config == null ? '' : '($config)';
+    appendSearchParams(column, 'fts$configPart.$query');
     return this;
   }
 
@@ -510,8 +508,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
   PostgrestFilterBuilder plfts(String column, String query, {config}) {
-    var configPart = config == null ? '' : '(${config})';
-    appendSearchParams('${column}', 'plfts${configPart}.${query}');
+    final configPart = config == null ? '' : '($config)';
+    appendSearchParams(column, 'plfts$configPart.$query');
     return this;
   }
 
@@ -522,8 +520,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
   PostgrestFilterBuilder phfts(String column, String query, {config}) {
-    var configPart = config == null ? '' : '(${config})';
-    appendSearchParams('${column}', 'phfts${configPart}.${query}');
+    final configPart = config == null ? '' : '($config)';
+    appendSearchParams(column, 'phfts$configPart.$query');
     return this;
   }
 
@@ -534,8 +532,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
   PostgrestFilterBuilder wfts(String column, String query, {config}) {
-    var configPart = config == null ? '' : '(${config})';
-    appendSearchParams('${column}', 'wfts${configPart}.${query}');
+    final configPart = config == null ? '' : '($config)';
+    appendSearchParams(column, 'wfts$configPart.$query');
     return this;
   }
 
@@ -545,7 +543,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().filter('username', 'eq', 'supabot')
   /// ```
   PostgrestFilterBuilder filter(String column, String operator, dynamic value) {
-    appendSearchParams('${column}', '${operator}.${value}');
+    appendSearchParams(column, '$operator.$value');
     return this;
   }
 
@@ -556,7 +554,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().match({ 'username': 'supabot', 'status': 'ONLINE' })
   /// ```
   PostgrestFilterBuilder match(Map query) {
-    query.forEach((k, v) => appendSearchParams('${k}', 'eq.${v}'));
+    query.forEach((k, v) => appendSearchParams('$k', 'eq.$v'));
     return this;
   }
 }

@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
 
 void main() {
-  var rootUrl = 'http://localhost:3000';
+  const rootUrl = 'http://localhost:3000';
   PostgrestClient postgrest;
 
   setUp(() {
@@ -10,14 +10,14 @@ void main() {
   });
 
   test('not', () async {
-    var res = await postgrest.from('users').select().not('status', 'eq', 'OFFLINE').execute();
+    final res = await postgrest.from('users').select().not('status', 'eq', 'OFFLINE').execute();
     res.data.forEach((item) {
       expect(item['status'] != ('OFFLINE'), true);
     });
   });
 
   test('or', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
         .or('status.eq.OFFLINE,username.eq.supabot')
@@ -28,7 +28,7 @@ void main() {
   });
 
   test('eq', () async {
-    var res = await postgrest.from('users').select().eq('username', 'supabot').execute();
+    final res = await postgrest.from('users').select().eq('username', 'supabot').execute();
 
     res.data.forEach((item) {
       expect(item['username'] == ('supabot'), true);
@@ -36,135 +36,135 @@ void main() {
   });
 
   test('neq', () async {
-    var res = await postgrest.from('users').select().neq('username', 'supabot').execute();
+    final res = await postgrest.from('users').select().neq('username', 'supabot').execute();
     res.data.forEach((item) {
       expect(item['username'] == ('supabot'), false);
     });
   });
 
   test('gt', () async {
-    var res = await postgrest.from('messages').select().gt('id', 1).execute();
+    final res = await postgrest.from('messages').select().gt('id', 1).execute();
     res.data.forEach((item) {
       expect(item['id'] > 1, true);
     });
   });
 
   test('gte', () async {
-    var res = await postgrest.from('messages').select().gte('id', 1).execute();
+    final res = await postgrest.from('messages').select().gte('id', 1).execute();
     res.data.forEach((item) {
       expect(item['id'] < 1, false);
     });
   });
 
   test('lt', () async {
-    var res = await postgrest.from('messages').select().lt('id', 2).execute();
+    final res = await postgrest.from('messages').select().lt('id', 2).execute();
     res.data.forEach((item) {
       expect(item['id'] < 2, true);
     });
   });
 
   test('lte', () async {
-    var res = await postgrest.from('messages').select().lte('id', 2).execute();
+    final res = await postgrest.from('messages').select().lte('id', 2).execute();
     res.data.forEach((item) {
       expect(item['id'] > 2, false);
     });
   });
 
   test('like', () async {
-    var res = await postgrest.from('users').select().like('username', '%supa%').execute();
+    final res = await postgrest.from('users').select().like('username', '%supa%').execute();
     res.data.forEach((item) {
       expect(item['username'].contains('supa'), true);
     });
   });
 
   test('ilike', () async {
-    var res = await postgrest.from('users').select().ilike('username', '%SUPA%').execute();
+    final res = await postgrest.from('users').select().ilike('username', '%SUPA%').execute();
     res.data.forEach((item) {
-      var user = item['username'].toLowerCase();
+      final user = item['username'].toLowerCase();
       expect(user.contains('supa'), true);
     });
   });
 
   test('is', () async {
-    var res = await postgrest.from('users').select().is_('data', null).execute();
+    final res = await postgrest.from('users').select().is_('data', null).execute();
     res.data.forEach((item) {
       expect(item['data'], null);
     });
   });
 
   test('in', () async {
-    var res = await postgrest.from('users').select().in_('status', ['ONLINE', 'OFFLINE']).execute();
+    final res = await postgrest.from('users').select().in_('status', ['ONLINE', 'OFFLINE']).execute();
     res.data.forEach((item) {
       expect(item['status'] == 'ONLINE' || item['status'] == 'OFFLINE', true);
     });
   });
 
   test('cs', () async {
-    var res = await postgrest.from('users').select().cs('age_range', '[1,2)').execute();
+    final res = await postgrest.from('users').select().cs('age_range', '[1,2)').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('cd', () async {
-    var res = await postgrest.from('users').select().cd('age_range', '[1,2)').execute();
+    final res = await postgrest.from('users').select().cd('age_range', '[1,2)').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('sl', () async {
-    var res = await postgrest.from('users').select().sl('age_range', '[2,25)').execute();
+    final res = await postgrest.from('users').select().sl('age_range', '[2,25)').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('sr', () async {
-    var res = await postgrest.from('users').select().sr('age_range', '[2,25)').execute();
+    final res = await postgrest.from('users').select().sr('age_range', '[2,25)').execute();
     res.data.forEach((item) {
       expect(item['username'] != 'supabot', true);
     });
   });
 
   test('nxl', () async {
-    var res = await postgrest.from('users').select().nxl('age_range', '[2,25)').execute();
+    final res = await postgrest.from('users').select().nxl('age_range', '[2,25)').execute();
     res.data.forEach((item) {
       expect(item['username'] != 'supabot', true);
     });
   });
 
   test('nxr', () async {
-    var res = await postgrest.from('users').select().nxr('age_range', '[2,25)').execute();
+    final res = await postgrest.from('users').select().nxr('age_range', '[2,25)').execute();
     res.data.forEach((item) {
       expect(item['username'] == 'supabot', true);
     });
   });
 
   test('adj', () async {
-    var res = await postgrest.from('users').select().adj('age_range', '[2,25)').execute();
+    final res = await postgrest.from('users').select().adj('age_range', '[2,25)').execute();
     expect(res.data.length, 3);
   });
 
   test('ov', () async {
-    var res = await postgrest.from('users').select().ov('age_range', '[2,25)').execute();
+    final res = await postgrest.from('users').select().ov('age_range', '[2,25)').execute();
     expect(res.data[0]['username'], 'dragarcia');
   });
 
   test('fts', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
-        .fts('catchphrase', '\'fat\' & \'cat\'', config: 'english')
+        .fts('catchphrase', "'fat' & 'cat'", config: 'english')
         .execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('plfts', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
-        .plfts('catchphrase', '\'fat\' & \'cat\'', config: 'english')
+        .plfts('catchphrase', "'fat' & 'cat'", config: 'english')
         .execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('phfts', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
         .phfts('catchphrase', 'cat', config: 'english')
@@ -173,16 +173,16 @@ void main() {
   });
 
   test('wfts', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
-        .wfts('catchphrase', '\'fat\' & \'cat\'', config: 'english')
+        .wfts('catchphrase', "'fat' & 'cat'", config: 'english')
         .execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('multiple filters', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
         .eq('username', 'supabot')
@@ -195,12 +195,12 @@ void main() {
   });
 
   test('filter', () async {
-    var res = await postgrest.from('users').select().filter('username', 'eq', 'supabot').execute();
+    final res = await postgrest.from('users').select().filter('username', 'eq', 'supabot').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('match', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select()
         .match({'username': 'supabot', 'status': 'ONLINE'}).execute();
