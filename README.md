@@ -10,7 +10,7 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 The usage should be the same as postgrest-js except:
 
 - You need to call `execute()` to finish your query chain.
-- `is_` and `in_` filter methods are prefixed with `_` sign to avoid collisions with reserved keywords.
+- `is_` and `in_` filter methods are suffixed with `_` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.io/docs/postgrest/client/postgrest-client).
 
