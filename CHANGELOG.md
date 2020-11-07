@@ -1,3 +1,8 @@
+## [0.0.1]
+
+- refactor: improve code style
+- Initial Release
+
 ## [0.0.1-dev.8]
 
 - chore: replace end() with execute()
