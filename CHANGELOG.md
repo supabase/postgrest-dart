@@ -1,3 +1,7 @@
+## [0.0.2]
+
+- Remove pre-release verion notice
+
 ## [0.0.1]
 
 - refactor: improve code style
