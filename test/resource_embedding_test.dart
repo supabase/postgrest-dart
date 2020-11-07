@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
 
 void main() {
-  var rootUrl = 'http://localhost:3000';
+  const rootUrl = 'http://localhost:3000';
   PostgrestClient postgrest;
 
   setUp(() {
@@ -10,13 +10,13 @@ void main() {
   });
 
   test('embedded select', () async {
-    var res = await postgrest.from('users').select('messages(*)').execute();
+    final res = await postgrest.from('users').select('messages(*)').execute();
     expect(res.data[0]['messages'].length, 2);
     expect(res.data[1]['messages'].length, 0);
   });
 
   test('embedded eq', () async {
-    var res =
+    final res =
         await postgrest.from('users').select('messages(*)').eq('messages.channel_id', 1).execute();
     expect(res.data[0]['messages'].length, 1);
     expect(res.data[1]['messages'].length, 0);
@@ -25,7 +25,7 @@ void main() {
   });
 
   test('embedded order', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select('messages(*)')
         .order('channel_id', foreignTable: 'messages', ascending: false)
@@ -37,7 +37,7 @@ void main() {
   });
 
   test('embedded limit', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select('messages(*)')
         .limit(1, foreignTable: 'messages')
@@ -49,7 +49,7 @@ void main() {
   });
 
   test('embedded range', () async {
-    var res = await postgrest
+    final res = await postgrest
         .from('users')
         .select('messages(*)')
         .range(1, 1, foreignTable: 'messages')
