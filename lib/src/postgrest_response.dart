@@ -23,7 +23,9 @@ class PostgrestResponse {
         data: json['body'],
         status: json['status'] as int,
         statusText: json['statusText'] as String,
-        error: json['error'] == null ? null : PostgrestError.fromJson(json['error'] as Map<String, dynamic>),
+        error: json['error'] == null
+            ? null
+            : PostgrestError.fromJson(json['error'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toJson() => {

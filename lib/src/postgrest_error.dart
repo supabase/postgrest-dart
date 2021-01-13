@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-PostgrestError postgrestErrorFromJson(String str) => PostgrestError.fromJson(json.decode(str) as Map<String, dynamic>);
+PostgrestError postgrestErrorFromJson(String str) =>
+    PostgrestError.fromJson(json.decode(str) as Map<String, dynamic>);
 
 /// A Postgrest response error
 class PostgrestError {
