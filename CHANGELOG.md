@@ -1,3 +1,7 @@
+## [0.0.3]
+
+- fix: lint errors
+
 ## [0.0.2]
 
 - Remove pre-release verion notice
