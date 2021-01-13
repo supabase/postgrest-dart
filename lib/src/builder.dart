@@ -55,7 +55,6 @@ class PostgrestBuilder {
       return parseJsonResponse(response);
     } catch (e) {
       return PostgrestResponse(
-        data: null,
         status: 500,
         error: PostgrestError(code: e.runtimeType.toString()),
         statusText: e.toString(),
@@ -68,13 +67,12 @@ class PostgrestBuilder {
     if (response.statusCode >= 400) {
       // error handling
       return PostgrestResponse(
-        data: null,
         status: response.statusCode,
         error: PostgrestError(code: response.statusCode.toString()),
         statusText: response.body.toString(),
       );
     } else {
-      var body;
+      dynamic body;
       try {
         body = json.decode(response.body);
       } on FormatException catch (_) {
@@ -84,8 +82,6 @@ class PostgrestBuilder {
       return PostgrestResponse(
         data: body,
         status: response.statusCode,
-        error: null,
-        statusText: null,
       );
     }
   }
@@ -145,9 +141,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
   /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
   /// ```
-  PostgrestBuilder insert(dynamic values, {bool upsert = false, onConflict}) {
+  PostgrestBuilder insert(dynamic values, {bool upsert = false, String onConflict}) {
     method = 'POST';
-    headers['Prefer'] = upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    headers['Prefer'] =
+        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
     body = values;
     return this;
   }
@@ -200,7 +197,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   PostgrestTransformBuilder order(String column,
       {bool ascending = false, bool nullsFirst = false, String foreignTable}) {
     final key = foreignTable == null ? 'order' : '"$foreignTable".order';
-    final value = '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
+    final value =
+        '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
     appendSearchParams(key, value);
     return this;
@@ -365,8 +363,9 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   /// Finds all rows whose value on the stated [column] exactly match the specified [value].
   /// ```dart
-  /// postgrest.from('users').select().$is('data', null)
+  /// postgrest.from('users').select().is_('data', null)
   /// ```
+  // ignore: non_constant_identifier_names
   PostgrestFilterBuilder is_(String column, dynamic value) {
     appendSearchParams(column, 'is.$value');
     return this;
@@ -375,8 +374,9 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// Finds all rows whose value on the stated [column] is found on the specified [values].
   ///
   /// ```dart
-  /// postgrest.from('users').select().in('status', ['ONLINE', 'OFFLINE'])
+  /// postgrest.from('users').select().in_('status', ['ONLINE', 'OFFLINE'])
   /// ```
+  // ignore: non_constant_identifier_names
   PostgrestFilterBuilder in_(String column, List values) {
     appendSearchParams(column, 'in.(${_cleanFilterArray(values)})');
     return this;
@@ -495,7 +495,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder fts(String column, String query, {config}) {
+  PostgrestFilterBuilder fts(String column, String query, {String config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'fts$configPart.$query');
     return this;
@@ -507,7 +507,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder plfts(String column, String query, {config}) {
+  PostgrestFilterBuilder plfts(String column, String query, {String config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'plfts$configPart.$query');
     return this;
@@ -519,7 +519,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
-  PostgrestFilterBuilder phfts(String column, String query, {config}) {
+  PostgrestFilterBuilder phfts(String column, String query, {String config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'phfts$configPart.$query');
     return this;
@@ -531,7 +531,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder wfts(String column, String query, {config}) {
+  PostgrestFilterBuilder wfts(String column, String query, {String config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'wfts$configPart.$query');
     return this;

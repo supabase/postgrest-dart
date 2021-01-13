@@ -63,14 +63,16 @@ void main() {
   test('basic update', () async {
     await postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo').execute();
 
-    final resMsg = await postgrest.from('messages').select().filter('message', 'eq', 'foo').execute();
+    final resMsg =
+        await postgrest.from('messages').select().filter('message', 'eq', 'foo').execute();
     resMsg.data.forEach((rec) => expect(rec['channel_id'], 2));
   });
 
   test('basic delete', () async {
     await postgrest.from('messages').delete().eq('message', 'foo').execute();
 
-    final resMsg = await postgrest.from('messages').select().filter('message', 'eq', 'foo').execute();
+    final resMsg =
+        await postgrest.from('messages').select().filter('message', 'eq', 'foo').execute();
     expect(resMsg.data.length, 0);
   });
 

@@ -10,7 +10,7 @@ void main() {
   });
 
   test('order', () async {
-    final res = await postgrest.from('users').select().order('username', ascending: false).execute();
+    final res = await postgrest.from('users').select().order('username').execute();
     expect(res.data[1]['username'], 'kiwicopple');
     expect(res.data[3]['username'], 'awailas');
   });

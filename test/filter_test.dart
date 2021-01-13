@@ -23,7 +23,7 @@ void main() {
         .or('status.eq.OFFLINE,username.eq.supabot')
         .execute();
     res.data.forEach((item) {
-      expect((item['username'] == ('supabot') || item['status'] == ('OFFLINE')), true);
+      expect(item['username'] == ('supabot') || item['status'] == ('OFFLINE'), true);
     });
   });
 
@@ -93,7 +93,8 @@ void main() {
   });
 
   test('in', () async {
-    final res = await postgrest.from('users').select().in_('status', ['ONLINE', 'OFFLINE']).execute();
+    final res =
+        await postgrest.from('users').select().in_('status', ['ONLINE', 'OFFLINE']).execute();
     res.data.forEach((item) {
       expect(item['status'] == 'ONLINE' || item['status'] == 'OFFLINE', true);
     });
@@ -195,7 +196,8 @@ void main() {
   });
 
   test('filter', () async {
-    final res = await postgrest.from('users').select().filter('username', 'eq', 'supabot').execute();
+    final res =
+        await postgrest.from('users').select().filter('username', 'eq', 'supabot').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 

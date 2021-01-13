@@ -28,7 +28,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .order('channel_id', foreignTable: 'messages', ascending: false)
+        .order('channel_id', foreignTable: 'messages')
         .execute();
     expect(res.data[0]['messages'].length, 2);
     expect(res.data[1]['messages'].length, 0);
