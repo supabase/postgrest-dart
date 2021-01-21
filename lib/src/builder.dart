@@ -43,13 +43,17 @@ class PostgrestBuilder {
       if (uppercaseMethod == 'GET') {
         response = await client.get(url, headers: headers ?? {});
       } else if (uppercaseMethod == 'POST') {
-        response = await client.post(url, headers: headers ?? {}, body: bodyStr);
+        response =
+            await client.post(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'PUT') {
         response = await client.put(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'PATCH') {
-        response = await client.patch(url, headers: headers ?? {}, body: bodyStr);
+        response =
+            await client.patch(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'DELETE') {
         response = await client.delete(url, headers: headers ?? {});
+      } else if (uppercaseMethod == 'HEAD') {
+        response = await client.head(url, headers: headers ?? {});
       }
 
       return parseJsonResponse(response);
@@ -73,15 +77,22 @@ class PostgrestBuilder {
       );
     } else {
       dynamic body;
+      int count;
       try {
         body = json.decode(response.body);
       } on FormatException catch (_) {
         body = response.body;
       }
 
+      final contentRange = response.headers['content-range'];
+      count = contentRange.split('/')[1] == '*'
+          ? null
+          : int.parse(contentRange.split('/')[1]);
+
       return PostgrestResponse(
         data: body,
         status: response.statusCode,
+        count: count,
       );
     }
   }
@@ -103,7 +114,8 @@ class PostgrestBuilder {
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url, {Map<String, String> headers, String schema}) {
+  PostgrestQueryBuilder(String url,
+      {Map<String, String> headers, String schema}) {
     this.url = Uri.parse(url);
     this.headers = headers ?? {};
     this.schema = schema;
@@ -114,7 +126,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestFilterBuilder select([String columns = '*']) {
+  PostgrestFilterBuilder select({
+    String columns = '*',
+    bool head = false,
+    CountOption count,
+  }) {
     method = 'GET';
 
     // Remove whitespaces except when quoted
@@ -130,6 +146,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
       return c;
     }).join('');
 
+    if (count != null) {
+      headers['Prefer'] = 'count=${count.toString().split('.')[1]}';
+    }
+    if (head) {
+      method = 'HEAD';
+    }
+
     appendSearchParams('select', cleanedColumns);
     return PostgrestFilterBuilder(this);
   }
@@ -141,11 +164,20 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
   /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
   /// ```
-  PostgrestBuilder insert(dynamic values, {bool upsert = false, String onConflict}) {
+  PostgrestBuilder insert(
+    dynamic values, {
+    bool upsert = false,
+    String onConflict,
+    CountOption count,
+  }) {
     method = 'POST';
-    headers['Prefer'] =
-        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    headers['Prefer'] = upsert
+        ? 'return=representation,resolution=merge-duplicates'
+        : 'return=representation';
     body = values;
+    if (count != null) {
+      headers['Prefer'] += 'count=${count.toString().split('.')[1]}';
+    }
     return this;
   }
 
@@ -154,10 +186,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').update({ channel_id: 2 }).eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder update(Map values) {
+  PostgrestFilterBuilder update(Map values, {CountOption count}) {
     method = 'PATCH';
     headers['Prefer'] = 'return=representation';
     body = values;
+    if (count != null) {
+      headers['Prefer'] += 'count=${count.toString().split('.')[1]}';
+    }
     return PostgrestFilterBuilder(this);
   }
 
@@ -166,9 +201,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder delete() {
+  PostgrestFilterBuilder delete({CountOption count}) {
     method = 'DELETE';
     headers['Prefer'] = 'return=representation';
+    if (count != null) {
+      headers['Prefer'] += 'count=${count.toString().split('.')[1]}';
+    }
     return PostgrestFilterBuilder(this);
   }
 
@@ -177,9 +215,19 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.rpc('get_status', { name_param: 'supabot' })
   /// ```
-  PostgrestBuilder rpc(dynamic params) {
+  PostgrestBuilder rpc(
+    dynamic params, {
+    bool head = false,
+    CountOption count,
+  }) {
     method = 'POST';
     body = params;
+    if (count != null) {
+      headers['Prefer'] = 'count=${count.toString().split('.')[1]}';
+    }
+    if (head) {
+      method = 'HEAD';
+    }
     return this;
   }
 }
@@ -225,7 +273,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
   /// ```
   PostgrestTransformBuilder range(int from, int to, {String foreignTable}) {
-    final keyOffset = foreignTable == null ? 'offset' : '"$foreignTable".offset';
+    final keyOffset =
+        foreignTable == null ? 'offset' : '"$foreignTable".offset';
     final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
     appendSearchParams(keyOffset, '$from');
@@ -557,4 +606,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     query.forEach((k, v) => appendSearchParams('$k', 'eq.$v'));
     return this;
   }
+}
+
+/// Three options for count parameter
+enum CountOption {
+  exact,
+  planned,
+  estimated,
 }
