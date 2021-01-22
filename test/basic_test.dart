@@ -164,9 +164,10 @@ void main() {
   });
 
   test('delete with count: exact', () async {
+    final resd = await postgrest.from('users').select().execute();
     final res = await postgrest
         .from('users')
-        .delete()
+        .delete(count: CountOption.exact)
         .eq('username', 'countexact')
         .execute();
 
