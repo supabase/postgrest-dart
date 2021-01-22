@@ -4,6 +4,7 @@ import 'dart:core';
 
 import 'package:http/http.dart' as http;
 
+import '../postgrest.dart';
 import 'postgrest_error.dart';
 import 'postgrest_response.dart';
 
@@ -78,10 +79,12 @@ class PostgrestBuilder {
     } else {
       dynamic body;
       int count;
-      try {
-        body = json.decode(response.body);
-      } on FormatException catch (_) {
-        body = response.body;
+      if (response.request.method != 'HEAD') {
+        try {
+          body = json.decode(response.body);
+        } on FormatException catch (_) {
+          body = response.body;
+        }
       }
 
       final contentRange = response.headers['content-range'];
@@ -176,7 +179,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
         : 'return=representation';
     body = values;
     if (count != null) {
-      headers['Prefer'] += 'count=${count.toString().split('.')[1]}';
+      headers['Prefer'] += ',count=${count.toString().split('.')[1]}';
     }
     return this;
   }
@@ -191,7 +194,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     headers['Prefer'] = 'return=representation';
     body = values;
     if (count != null) {
-      headers['Prefer'] += 'count=${count.toString().split('.')[1]}';
+      headers['Prefer'] += ',count=${count.toString().split('.')[1]}';
     }
     return PostgrestFilterBuilder(this);
   }
@@ -205,7 +208,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     method = 'DELETE';
     headers['Prefer'] = 'return=representation';
     if (count != null) {
-      headers['Prefer'] += 'count=${count.toString().split('.')[1]}';
+      headers['Prefer'] += ',count=${count.toString().split('.')[1]}';
     }
     return PostgrestFilterBuilder(this);
   }
@@ -606,11 +609,4 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     query.forEach((k, v) => appendSearchParams('$k', 'eq.$v'));
     return this;
   }
-}
-
-/// Three options for count parameter
-enum CountOption {
-  exact,
-  planned,
-  estimated,
 }
