@@ -157,8 +157,8 @@ void main() {
   test('update with count: exact', () async {
     final res = await postgrest
         .from('users')
-        .update({'status': 'OFFLINE'}, count: CountOption.exact)
-        .eq('username', 'supabot')
+        .update({'status': 'ONLINE'}, count: CountOption.exact)
+        .eq('username', 'countexact')
         .execute();
     expect(res.count, 1);
   });
@@ -167,7 +167,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .delete()
-        .eq('username', 'supabot')
+        .eq('username', 'countexact')
         .execute();
 
     expect(res.count, 1);
