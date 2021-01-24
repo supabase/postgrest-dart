@@ -1,3 +1,4 @@
+import 'package:postgrest/src/count_option.dart';
 import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
 
@@ -164,7 +165,6 @@ void main() {
   });
 
   test('delete with count: exact', () async {
-    final resd = await postgrest.from('users').select().execute();
     final res = await postgrest
         .from('users')
         .delete(count: CountOption.exact)

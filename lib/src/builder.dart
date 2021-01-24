@@ -4,7 +4,7 @@ import 'dart:core';
 
 import 'package:http/http.dart' as http;
 
-import '../postgrest.dart';
+import 'count_option.dart';
 import 'postgrest_error.dart';
 import 'postgrest_response.dart';
 
@@ -150,7 +150,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }).join('');
 
     if (count != null) {
-      headers['Prefer'] = 'count=${count.toString().split('.')[1]}';
+      headers['Prefer'] = 'count=${count.name()}';
     }
     if (head) {
       method = 'HEAD';
@@ -179,7 +179,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
         : 'return=representation';
     body = values;
     if (count != null) {
-      headers['Prefer'] += ',count=${count.toString().split('.')[1]}';
+      headers['Prefer'] += ',count=${count.name()}';
     }
     return this;
   }
@@ -194,7 +194,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     headers['Prefer'] = 'return=representation';
     body = values;
     if (count != null) {
-      headers['Prefer'] += ',count=${count.toString().split('.')[1]}';
+      headers['Prefer'] += ',count=${count.name()}';
     }
     return PostgrestFilterBuilder(this);
   }
@@ -208,7 +208,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     method = 'DELETE';
     headers['Prefer'] = 'return=representation';
     if (count != null) {
-      headers['Prefer'] += ',count=${count.toString().split('.')[1]}';
+      headers['Prefer'] += ',count=${count.name()}';
     }
     return PostgrestFilterBuilder(this);
   }
@@ -226,7 +226,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     method = 'POST';
     body = params;
     if (count != null) {
-      headers['Prefer'] = 'count=${count.toString().split('.')[1]}';
+      headers['Prefer'] = 'count=${count.name()}';
     }
     if (head) {
       method = 'HEAD';

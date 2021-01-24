@@ -37,10 +37,3 @@ class PostgrestClient {
         .rpc(params);
   }
 }
-
-/// Returns count as part of the response when specified.
-enum CountOption {
-  exact,
-  planned,
-  estimated,
-}
