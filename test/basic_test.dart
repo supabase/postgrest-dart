@@ -102,15 +102,15 @@ void main() {
   });
 
   test('select with head:true', () async {
-    final res = await postgrest.from('users').select(head: true).execute();
+    final res = await postgrest.from('users').select().execute(head: true);
     expect(res.data, null);
   });
 
   test('select with head:true, count: exact', () async {
     final res = await postgrest
         .from('users')
-        .select(head: true, count: CountOption.exact)
-        .execute();
+        .select()
+        .execute(head: true, count: CountOption.exact);
     expect(res.data, null);
     expect(res.count, 4);
   });
@@ -118,16 +118,16 @@ void main() {
   test('select with  count: planned', () async {
     final res = await postgrest
         .from('users')
-        .select(count: CountOption.exact)
-        .execute();
+        .select()
+        .execute(count: CountOption.exact);
     expect(res.count, const TypeMatcher<int>());
   });
 
   test('select with head:true, count: estimated', () async {
     final res = await postgrest
         .from('users')
-        .select(count: CountOption.exact)
-        .execute();
+        .select()
+        .execute(count: CountOption.exact);
     expect(res.count, const TypeMatcher<int>());
   });
 
@@ -140,36 +140,33 @@ void main() {
   test('stored procedure with count: exact', () async {
     final res = await postgrest
         .from('users')
-        .rpc('get_status', count: CountOption.exact)
-        .execute();
+        .rpc('get_status')
+        .execute(count: CountOption.exact);
     expect(res.count, const TypeMatcher<int>());
   });
 
   test('insert with count: exact', () async {
     final res = await postgrest.from('users').insert(
-      {'username': 'countexact', 'status': 'OFFLINE'},
-      upsert: true,
-      onConflict: 'username',
-      count: CountOption.exact,
-    ).execute();
+        {'username': 'countexact', 'status': 'OFFLINE'},
+        upsert: true, onConflict: 'username').execute(count: CountOption.exact);
     expect(res.count, 1);
   });
 
   test('update with count: exact', () async {
     final res = await postgrest
         .from('users')
-        .update({'status': 'ONLINE'}, count: CountOption.exact)
+        .update({'status': 'ONLINE'})
         .eq('username', 'countexact')
-        .execute();
+        .execute(count: CountOption.exact);
     expect(res.count, 1);
   });
 
   test('delete with count: exact', () async {
     final res = await postgrest
         .from('users')
-        .delete(count: CountOption.exact)
+        .delete()
         .eq('username', 'countexact')
-        .execute();
+        .execute(count: CountOption.exact);
 
     expect(res.count, 1);
   });

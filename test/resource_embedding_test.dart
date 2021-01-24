@@ -10,8 +10,7 @@ void main() {
   });
 
   test('embedded select', () async {
-    final res =
-        await postgrest.from('users').select(columns: 'messages(*)').execute();
+    final res = await postgrest.from('users').select('messages(*)').execute();
     expect(res.data[0]['messages'].length, 2);
     expect(res.data[1]['messages'].length, 0);
   });
@@ -19,7 +18,7 @@ void main() {
   test('embedded eq', () async {
     final res = await postgrest
         .from('users')
-        .select(columns: 'messages(*)')
+        .select('messages(*)')
         .eq('messages.channel_id', 1)
         .execute();
     expect(res.data[0]['messages'].length, 1);
@@ -31,7 +30,7 @@ void main() {
   test('embedded order', () async {
     final res = await postgrest
         .from('users')
-        .select(columns: 'messages(*)')
+        .select('messages(*)')
         .order('channel_id', foreignTable: 'messages')
         .execute();
     expect(res.data[0]['messages'].length, 2);
@@ -43,7 +42,7 @@ void main() {
   test('embedded limit', () async {
     final res = await postgrest
         .from('users')
-        .select(columns: 'messages(*)')
+        .select('messages(*)')
         .limit(1, foreignTable: 'messages')
         .execute();
     expect(res.data[0]['messages'].length, 1);
@@ -55,7 +54,7 @@ void main() {
   test('embedded range', () async {
     final res = await postgrest
         .from('users')
-        .select(columns: 'messages(*)')
+        .select('messages(*)')
         .range(1, 1, foreignTable: 'messages')
         .execute();
     expect(res.data[0]['messages'].length, 1);

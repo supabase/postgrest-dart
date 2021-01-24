@@ -22,7 +22,22 @@ class PostgrestBuilder {
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
   /// Returns {Future} Resolves when the request has completed.
-  Future<PostgrestResponse> execute() async {
+  Future<PostgrestResponse> execute({
+    bool head = false,
+    CountOption count,
+  }) async {
+    if (head) {
+      method = 'HEAD';
+    }
+
+    if (count != null) {
+      if (headers['Prefer'] == null) {
+        headers['Prefer'] = 'count=${count.name()}';
+      } else {
+        headers['Prefer'] += ',count=${count.name()}';
+      }
+    }
+
     try {
       final uppercaseMethod = method.toUpperCase();
       http.Response response;
@@ -129,11 +144,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestFilterBuilder select({
-    String columns = '*',
-    bool head = false,
-    CountOption count,
-  }) {
+  PostgrestFilterBuilder select([String columns = '*']) {
     method = 'GET';
 
     // Remove whitespaces except when quoted
@@ -148,13 +159,6 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
       }
       return c;
     }).join('');
-
-    if (count != null) {
-      headers['Prefer'] = 'count=${count.name()}';
-    }
-    if (head) {
-      method = 'HEAD';
-    }
 
     appendSearchParams('select', cleanedColumns);
     return PostgrestFilterBuilder(this);
@@ -171,16 +175,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     dynamic values, {
     bool upsert = false,
     String onConflict,
-    CountOption count,
   }) {
     method = 'POST';
     headers['Prefer'] = upsert
         ? 'return=representation,resolution=merge-duplicates'
         : 'return=representation';
     body = values;
-    if (count != null) {
-      headers['Prefer'] += ',count=${count.name()}';
-    }
     return this;
   }
 
@@ -189,13 +189,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').update({ channel_id: 2 }).eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder update(Map values, {CountOption count}) {
+  PostgrestFilterBuilder update(Map values) {
     method = 'PATCH';
     headers['Prefer'] = 'return=representation';
     body = values;
-    if (count != null) {
-      headers['Prefer'] += ',count=${count.name()}';
-    }
     return PostgrestFilterBuilder(this);
   }
 
@@ -204,12 +201,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder delete({CountOption count}) {
+  PostgrestFilterBuilder delete() {
     method = 'DELETE';
     headers['Prefer'] = 'return=representation';
-    if (count != null) {
-      headers['Prefer'] += ',count=${count.name()}';
-    }
     return PostgrestFilterBuilder(this);
   }
 
@@ -218,16 +212,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.rpc('get_status', { name_param: 'supabot' })
   /// ```
-  PostgrestBuilder rpc(
-    dynamic params, {
-    bool head = false,
-    CountOption count,
-  }) {
+  PostgrestBuilder rpc(dynamic params, {bool head = false}) {
     method = 'POST';
     body = params;
-    if (count != null) {
-      headers['Prefer'] = 'count=${count.name()}';
-    }
     if (head) {
       method = 'HEAD';
     }
