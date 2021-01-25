@@ -1,3 +1,7 @@
+## [0.0.4]
+
+- feat: support head request and row count option
+
 ## [0.0.3]
 
 - fix: lint errors
