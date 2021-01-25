@@ -103,9 +103,11 @@ class PostgrestBuilder {
       }
 
       final contentRange = response.headers['content-range'];
-      count = contentRange.split('/')[1] == '*'
-          ? null
-          : int.parse(contentRange.split('/')[1]);
+      if (contentRange != null) {
+        count = contentRange.split('/').last == '*'
+            ? null
+            : int.parse(contentRange.split('/').last);
+      }
 
       return PostgrestResponse(
         data: body,
