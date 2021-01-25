@@ -12,20 +12,24 @@ class PostgrestResponse {
     this.status,
     this.statusText,
     this.error,
+    this.count,
   });
 
   final dynamic data;
   final int status;
   final String statusText;
   final PostgrestError error;
+  final int count;
 
-  factory PostgrestResponse.fromJson(Map<String, dynamic> json) => PostgrestResponse(
+  factory PostgrestResponse.fromJson(Map<String, dynamic> json) =>
+      PostgrestResponse(
         data: json['body'],
         status: json['status'] as int,
         statusText: json['statusText'] as String,
         error: json['error'] == null
             ? null
             : PostgrestError.fromJson(json['error'] as Map<String, dynamic>),
+        count: json['count'] as int,
       );
 
   Map<String, dynamic> toJson() => {
@@ -33,5 +37,6 @@ class PostgrestResponse {
         'status': status,
         'statusText': statusText,
         'error': error?.toJson(),
+        'count': count,
       };
 }

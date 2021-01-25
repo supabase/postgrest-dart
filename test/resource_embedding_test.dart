@@ -16,8 +16,11 @@ void main() {
   });
 
   test('embedded eq', () async {
-    final res =
-        await postgrest.from('users').select('messages(*)').eq('messages.channel_id', 1).execute();
+    final res = await postgrest
+        .from('users')
+        .select('messages(*)')
+        .eq('messages.channel_id', 1)
+        .execute();
     expect(res.data[0]['messages'].length, 1);
     expect(res.data[1]['messages'].length, 0);
     expect(res.data[2]['messages'].length, 0);

@@ -4,6 +4,7 @@ import 'dart:core';
 
 import 'package:http/http.dart' as http;
 
+import 'count_option.dart';
 import 'postgrest_error.dart';
 import 'postgrest_response.dart';
 
@@ -21,7 +22,22 @@ class PostgrestBuilder {
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
   /// Returns {Future} Resolves when the request has completed.
-  Future<PostgrestResponse> execute() async {
+  Future<PostgrestResponse> execute({
+    bool head = false,
+    CountOption count,
+  }) async {
+    if (head) {
+      method = 'HEAD';
+    }
+
+    if (count != null) {
+      if (headers['Prefer'] == null) {
+        headers['Prefer'] = 'count=${count.name()}';
+      } else {
+        headers['Prefer'] += ',count=${count.name()}';
+      }
+    }
+
     try {
       final uppercaseMethod = method.toUpperCase();
       http.Response response;
@@ -43,13 +59,17 @@ class PostgrestBuilder {
       if (uppercaseMethod == 'GET') {
         response = await client.get(url, headers: headers ?? {});
       } else if (uppercaseMethod == 'POST') {
-        response = await client.post(url, headers: headers ?? {}, body: bodyStr);
+        response =
+            await client.post(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'PUT') {
         response = await client.put(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'PATCH') {
-        response = await client.patch(url, headers: headers ?? {}, body: bodyStr);
+        response =
+            await client.patch(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'DELETE') {
         response = await client.delete(url, headers: headers ?? {});
+      } else if (uppercaseMethod == 'HEAD') {
+        response = await client.head(url, headers: headers ?? {});
       }
 
       return parseJsonResponse(response);
@@ -73,15 +93,26 @@ class PostgrestBuilder {
       );
     } else {
       dynamic body;
-      try {
-        body = json.decode(response.body);
-      } on FormatException catch (_) {
-        body = response.body;
+      int count;
+      if (response.request.method != 'HEAD') {
+        try {
+          body = json.decode(response.body);
+        } on FormatException catch (_) {
+          body = response.body;
+        }
+      }
+
+      final contentRange = response.headers['content-range'];
+      if (contentRange != null) {
+        count = contentRange.split('/').last == '*'
+            ? null
+            : int.parse(contentRange.split('/').last);
       }
 
       return PostgrestResponse(
         data: body,
         status: response.statusCode,
+        count: count,
       );
     }
   }
@@ -103,7 +134,8 @@ class PostgrestBuilder {
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url, {Map<String, String> headers, String schema}) {
+  PostgrestQueryBuilder(String url,
+      {Map<String, String> headers, String schema}) {
     this.url = Uri.parse(url);
     this.headers = headers ?? {};
     this.schema = schema;
@@ -141,10 +173,15 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
   /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
   /// ```
-  PostgrestBuilder insert(dynamic values, {bool upsert = false, String onConflict}) {
+  PostgrestBuilder insert(
+    dynamic values, {
+    bool upsert = false,
+    String onConflict,
+  }) {
     method = 'POST';
-    headers['Prefer'] =
-        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    headers['Prefer'] = upsert
+        ? 'return=representation,resolution=merge-duplicates'
+        : 'return=representation';
     body = values;
     return this;
   }
@@ -225,7 +262,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
   /// ```
   PostgrestTransformBuilder range(int from, int to, {String foreignTable}) {
-    final keyOffset = foreignTable == null ? 'offset' : '"$foreignTable".offset';
+    final keyOffset =
+        foreignTable == null ? 'offset' : '"$foreignTable".offset';
     final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
     appendSearchParams(keyOffset, '$from');
