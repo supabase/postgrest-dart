@@ -133,7 +133,7 @@ void main() {
 
   test('stored procedure with head: true', () async {
     final res =
-        await postgrest.from('users').rpc('get_status', head: true).execute();
+        await postgrest.from('users').rpc('get_status').execute(head: true);
     expect(res.data, null);
   });
 

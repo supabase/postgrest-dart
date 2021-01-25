@@ -212,12 +212,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.rpc('get_status', { name_param: 'supabot' })
   /// ```
-  PostgrestBuilder rpc(dynamic params, {bool head = false}) {
+  PostgrestBuilder rpc(dynamic params) {
     method = 'POST';
     body = params;
-    if (head) {
-      method = 'HEAD';
-    }
     return this;
   }
 }
