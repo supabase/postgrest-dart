@@ -20,6 +20,10 @@ class PostgrestBuilder {
   /// Sends the request and returns a Future.
   /// catch any error and returns with status 500
   ///
+  /// [head] to trigger a HEAD request
+  ///
+  /// [count] if you want to returns the count value. Support exact, planned and estimated count options.
+  ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
   /// Returns {Future} Resolves when the request has completed.
   Future<PostgrestResponse> execute({
@@ -59,13 +63,11 @@ class PostgrestBuilder {
       if (uppercaseMethod == 'GET') {
         response = await client.get(url, headers: headers ?? {});
       } else if (uppercaseMethod == 'POST') {
-        response =
-            await client.post(url, headers: headers ?? {}, body: bodyStr);
+        response = await client.post(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'PUT') {
         response = await client.put(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'PATCH') {
-        response =
-            await client.patch(url, headers: headers ?? {}, body: bodyStr);
+        response = await client.patch(url, headers: headers ?? {}, body: bodyStr);
       } else if (uppercaseMethod == 'DELETE') {
         response = await client.delete(url, headers: headers ?? {});
       } else if (uppercaseMethod == 'HEAD') {
@@ -104,9 +106,8 @@ class PostgrestBuilder {
 
       final contentRange = response.headers['content-range'];
       if (contentRange != null) {
-        count = contentRange.split('/').last == '*'
-            ? null
-            : int.parse(contentRange.split('/').last);
+        count =
+            contentRange.split('/').last == '*' ? null : int.parse(contentRange.split('/').last);
       }
 
       return PostgrestResponse(
@@ -134,8 +135,7 @@ class PostgrestBuilder {
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url,
-      {Map<String, String> headers, String schema}) {
+  PostgrestQueryBuilder(String url, {Map<String, String> headers, String schema}) {
     this.url = Uri.parse(url);
     this.headers = headers ?? {};
     this.schema = schema;
@@ -179,9 +179,8 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     String onConflict,
   }) {
     method = 'POST';
-    headers['Prefer'] = upsert
-        ? 'return=representation,resolution=merge-duplicates'
-        : 'return=representation';
+    headers['Prefer'] =
+        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
     body = values;
     return this;
   }
@@ -262,8 +261,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
   /// ```
   PostgrestTransformBuilder range(int from, int to, {String foreignTable}) {
-    final keyOffset =
-        foreignTable == null ? 'offset' : '"$foreignTable".offset';
+    final keyOffset = foreignTable == null ? 'offset' : '"$foreignTable".offset';
     final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
     appendSearchParams(keyOffset, '$from');

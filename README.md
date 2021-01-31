@@ -64,6 +64,18 @@ var response = await client.from('users')
       .execute();
 ```
 
+#### Get Count
+
+```dart
+import 'package:postgrest/postgrest.dart';
+
+var url = 'https://example.com/postgrest/endpoint';
+var client = PostgrestClient(url);
+var response = await client.from('countries')
+      .select()
+      .execute(count: CountOption.exact, head: true);
+```
+
 ## Contributing
 
 - Fork the repo on [GitHub](https://github.com/supabase/postgrest-dart)
