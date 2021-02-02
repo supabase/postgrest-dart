@@ -1,3 +1,7 @@
+## [0.0.5]
+
+- chore: export builder classes
+
 ## [0.0.4]
 
 - feat: support head request and row count option
