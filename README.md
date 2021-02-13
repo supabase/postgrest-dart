@@ -86,7 +86,7 @@ var response = await client.from('countries')
 
 ## License
 
-This repo is liscenced under MIT.
+This repo is licensed under MIT.
 
 ## Credits
 
