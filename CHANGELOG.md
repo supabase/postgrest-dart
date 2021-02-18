@@ -1,6 +1,15 @@
+## [0.0.6]
+
+- fix: error json parsing
+- fix: unit tests
+- refactor: remove PostgrestResponse.statusText
+- refactor: clean up PostgrestError, PostgrestResponse
+- chore: export PostgrestError class
+- chore: update example with try/catch
+
 ## [0.0.5]
 
-- chore: export builder classes
+- chore: export builder class
 
 ## [0.0.4]
 
