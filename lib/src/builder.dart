@@ -76,9 +76,10 @@ class PostgrestBuilder {
 
       return parseJsonResponse(response);
     } catch (e) {
+      final error = PostgrestError(code: e.runtimeType.toString(), message: e.toString());
       return PostgrestResponse(
         status: 500,
-        error: PostgrestError(code: e.runtimeType.toString()),
+        error: error,
       );
     }
   }
