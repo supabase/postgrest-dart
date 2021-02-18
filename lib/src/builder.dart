@@ -79,23 +79,16 @@ class PostgrestBuilder {
       return PostgrestResponse(
         status: 500,
         error: PostgrestError(code: e.runtimeType.toString()),
-        statusText: e.toString(),
       );
     }
   }
 
   /// Parse request response to json object if possible
   PostgrestResponse parseJsonResponse(http.Response response) {
-    if (response.statusCode >= 400) {
-      // error handling
-      return PostgrestResponse(
-        status: response.statusCode,
-        error: PostgrestError(code: response.statusCode.toString()),
-        statusText: response.body.toString(),
-      );
-    } else {
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int count;
+
       if (response.request.method != 'HEAD') {
         try {
           body = json.decode(response.body);
@@ -114,6 +107,23 @@ class PostgrestBuilder {
         data: body,
         status: response.statusCode,
         count: count,
+      );
+    } else {
+      PostgrestError error;
+      if (response.request.method != 'HEAD') {
+        try {
+          final Map<String, dynamic> errorJson = json.decode(response.body) as Map<String, dynamic>;
+          error = PostgrestError.fromJson(errorJson);
+        } on FormatException catch (_) {
+          error = PostgrestError(code: response.statusCode.toString());
+        }
+      } else {
+        error = PostgrestError(code: response.statusCode.toString());
+      }
+
+      return PostgrestResponse(
+        status: response.statusCode,
+        error: error,
       );
     }
   }
@@ -207,13 +217,17 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     headers['Prefer'] = 'return=representation';
     return PostgrestFilterBuilder(this);
   }
+}
+
+class PostgrestRpcBuilder extends PostgrestBuilder {
+  PostgrestRpcBuilder(String url, {Map<String, String> headers, String schema}) {
+    this.url = Uri.parse(url);
+    this.headers = headers ?? {};
+    this.schema = schema;
+  }
 
   /// Performs stored procedures on the database.
-  ///
-  /// ```dart
-  /// postgrest.rpc('get_status', { name_param: 'supabot' })
-  /// ```
-  PostgrestBuilder rpc(dynamic params) {
+  PostgrestBuilder rpc([dynamic params]) {
     method = 'POST';
     body = params;
     return this;

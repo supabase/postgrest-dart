@@ -21,15 +21,19 @@ class PostgrestClient {
     return this;
   }
 
-  /// Authenticates the request with JWT.
+  /// Perform a table operation.
   PostgrestQueryBuilder from(String table) {
     final url = '${this.url}/$table';
     return PostgrestQueryBuilder(url, headers: headers, schema: schema);
   }
 
   /// Perform a stored procedure call.
-  PostgrestBuilder rpc(String fn, Map params) {
+  ///
+  /// ```dart
+  /// postgrest.rpc('get_status', params: {'name_param': 'supabot'})
+  /// ```
+  PostgrestBuilder rpc(String fn, {Map params}) {
     final url = '${this.url}/rpc/$fn';
-    return PostgrestQueryBuilder(url, headers: headers, schema: schema).rpc(params);
+    return PostgrestRpcBuilder(url, headers: headers, schema: schema).rpc(params);
   }
 }
