@@ -1,17 +1,22 @@
 import 'package:postgrest/postgrest.dart';
+import 'package:postgrest/src/count_option.dart';
 
 /// Example to use with Supabase API https://supabase.io/
 dynamic main() async {
-  final client = PostgrestClient('SUPABASE_API_ENDPOINT/rest/v1',
-      headers: {
-        'apikey': 'SUPABSE_API_KEY',
-      },
-      schema: 'public');
+  const supabaseUrl = '';
+  const supabaseKey = '';
+  final client =
+      PostgrestClient('$supabaseUrl/rest/v1', headers: {'apikey': supabaseKey}, schema: 'public');
 
-  final response = await client.from('countries').select().order('name', ascending: true).execute();
-  if (response.error == null) {
+  try {
+    final response = await client.from('countries').select().execute(count: CountOption.exact);
+    if (response.error != null) {
+      throw response.error;
+    }
     return response.data;
-  } else {
-    return null;
+  } on PostgrestError catch (e) {
+    // handle PostgrestError
+    print(e.code);
+    print(e.message);
   }
 }
