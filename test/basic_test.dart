@@ -20,6 +20,19 @@ void main() {
     expect(res.data, 'ONLINE');
   });
 
+  test('select on stored procedure', () async {
+    final res = await postgrest
+        .rpc('get_username_and_status', params: {'name_param': 'supabot'})
+        .select('status')
+        .execute();
+    expect(res.data[0]['status'], 'ONLINE');
+  });
+
+  test('stored procedure returns void', () async {
+    final res = await postgrest.rpc('void_func').execute();
+    expect(res.data, isNull);
+  });
+
   test('custom headers', () async {
     final postgrest = PostgrestClient(rootUrl, headers: {'apikey': 'foo'});
     expect(postgrest.from('users').select().headers['apikey'], 'foo');
