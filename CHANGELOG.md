@@ -1,3 +1,9 @@
+## [0.0.7]
+
+- feat: allow postgrest.rpc() filtering
+- refactor: builder into separate classes
+- chore: update stored procedure unit tests
+
 ## [0.0.6]
 
 - fix: error json parsing
