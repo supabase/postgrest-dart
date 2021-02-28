@@ -12,9 +12,11 @@ import 'postgrest_filter_builder.dart';
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url,
-      {Map<String, String>? headers, String? schema})
-      : super(
+  PostgrestQueryBuilder(
+    String url, {
+    Map<String, String>? headers,
+    String? schema,
+  }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},
           schema: schema,

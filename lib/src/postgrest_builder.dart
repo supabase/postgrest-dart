@@ -12,8 +12,8 @@ import 'postgrest_response.dart';
 abstract class PostgrestBuilder {
   PostgrestBuilder({
     required this.url,
-    this.schema,
     required this.headers,
+    this.schema,
     this.method,
     this.body,
   });

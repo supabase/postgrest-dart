@@ -15,7 +15,11 @@ class PostgrestClient {
   /// new PostgrestClient(REST_URL)
   /// new PostgrestClient(REST_URL, headers: { 'apikey': 'foo' })
   /// ```
-  PostgrestClient(this.url, {Map<String, String>? headers, this.schema}) : headers = headers ?? {};
+  PostgrestClient(
+    this.url, {
+    Map<String, String>? headers,
+    this.schema,
+  }) : headers = headers ?? {};
 
   /// Authenticates the request with JWT.
   PostgrestClient auth(String token) {
@@ -36,6 +40,7 @@ class PostgrestClient {
   /// ```
   PostgrestTransformBuilder rpc(String fn, {Map? params}) {
     final url = '${this.url}/rpc/$fn';
-    return PostgrestRpcBuilder(url, headers: headers, schema: schema).rpc(params);
+    return PostgrestRpcBuilder(url, headers: headers, schema: schema)
+        .rpc(params);
   }
 }

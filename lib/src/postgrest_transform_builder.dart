@@ -3,11 +3,12 @@ import 'postgrest_builder.dart';
 class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   PostgrestTransformBuilder(PostgrestBuilder builder)
       : super(
-            url: builder.url,
-            method: builder.method,
-            headers: builder.headers,
-            schema: builder.schema,
-            body: builder.body);
+          url: builder.url,
+          method: builder.method,
+          headers: builder.headers,
+          schema: builder.schema,
+          body: builder.body,
+        );
 
   /// Performs horizontal filtering with SELECT.
   ///
