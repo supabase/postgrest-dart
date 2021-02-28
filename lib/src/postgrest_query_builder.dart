@@ -12,11 +12,13 @@ import 'postgrest_filter_builder.dart';
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
 class PostgrestQueryBuilder extends PostgrestBuilder {
-  PostgrestQueryBuilder(String url, {Map<String, String> headers, String schema}) {
-    this.url = Uri.parse(url);
-    this.headers = headers ?? {};
-    this.schema = schema;
-  }
+  PostgrestQueryBuilder(String url,
+      {Map<String, String>? headers, String? schema})
+      : super(
+          url: Uri.parse(url),
+          headers: headers ?? {},
+          schema: schema,
+        );
 
   /// Performs horizontal filtering with SELECT.
   ///
@@ -37,7 +39,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
         quoted = !quoted;
       }
       return c;
-    }).join('');
+    }).join();
 
     appendSearchParams('select', cleanedColumns);
     return PostgrestFilterBuilder(this);
@@ -53,11 +55,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestBuilder insert(
     dynamic values, {
     bool upsert = false,
-    String onConflict,
+    String? onConflict,
   }) {
     method = 'POST';
-    headers['Prefer'] =
-        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    headers['Prefer'] = upsert
+        ? 'return=representation,resolution=merge-duplicates'
+        : 'return=representation';
     body = values;
     return this;
   }

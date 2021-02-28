@@ -3,7 +3,7 @@ import 'package:postgrest/postgrest.dart';
 
 void main() {
   const rootUrl = 'http://localhost:3000';
-  PostgrestClient postgrest;
+  late PostgrestClient postgrest;
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);

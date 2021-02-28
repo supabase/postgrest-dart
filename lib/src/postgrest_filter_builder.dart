@@ -247,7 +247,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder fts(String column, String query, {String config}) {
+  PostgrestFilterBuilder fts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'fts$configPart.$query');
     return this;
@@ -259,7 +259,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder plfts(String column, String query, {String config}) {
+  PostgrestFilterBuilder plfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'plfts$configPart.$query');
     return this;
@@ -271,7 +271,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
-  PostgrestFilterBuilder phfts(String column, String query, {String config}) {
+  PostgrestFilterBuilder phfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'phfts$configPart.$query');
     return this;
@@ -283,7 +283,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
-  PostgrestFilterBuilder wfts(String column, String query, {String config}) {
+  PostgrestFilterBuilder wfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'wfts$configPart.$query');
     return this;
