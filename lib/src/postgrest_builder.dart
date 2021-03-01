@@ -126,10 +126,14 @@ abstract class PostgrestBuilder {
               json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
         } on FormatException catch (_) {
-          error = PostgrestError(code: response.statusCode.toString());
+          error = PostgrestError(
+              code: response.statusCode.toString(),
+              message: 'Format error in response');
         }
       } else {
-        error = PostgrestError(code: response.statusCode.toString());
+        error = PostgrestError(
+            code: response.statusCode.toString(),
+            message: 'Error in Postgrest response for method HEAD');
       }
 
       return PostgrestResponse(

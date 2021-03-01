@@ -1,4 +1,4 @@
-## [0.1.0]
+## [0.0.8]
 
 - feat: Migrate to null-safe dart
 

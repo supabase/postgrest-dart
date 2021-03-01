@@ -1,19 +1,19 @@
 /// A Postgrest response error
 class PostgrestError {
   PostgrestError({
-    this.message,
+    required this.message,
     this.details,
     this.hint,
     this.code,
   });
 
-  String? message;
+  String message;
   String? details;
   String? hint;
   String? code;
 
   factory PostgrestError.fromJson(Map<String, dynamic> json) => PostgrestError(
-        message: json['message'] as String?,
+        message: json['message'] as String,
         details: json['details'] as String?,
         hint: json['hint'] as String?,
         code: json['code'] as String?,
