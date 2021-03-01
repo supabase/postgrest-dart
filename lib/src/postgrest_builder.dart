@@ -9,12 +9,19 @@ import 'postgrest_error.dart';
 import 'postgrest_response.dart';
 
 /// The base builder class.
-class PostgrestBuilder {
+abstract class PostgrestBuilder {
+  PostgrestBuilder({
+    required this.url,
+    required this.headers,
+    this.schema,
+    this.method,
+    this.body,
+  });
   dynamic body;
-  List query = [];
-  Map<String, String> headers;
-  String method;
-  String schema;
+  final List query = [];
+  final Map<String, String> headers;
+  String? method;
+  final String? schema;
   Uri url;
 
   /// Sends the request and returns a Future.
@@ -28,7 +35,7 @@ class PostgrestBuilder {
   /// Returns {Future} Resolves when the request has completed.
   Future<PostgrestResponse> execute({
     bool head = false,
-    CountOption count,
+    CountOption? count,
   }) async {
     if (head) {
       method = 'HEAD';
@@ -38,20 +45,20 @@ class PostgrestBuilder {
       if (headers['Prefer'] == null) {
         headers['Prefer'] = 'count=${count.name()}';
       } else {
-        headers['Prefer'] += ',count=${count.name()}';
+        headers['Prefer'] = '${headers['Prefer']!},count=${count.name()}';
       }
     }
 
     try {
-      final uppercaseMethod = method.toUpperCase();
-      http.Response response;
+      final uppercaseMethod = method!.toUpperCase();
+      late http.Response response;
 
       if (schema == null) {
         // skip
       } else if (['GET', 'HEAD'].contains(method)) {
-        headers['Accept-Profile'] = schema;
+        headers['Accept-Profile'] = schema!;
       } else {
-        headers['Content-Profile'] = schema;
+        headers['Content-Profile'] = schema!;
       }
       if (method != 'GET' && method != 'HEAD') {
         headers['Content-Type'] = 'application/json';
@@ -61,22 +68,23 @@ class PostgrestBuilder {
       final bodyStr = json.encode(body);
 
       if (uppercaseMethod == 'GET') {
-        response = await client.get(url, headers: headers ?? {});
+        response = await client.get(url, headers: headers);
       } else if (uppercaseMethod == 'POST') {
-        response = await client.post(url, headers: headers ?? {}, body: bodyStr);
+        response = await client.post(url, headers: headers, body: bodyStr);
       } else if (uppercaseMethod == 'PUT') {
-        response = await client.put(url, headers: headers ?? {}, body: bodyStr);
+        response = await client.put(url, headers: headers, body: bodyStr);
       } else if (uppercaseMethod == 'PATCH') {
-        response = await client.patch(url, headers: headers ?? {}, body: bodyStr);
+        response = await client.patch(url, headers: headers, body: bodyStr);
       } else if (uppercaseMethod == 'DELETE') {
-        response = await client.delete(url, headers: headers ?? {});
+        response = await client.delete(url, headers: headers);
       } else if (uppercaseMethod == 'HEAD') {
-        response = await client.head(url, headers: headers ?? {});
+        response = await client.head(url, headers: headers);
       }
 
       return parseJsonResponse(response);
     } catch (e) {
-      final error = PostgrestError(code: e.runtimeType.toString(), message: e.toString());
+      final error =
+          PostgrestError(code: e.runtimeType.toString(), message: e.toString());
       return PostgrestResponse(
         status: 500,
         error: error,
@@ -88,9 +96,9 @@ class PostgrestBuilder {
   PostgrestResponse parseJsonResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
-      int count;
+      int? count;
 
-      if (response.request.method != 'HEAD') {
+      if (response.request!.method != 'HEAD') {
         try {
           body = json.decode(response.body);
         } on FormatException catch (_) {
@@ -100,8 +108,9 @@ class PostgrestBuilder {
 
       final contentRange = response.headers['content-range'];
       if (contentRange != null) {
-        count =
-            contentRange.split('/').last == '*' ? null : int.parse(contentRange.split('/').last);
+        count = contentRange.split('/').last == '*'
+            ? null
+            : int.parse(contentRange.split('/').last);
       }
 
       return PostgrestResponse(
@@ -111,15 +120,20 @@ class PostgrestBuilder {
       );
     } else {
       PostgrestError error;
-      if (response.request.method != 'HEAD') {
+      if (response.request!.method != 'HEAD') {
         try {
-          final Map<String, dynamic> errorJson = json.decode(response.body) as Map<String, dynamic>;
+          final Map<String, dynamic> errorJson =
+              json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
         } on FormatException catch (_) {
-          error = PostgrestError(code: response.statusCode.toString());
+          error = PostgrestError(
+              code: response.statusCode.toString(),
+              message: 'Format error in response');
         }
       } else {
-        error = PostgrestError(code: response.statusCode.toString());
+        error = PostgrestError(
+            code: response.statusCode.toString(),
+            message: 'Error in Postgrest response for method HEAD');
       }
 
       return PostgrestResponse(

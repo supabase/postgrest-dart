@@ -6,7 +6,7 @@ import 'postgrest_transform_builder.dart';
 class PostgrestClient {
   final String url;
   final Map<String, String> headers;
-  final String schema;
+  final String? schema;
 
   /// To create a [PostgrestClient], you need to provide an [url] endpoint.
   ///
@@ -15,7 +15,11 @@ class PostgrestClient {
   /// new PostgrestClient(REST_URL)
   /// new PostgrestClient(REST_URL, headers: { 'apikey': 'foo' })
   /// ```
-  PostgrestClient(this.url, {Map<String, String> headers, this.schema}) : headers = headers ?? {};
+  PostgrestClient(
+    this.url, {
+    Map<String, String>? headers,
+    this.schema,
+  }) : headers = headers ?? {};
 
   /// Authenticates the request with JWT.
   PostgrestClient auth(String token) {
@@ -34,8 +38,9 @@ class PostgrestClient {
   /// ```dart
   /// postgrest.rpc('get_status', params: {'name_param': 'supabot'})
   /// ```
-  PostgrestTransformBuilder rpc(String fn, {Map params}) {
+  PostgrestTransformBuilder rpc(String fn, {Map? params}) {
     final url = '${this.url}/rpc/$fn';
-    return PostgrestRpcBuilder(url, headers: headers, schema: schema).rpc(params);
+    return PostgrestRpcBuilder(url, headers: headers, schema: schema)
+        .rpc(params);
   }
 }

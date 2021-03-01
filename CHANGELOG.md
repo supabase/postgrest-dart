@@ -1,3 +1,7 @@
+## [0.0.8]
+
+- feat: Migrate to null-safe dart
+
 ## [0.0.7]
 
 - feat: allow postgrest.rpc() filtering

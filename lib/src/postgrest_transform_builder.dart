@@ -1,13 +1,14 @@
 import 'postgrest_builder.dart';
 
 class PostgrestTransformBuilder<T> extends PostgrestBuilder {
-  PostgrestTransformBuilder(PostgrestBuilder builder) {
-    url = builder.url;
-    method = builder.method;
-    headers = builder.headers;
-    schema = builder.schema;
-    body = builder.body;
-  }
+  PostgrestTransformBuilder(PostgrestBuilder builder)
+      : super(
+          url: builder.url,
+          method: builder.method,
+          headers: builder.headers,
+          schema: builder.schema,
+          body: builder.body,
+        );
 
   /// Performs horizontal filtering with SELECT.
   ///
@@ -26,7 +27,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
         quoted = !quoted;
       }
       return c;
-    }).join('');
+    }).join();
 
     appendSearchParams('select', cleanedColumns);
     return this;
@@ -42,7 +43,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').order('channel_id', { foreignTable: 'messages', ascending: false })
   /// ```
   PostgrestTransformBuilder order(String column,
-      {bool ascending = false, bool nullsFirst = false, String foreignTable}) {
+      {bool ascending = false, bool nullsFirst = false, String? foreignTable}) {
     final key = foreignTable == null ? 'order' : '"$foreignTable".order';
     final value =
         '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
@@ -58,7 +59,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select().limit(1)
   /// postgrest.from('users').select('messages(*)').limit(1, { foreignTable: 'messages' })
   /// ```
-  PostgrestTransformBuilder limit(int count, {String foreignTable}) {
+  PostgrestTransformBuilder limit(int count, {String? foreignTable}) {
     final key = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
     appendSearchParams(key, '$count');
@@ -71,8 +72,9 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
   /// ```
-  PostgrestTransformBuilder range(int from, int to, {String foreignTable}) {
-    final keyOffset = foreignTable == null ? 'offset' : '"$foreignTable".offset';
+  PostgrestTransformBuilder range(int from, int to, {String? foreignTable}) {
+    final keyOffset =
+        foreignTable == null ? 'offset' : '"$foreignTable".offset';
     final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
 
     appendSearchParams(keyOffset, '$from');

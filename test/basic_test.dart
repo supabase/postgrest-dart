@@ -4,7 +4,7 @@ import 'package:postgrest/postgrest.dart';
 
 void main() {
   const rootUrl = 'http://localhost:3000';
-  PostgrestClient postgrest;
+  late PostgrestClient postgrest;
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
@@ -98,7 +98,7 @@ void main() {
   test('connection error', () async {
     final postgrest = PostgrestClient('http://this.url.does.not.exist');
     final res = await postgrest.from('user').select().execute();
-    expect(res.error.code, 'SocketException');
+    expect(res.error!.code, 'SocketException');
   });
 
   test('select with head:true', () async {
@@ -126,14 +126,14 @@ void main() {
   test('stored procedure with head: true', () async {
     final res = await postgrest.rpc('get_status').execute(head: true);
     expect(res.error, isNotNull);
-    expect(res.error.code, '404');
+    expect(res.error!.code, '404');
   });
 
   test('stored procedure with count: exact', () async {
     final res = await postgrest.rpc('get_status').execute(count: CountOption.exact);
     expect(res.error, isNotNull);
-    expect(res.error.hint, isNotNull);
-    expect(res.error.message, isNotNull);
+    expect(res.error!.hint, isNotNull);
+    expect(res.error!.message, isNotNull);
   });
 
   test('insert with count: exact', () async {
