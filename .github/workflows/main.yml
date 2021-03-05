@@ -26,8 +26,6 @@ jobs:
 
       - name: Setup Dart
         uses: cedx/setup-dart@v2
-        with:
-          release-channel: beta
 
       - name: Install dependencies
         run: pub get
