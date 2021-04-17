@@ -110,14 +110,14 @@ void main() {
 
   test('contains', () async {
     final res =
-        await postgrest.from('users').select('age_range').contains('age_range', '[1,2)').execute();
+        await postgrest.from('users').select('username').contains('age_range', '[1,2)').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('containedBy', () async {
     final res = await postgrest
         .from('users')
-        .select('age_range')
+        .select('username')
         .containedBy('age_range', '[1,2)')
         .execute();
     expect(res.data[0]['username'], 'supabot');
@@ -125,7 +125,7 @@ void main() {
 
   test('rangeLt', () async {
     final res =
-        await postgrest.from('users').select('age_range').rangeLt('age_range', '[2,25)').execute();
+        await postgrest.from('users').select('username').rangeLt('age_range', '[2,25)').execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
@@ -147,7 +147,7 @@ void main() {
 
   test('rangeLte', () async {
     final res =
-        await postgrest.from('users').select('age_range').rangeLte('age_range', '[2,25)').execute();
+        await postgrest.from('users').select('username').rangeLte('age_range', '[2,25)').execute();
     res.data.forEach((item) {
       expect(item['username'] == 'supabot', true);
     });
