@@ -270,7 +270,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// Finds all rows whose text or tsvector value on the stated [column] matches the tsquery in [query].
   ///
   /// ```dart
-  /// postgrest.from('users').select().textSearch('catchphrase', "'fat' & 'cat'", { config: 'english' })
+  /// postgrest.from('users').select().textSearch('catchphrase', "'fat' & 'cat'", config: 'english')
   /// ```
   PostgrestFilterBuilder textSearch(
     String column,
