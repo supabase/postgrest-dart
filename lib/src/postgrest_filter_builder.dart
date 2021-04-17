@@ -267,21 +267,9 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   @Deprecated('Use `overlaps()` instead.')
   PostgrestFilterBuilder Function(String, String) get ov => overlaps;
 
-/**
-   * Finds all rows whose text or tsvector value on the stated `column` matches
-   * the tsquery in `query`.
-   *
-   * @param column  The column to filter on.
-   * @param query  The Postgres tsquery string to filter with.
-   * @param config  The text search configuration to use.
-   * @param type  The type of tsquery conversion to use on `query`.
-   */
-
   /// Finds all rows whose text or tsvector value on the stated [column] matches the tsquery in [query].
   ///
-  ///
   /// ```dart
-  /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// postgrest.from('users').select().textSearch('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
   PostgrestFilterBuilder textSearch(
@@ -309,7 +297,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches to_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
@@ -322,7 +310,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches plainto_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
@@ -335,7 +323,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches phraseto_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
@@ -348,7 +336,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches websearch_to_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
