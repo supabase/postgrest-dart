@@ -156,7 +156,6 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  ///   /** @deprecated Use `contains()` instead. */
   @Deprecated('Use `contains()` instead.')
   PostgrestFilterBuilder Function(String, dynamic) get cs => contains;
 
@@ -232,7 +231,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  @Deprecated('Use `rangeGte()` instead.')
+  @Deprecated('Use `rangeLte()` instead.')
   PostgrestFilterBuilder Function(String, String) get nxr => rangeLte;
 
   /// Finds all rows whose range value on the stated [column] is adjacent to the specified [range].
@@ -245,7 +244,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  @Deprecated('Use `rangeGte()` instead.')
+  @Deprecated('Use `rangeAdjacent()` instead.')
   PostgrestFilterBuilder Function(String, String) get adj => rangeAdjacent;
 
   /// Finds all rows whose array or range value on the stated [column] overlaps (has a value in common) with the specified [value].
@@ -265,7 +264,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  @Deprecated('Use `rangeGte()` instead.')
+  @Deprecated('Use `overlaps()` instead.')
   PostgrestFilterBuilder Function(String, String) get ov => overlaps;
 
 /**
@@ -282,7 +281,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   ///
   /// ```dart
-  /// postgrest.from('users').select().textSearch('bio', 'cat')
+  /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
+  /// postgrest.from('users').select().textSearch('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
   PostgrestFilterBuilder textSearch(
     String column,
@@ -307,7 +307,6 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches to_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
@@ -321,7 +320,6 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches plainto_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
@@ -335,7 +333,6 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches phraseto_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
@@ -349,7 +346,6 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
-  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches websearch_to_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
