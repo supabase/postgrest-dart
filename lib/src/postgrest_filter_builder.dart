@@ -268,6 +268,45 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   @Deprecated('Use `rangeGte()` instead.')
   PostgrestFilterBuilder Function(String, String) get ov => overlaps;
 
+/**
+   * Finds all rows whose text or tsvector value on the stated `column` matches
+   * the tsquery in `query`.
+   *
+   * @param column  The column to filter on.
+   * @param query  The Postgres tsquery string to filter with.
+   * @param config  The text search configuration to use.
+   * @param type  The type of tsquery conversion to use on `query`.
+   */
+
+  /// Finds all rows whose text or tsvector value on the stated [column] matches the tsquery in [query].
+  ///
+  ///
+  /// ```dart
+  /// postgrest.from('users').select().textSearch('bio', 'cat')
+  /// ```
+  PostgrestFilterBuilder textSearch(
+    String column,
+    String query, {
+
+    /// The text search configuration to use.
+    String? config,
+
+    /// The type of tsquery conversion to use on [query].
+    TextSearchType? type,
+  }) {
+    var typePart = '';
+    if (type == TextSearchType.plain) {
+      typePart = 'pl';
+    } else if (type == TextSearchType.phrase) {
+      typePart = 'ph';
+    } else if (type == TextSearchType.websearch) {
+      typePart = 'w';
+    }
+    final configPart = config == null ? '' : '($config)';
+    appendSearchParams(column, '${typePart}fts$configPart.$query');
+    return this;
+  }
+
   /// Finds all rows whose tsvector value on the stated [column] matches to_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
