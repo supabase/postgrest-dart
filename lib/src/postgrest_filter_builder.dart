@@ -307,48 +307,56 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
+  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches to_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder fts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'fts$configPart.$query');
     return this;
   }
 
+  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches plainto_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder plfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'plfts$configPart.$query');
     return this;
   }
 
+  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches phraseto_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder phfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'phfts$configPart.$query');
     return this;
   }
 
+  /// This class is deprecated, please use `textSearch()` instead.
   /// Finds all rows whose tsvector value on the stated [column] matches websearch_to_tsquery([query]).
   ///
   /// [options] can contains `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder wfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'wfts$configPart.$query');
