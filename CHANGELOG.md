@@ -1,3 +1,18 @@
+## [0.1.0]
+
+- deprecated: `cs()` in filter. Use `contains()` instead.
+- deprecated: `cd()` in filter. Use `containedBy()` instead.
+- deprecated: `sl()` in filter. Use `rangeLt()` instead.
+- deprecated: `sr()` in filter. Use `rangeGt()` instead.
+- deprecated: `nxl()` in filter. Use `rangeGte()` instead.
+- deprecated: `nxr()` in filter. Use `rangeLte()` instead.
+- deprecated: `adj()` in filter. Use `rangeAdjacent()` instead.
+- deprecated: `ov()` in filter. Use `overlaps()` instead.
+- deprecated: `fts()` in filter. Use `textSearch()` instead.
+- deprecated: `plfts()` in filter. Use `textSearch()` instead.
+- deprecated: `phfts()` in filter. Use `textSearch()` instead.
+- deprecated: `wfts()` in filter. Use `textSearch()` instead.
+
 ## [0.0.8]
 
 - feat: Migrate to null-safe dart

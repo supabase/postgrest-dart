@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:postgrest/src/text_search_type.dart';
+
 import 'postgrest_builder.dart';
 import 'postgrest_transform_builder.dart';
 
@@ -137,9 +139,9 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// Finds all rows whose json, array, or range value on the stated [column] contains the values specified in [value].
   ///
   /// ```dart
-  /// postgrest.from('users').select().cs('age_range', '[1,2)')
+  /// postgrest.from('users').select().contains('age_range', '[1,2)')
   /// ```
-  PostgrestFilterBuilder cs(String column, dynamic value) {
+  PostgrestFilterBuilder contains(String column, dynamic value) {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
@@ -154,12 +156,15 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
+  @Deprecated('Use `contains()` instead.')
+  PostgrestFilterBuilder Function(String, dynamic) get cs => contains;
+
   /// Finds all rows whose json, array, or range value on the stated [column] is contained by the specified [value].
   ///
   /// ```dart
-  /// postgrest.from('users').select().cd('age_range', '[1,2)')
+  /// postgrest.from('users').select().containedBy('age_range', '[1,2)')
   /// ```
-  PostgrestFilterBuilder cd(String column, dynamic value) {
+  PostgrestFilterBuilder containedBy(String column, dynamic value) {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
@@ -174,62 +179,80 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
+  @Deprecated('Use `containedBy()` instead.')
+  PostgrestFilterBuilder Function(String, dynamic) get cd => containedBy;
+
   /// Finds all rows whose range value on the stated [column] is strictly to the left of the specified [range].
   ///
   /// ```dart
   /// postgrest.from('users').select().sl('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder sl(String column, String range) {
+  PostgrestFilterBuilder rangeLt(String column, String range) {
     appendSearchParams(column, 'sl.$range');
     return this;
   }
 
+  @Deprecated('Use `rangeLt()` instead.')
+  PostgrestFilterBuilder Function(String, String) get sl => rangeLt;
+
   /// Finds all rows whose range value on the stated [column] is strictly to the right of the specified [range].
   ///
   /// ```dart
-  /// postgrest.from('users').select().sr('age_range', '[2,25)')
+  /// postgrest.from('users').select().rangeGt('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder sr(String column, String range) {
+  PostgrestFilterBuilder rangeGt(String column, String range) {
     appendSearchParams(column, 'sr.$range');
     return this;
   }
 
+  @Deprecated('Use `rangeGt()` instead.')
+  PostgrestFilterBuilder Function(String, String) get sr => rangeGt;
+
   /// Finds all rows whose range value on the stated [column] does not extend to the left of the specified [range].
   ///
   /// ```dart
-  /// postgrest.from('users').select().nxl('age_range', '[2,25)')
+  /// postgrest.from('users').select().rangeGte('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder nxl(String column, String range) {
+  PostgrestFilterBuilder rangeGte(String column, String range) {
     appendSearchParams(column, 'nxl.$range');
     return this;
   }
 
+  @Deprecated('Use `rangeGte()` instead.')
+  PostgrestFilterBuilder Function(String, String) get nxl => rangeGte;
+
   /// Finds all rows whose range value on the stated [column] does not extend to the right of the specified [range].
   ///
   /// ```dart
-  /// postgrest.from('users').select().nxr('age_range', '[2,25)')
+  /// postgrest.from('users').select().rangeLte('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder nxr(String column, String range) {
+  PostgrestFilterBuilder rangeLte(String column, String range) {
     appendSearchParams(column, 'nxr.$range');
     return this;
   }
 
+  @Deprecated('Use `rangeLte()` instead.')
+  PostgrestFilterBuilder Function(String, String) get nxr => rangeLte;
+
   /// Finds all rows whose range value on the stated [column] is adjacent to the specified [range].
   ///
   /// ```dart
-  /// postgrest.from('users').select().adj('age_range', '[2,25)')
+  /// postgrest.from('users').select().rangeAdjacent('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder adj(String column, String range) {
+  PostgrestFilterBuilder rangeAdjacent(String column, String range) {
     appendSearchParams(column, 'adj.$range');
     return this;
   }
 
-  /// Finds all rows whose array or range value on the stated [column] iscontained by the specified [value].
+  @Deprecated('Use `rangeAdjacent()` instead.')
+  PostgrestFilterBuilder Function(String, String) get adj => rangeAdjacent;
+
+  /// Finds all rows whose array or range value on the stated [column] overlaps (has a value in common) with the specified [value].
   ///
   /// ```dart
-  /// postgrest.from('users').select().ov('age_range', '[2,25)')
+  /// postgrest.from('users').select().overlaps('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder ov(String column, dynamic value) {
+  PostgrestFilterBuilder overlaps(String column, dynamic value) {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
@@ -241,12 +264,44 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
     return this;
   }
 
+  @Deprecated('Use `overlaps()` instead.')
+  PostgrestFilterBuilder Function(String, String) get ov => overlaps;
+
+  /// Finds all rows whose text or tsvector value on the stated [column] matches the tsquery in [query].
+  ///
+  /// ```dart
+  /// postgrest.from('users').select().textSearch('catchphrase', "'fat' & 'cat'", config: 'english')
+  /// ```
+  PostgrestFilterBuilder textSearch(
+    String column,
+    String query, {
+
+    /// The text search configuration to use.
+    String? config,
+
+    /// The type of tsquery conversion to use on [query].
+    TextSearchType? type,
+  }) {
+    var typePart = '';
+    if (type == TextSearchType.plain) {
+      typePart = 'pl';
+    } else if (type == TextSearchType.phrase) {
+      typePart = 'ph';
+    } else if (type == TextSearchType.websearch) {
+      typePart = 'w';
+    }
+    final configPart = config == null ? '' : '($config)';
+    appendSearchParams(column, '${typePart}fts$configPart.$query');
+    return this;
+  }
+
   /// Finds all rows whose tsvector value on the stated [column] matches to_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder fts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'fts$configPart.$query');
@@ -255,10 +310,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches plainto_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder plfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'plfts$configPart.$query');
@@ -267,10 +323,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches phraseto_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder phfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'phfts$configPart.$query');
@@ -279,10 +336,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Finds all rows whose tsvector value on the stated [column] matches websearch_to_tsquery([query]).
   ///
-  /// [options] can contains `config` key which is text search configuration to use.
+  /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
   /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
   /// ```
+  @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder wfts(String column, String query, {String? config}) {
     final configPart = config == null ? '' : '($config)';
     appendSearchParams(column, 'wfts$configPart.$query');
