@@ -161,4 +161,9 @@ void main() {
 
     expect(res.count, 1);
   });
+
+  test('execute without table operation', () async {
+    final res = await postgrest.from('users').execute();
+    expect(res.error, isNotNull);
+  });
 }
