@@ -49,17 +49,17 @@ void main() {
     expect(res.data.length, 5);
   });
 
-  test('on_conflict insert', () async {
-    final res = await postgrest.from('users').insert({'username': 'dragarcia', 'status': 'OFFLINE'},
-        upsert: true, onConflict: 'username').execute();
+  test('on_conflict upsert', () async {
+    final res = await postgrest
+        .from('users')
+        .upsert({'username': 'dragarcia', 'status': 'OFFLINE'}, onConflict: 'username').execute();
     expect(res.data[0]['status'], 'OFFLINE');
   });
 
   test('upsert', () async {
-    final res = await postgrest.from('messages').insert(
-        {'id': 3, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
-        upsert: true).execute();
-    //{id: 3, message: foo, username: supabot, channel_id: 2}
+    final res = await postgrest
+        .from('messages')
+        .upsert({'id': 3, 'message': 'foo', 'username': 'supabot', 'channel_id': 2}).execute();
     expect(res.data[0]['id'], 3);
 
     final resMsg = await postgrest.from('messages').select().execute();
@@ -137,9 +137,9 @@ void main() {
   });
 
   test('insert with count: exact', () async {
-    final res = await postgrest.from('users').insert(
+    final res = await postgrest.from('users').upsert(
         {'username': 'countexact', 'status': 'OFFLINE'},
-        upsert: true, onConflict: 'username').execute(count: CountOption.exact);
+        onConflict: 'username').execute(count: CountOption.exact);
     expect(res.count, 1);
   });
 
