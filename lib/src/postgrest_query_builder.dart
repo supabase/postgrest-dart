@@ -49,20 +49,38 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an INSERT into the table.
   ///
-  /// When [options] has `upsert` is true, performs an UPSERT.
   /// ```dart
-  /// postgrest.from('messages').insert({ message: 'foo', username: 'supabot', channel_id: 1 })
-  /// postgrest.from('messages').insert({ id: 3, message: 'foo', username: 'supabot', channel_id: 2 }, { upsert: true })
+  /// postgrest.from('messages').insert({ 'message': 'foo', 'username': 'supabot', 'channel_id': 1 })
   /// ```
   PostgrestBuilder insert(
     dynamic values, {
-    bool upsert = false,
+    @Deprecated('Use `upsert()` method instead') bool upsert = false,
+    @Deprecated('Use `upsert()` method instead') String? onConflict,
+  }) {
+    method = 'POST';
+    headers['Prefer'] =
+        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    if (onConflict != null) {
+      url.queryParameters.addAll({'on_conflict': onConflict});
+    }
+    body = values;
+    return this;
+  }
+
+  /// Performs an UPSERT into the table.
+  ///
+  /// ```dart
+  /// postgrest.from('messages').upsert({ 'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2 }, { upsert: true })
+  /// ```
+  PostgrestBuilder upsert(
+    dynamic values, {
     String? onConflict,
   }) {
     method = 'POST';
-    headers['Prefer'] = upsert
-        ? 'return=representation,resolution=merge-duplicates'
-        : 'return=representation';
+    headers['Prefer'] = 'return=representation,resolution=merge-duplicates';
+    if (onConflict != null) {
+      url.queryParameters.addAll({'on_conflict': onConflict});
+    }
     body = values;
     return this;
   }
@@ -70,7 +88,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// Performs an UPDATE on the table.
   ///
   /// ```dart
-  /// postgrest.from('messages').update({ channel_id: 2 }).eq('message', 'foo')
+  /// postgrest.from('messages').update({ 'channel_id': 2 }).eq('message', 'foo')
   /// ```
   PostgrestFilterBuilder update(Map values) {
     method = 'PATCH';
