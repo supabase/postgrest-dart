@@ -166,4 +166,26 @@ void main() {
     final res = await postgrest.from('users').execute();
     expect(res.error, isNotNull);
   });
+
+  test('select from uppercase table name', () async {
+    final res = await postgrest.from('TestTable').select().execute();
+    expect(res.data.length, 2);
+  });
+
+  test('insert from uppercase table name', () async {
+    final res = await postgrest.from('TestTable').insert([
+      {'slug': 'new slug'}
+    ]).execute();
+    expect(res.data[0]['slug'], 'new slug');
+    expect(res.data[0]['id'], 3);
+  });
+
+  test('delete from uppercase table name', () async {
+    final res = await postgrest
+        .from('TestTable')
+        .delete()
+        .eq('slug', 'new slug')
+        .execute(count: CountOption.exact);
+    expect(res.count, 1);
+  });
 }
