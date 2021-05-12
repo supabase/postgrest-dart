@@ -1,3 +1,7 @@
+## [0.1.1]
+
+- fix: PostgrestError parsing
+
 ## [0.1.0]
 
 - deprecated: `cs()` in filter. Use `contains()` instead.
