@@ -188,4 +188,9 @@ void main() {
         .execute(count: CountOption.exact);
     expect(res.count, 1);
   });
+
+  test('row level security error', () async {
+    final res = await postgrest.from('sample').update({'id': 2}).execute();
+    expect(res.error, isNotNull);
+  });
 }
