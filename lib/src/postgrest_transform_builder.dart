@@ -92,4 +92,15 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
     headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
   }
+
+  /// Retrieves the response as CSV.
+  /// This will skip object parsing.
+  ///
+  /// ```dart
+  /// postgrest.from('users').select().csv()
+  /// ```
+  PostgrestTransformBuilder csv() {
+    headers['Accept'] = 'text/csv';
+    return this;
+  }
 }
