@@ -123,6 +123,11 @@ void main() {
     expect(res.count, const TypeMatcher<int>());
   });
 
+  test('select with csv', () async {
+    final res = await postgrest.from('users').select().csv().execute();
+    expect(res.data, const TypeMatcher<String>());
+  });
+
   test('stored procedure with head: true', () async {
     final res = await postgrest.rpc('get_status').execute(head: true);
     expect(res.error, isNotNull);

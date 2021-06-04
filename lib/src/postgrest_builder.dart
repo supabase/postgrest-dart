@@ -85,7 +85,7 @@ abstract class PostgrestBuilder {
         response = await client.head(url, headers: headers);
       }
 
-      return parseJsonResponse(response);
+      return parseResponse(response);
     } catch (e) {
       final error = PostgrestError(code: e.runtimeType.toString(), message: e.toString());
       return PostgrestResponse(
@@ -96,16 +96,20 @@ abstract class PostgrestBuilder {
   }
 
   /// Parse request response to json object if possible
-  PostgrestResponse parseJsonResponse(http.Response response) {
+  PostgrestResponse parseResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
 
       if (response.request!.method != 'HEAD') {
-        try {
-          body = json.decode(response.body);
-        } on FormatException catch (_) {
-          body = null;
+        if (response.request!.headers['Accept'] == 'text/csv') {
+          body = response.body;
+        } else {
+          try {
+            body = json.decode(response.body);
+          } on FormatException catch (_) {
+            body = null;
+          }
         }
       }
 
