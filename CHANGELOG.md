@@ -1,3 +1,8 @@
+## [0.1.2]
+
+- feat: Add CSV response
+- chore: remove unnecessary new keyword on docs
+
 ## [0.1.1]
 
 - fix: PostgrestError parsing
