@@ -1,3 +1,7 @@
+## [0.1.3]
+
+- chore: added count_option export
+
 ## [0.1.2]
 
 - feat: Add CSV response
