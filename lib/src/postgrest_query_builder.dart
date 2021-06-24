@@ -70,7 +70,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// Performs an UPSERT into the table.
   ///
   /// ```dart
-  /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2}, {upsert: true})
+  /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
   PostgrestBuilder upsert(
     dynamic values, {
