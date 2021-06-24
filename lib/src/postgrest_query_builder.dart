@@ -50,7 +50,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// Performs an INSERT into the table.
   ///
   /// ```dart
-  /// postgrest.from('messages').insert({ 'message': 'foo', 'username': 'supabot', 'channel_id': 1 })
+  /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
   PostgrestBuilder insert(
     dynamic values, {
@@ -70,7 +70,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// Performs an UPSERT into the table.
   ///
   /// ```dart
-  /// postgrest.from('messages').upsert({ 'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2 }, { upsert: true })
+  /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2}, {upsert: true})
   /// ```
   PostgrestBuilder upsert(
     dynamic values, {
@@ -88,7 +88,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// Performs an UPDATE on the table.
   ///
   /// ```dart
-  /// postgrest.from('messages').update({ 'channel_id': 2 }).eq('message', 'foo')
+  /// postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo')
   /// ```
   PostgrestFilterBuilder update(Map values) {
     method = 'PATCH';

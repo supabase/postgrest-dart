@@ -39,8 +39,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// When [options] has `nullsFirst` value true, `null`s appear first.
   /// If [column] is a foreign column, the [options] need to have `foreignTable` value provided
   /// ```dart
-  /// postgrest.from('users').select().order('username', { ascending: false })
-  /// postgrest.from('users').select('messages(*)').order('channel_id', { foreignTable: 'messages', ascending: false })
+  /// postgrest.from('users').select().order('username', ascending: false)
+  /// postgrest.from('users').select('messages(*)').order('channel_id', foreignTable: 'messages', ascending: false)
   /// ```
   PostgrestTransformBuilder order(String column,
       {bool ascending = false, bool nullsFirst = false, String? foreignTable}) {
@@ -57,7 +57,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// If we want to limit a foreign column, the [options] need to have `foreignTable` value provided
   /// ```dart
   /// postgrest.from('users').select().limit(1)
-  /// postgrest.from('users').select('messages(*)').limit(1, { foreignTable: 'messages' })
+  /// postgrest.from('users').select('messages(*)').limit(1, foreignTable: 'messages')
   /// ```
   PostgrestTransformBuilder limit(int count, {String? foreignTable}) {
     final key = foreignTable == null ? 'limit' : '"$foreignTable".limit';
@@ -70,7 +70,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   ///
   /// If we want to limit a foreign column, the [options] need to have `foreignTable` value provided
   /// ```dart
-  /// postgrest.from('users').select('messages(*)').range(1, 1, { foreignTable: 'messages' })
+  /// postgrest.from('users').select('messages(*)').range(1, 1, foreignTable: 'messages')
   /// ```
   PostgrestTransformBuilder range(int from, int to, {String? foreignTable}) {
     final keyOffset =
