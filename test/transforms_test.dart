@@ -15,6 +15,13 @@ void main() {
     expect(res.data[3]['username'], 'awailas');
   });
 
+  test('order on multiple columns', () async {
+    final res = await postgrest.from('users').select().order('status', ascending: true).order('username').execute();
+    expect(res.data[0]['username'], 'supabot');
+    expect(res.data[2]['username'], 'kiwicopple');
+    expect(res.data[3]['username'], 'dragarcia');
+  });
+
   test('limit', () async {
     final res = await postgrest.from('users').select().limit(1).execute();
     expect(res.data.length, 1);

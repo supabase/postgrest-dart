@@ -45,7 +45,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   PostgrestTransformBuilder order(String column,
       {bool ascending = false, bool nullsFirst = false, String? foreignTable}) {
     final key = foreignTable == null ? 'order' : '"$foreignTable".order';
-    final value =
+    final existingOrder = url.queryParameters[key];
+    final value = '${existingOrder == null ? '' : '$existingOrder,'}'
         '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
     appendSearchParams(key, value);
