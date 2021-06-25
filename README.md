@@ -33,7 +33,7 @@ var url = 'https://example.com/postgrest/endpoint';
 var client = PostgrestClient(url);
 var response = await client.from('users')
       .insert([
-        { 'username': 'supabot', 'status': 'ONLINE'}
+        {'username': 'supabot', 'status': 'ONLINE'}
       ])
       .execute();
 ```
@@ -46,7 +46,7 @@ import 'package:postgrest/postgrest.dart';
 var url = 'https://example.com/postgrest/endpoint';
 var client = PostgrestClient(url);
 var response = await client.from('users')
-      .update({ 'status': 'OFFLINE' })
+      .update({'status': 'OFFLINE'})
       .eq('username', 'dragarcia')
       .execute();
 ```

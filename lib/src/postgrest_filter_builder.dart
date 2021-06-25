@@ -299,7 +299,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
-  /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", { config: 'english' })
+  /// postgrest.from('users').select().fts('catchphrase', "'fat' & 'cat'", config: 'english')
   /// ```
   @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder fts(String column, String query, {String? config}) {
@@ -312,7 +312,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
-  /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
+  /// postgrest.from('users').select().plfts('catchphrase', "'fat' & 'cat'", config: 'english')
   /// ```
   @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder plfts(String column, String query, {String? config}) {
@@ -325,7 +325,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
-  /// postgrest.from('users').select().phfts('catchphrase', 'cat', { config: 'english' })
+  /// postgrest.from('users').select().phfts('catchphrase', 'cat', config: 'english')
   /// ```
   @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder phfts(String column, String query, {String? config}) {
@@ -338,7 +338,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   /// [options] can contain `config` key which is text search configuration to use.
   /// ```dart
-  /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", { config: 'english' })
+  /// postgrest.from('users').select().wfts('catchphrase', "'fat' & 'cat'", config: 'english')
   /// ```
   @Deprecated('Use `textSearch()` instead.')
   PostgrestFilterBuilder wfts(String column, String query, {String? config}) {
@@ -361,7 +361,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   ///
   /// [query] contains column names as keys mapped to their filter values.
   /// ```dart
-  /// postgrest.from('users').select().match({ 'username': 'supabot', 'status': 'ONLINE' })
+  /// postgrest.from('users').select().match({'username': 'supabot', 'status': 'ONLINE'})
   /// ```
   PostgrestFilterBuilder match(Map query) {
     query.forEach((k, v) => appendSearchParams('$k', 'eq.$v'));
