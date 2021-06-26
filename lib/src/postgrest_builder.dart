@@ -87,7 +87,8 @@ abstract class PostgrestBuilder {
 
       return parseResponse(response);
     } catch (e) {
-      final error = PostgrestError(code: e.runtimeType.toString(), message: e.toString());
+      final error =
+          PostgrestError(code: e.runtimeType.toString(), message: e.toString());
       return PostgrestResponse(
         status: 500,
         error: error,
@@ -115,8 +116,9 @@ abstract class PostgrestBuilder {
 
       final contentRange = response.headers['content-range'];
       if (contentRange != null) {
-        count =
-            contentRange.split('/').last == '*' ? null : int.parse(contentRange.split('/').last);
+        count = contentRange.split('/').last == '*'
+            ? null
+            : int.parse(contentRange.split('/').last);
       }
 
       return PostgrestResponse(
@@ -128,7 +130,8 @@ abstract class PostgrestBuilder {
       PostgrestError error;
       if (response.request!.method != 'HEAD') {
         try {
-          final Map<String, dynamic> errorJson = json.decode(response.body) as Map<String, dynamic>;
+          final Map<String, dynamic> errorJson =
+              json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
         } catch (_) {
           error = PostgrestError(message: response.body);

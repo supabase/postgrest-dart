@@ -11,8 +11,11 @@ void main() {
   });
 
   test('not', () async {
-    final res =
-        await postgrest.from('users').select('status').not('status', 'eq', 'OFFLINE').execute();
+    final res = await postgrest
+        .from('users')
+        .select('status')
+        .not('status', 'eq', 'OFFLINE')
+        .execute();
     res.data.forEach((item) {
       expect(item['status'] != ('OFFLINE'), true);
     });
@@ -25,13 +28,17 @@ void main() {
         .or('status.eq.OFFLINE,username.eq.supabot')
         .execute();
     res.data.forEach((item) {
-      expect(item['username'] == ('supabot') || item['status'] == ('OFFLINE'), true);
+      expect(item['username'] == ('supabot') || item['status'] == ('OFFLINE'),
+          true);
     });
   });
 
   test('eq', () async {
-    final res =
-        await postgrest.from('users').select('username').eq('username', 'supabot').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .eq('username', 'supabot')
+        .execute();
 
     res.data.forEach((item) {
       expect(item['username'] == ('supabot'), true);
@@ -39,52 +46,65 @@ void main() {
   });
 
   test('neq', () async {
-    final res =
-        await postgrest.from('users').select('username').neq('username', 'supabot').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .neq('username', 'supabot')
+        .execute();
     res.data.forEach((item) {
       expect(item['username'] == ('supabot'), false);
     });
   });
 
   test('gt', () async {
-    final res = await postgrest.from('messages').select('id').gt('id', 1).execute();
+    final res =
+        await postgrest.from('messages').select('id').gt('id', 1).execute();
     res.data.forEach((item) {
       expect(item['id'] > 1, true);
     });
   });
 
   test('gte', () async {
-    final res = await postgrest.from('messages').select('id').gte('id', 1).execute();
+    final res =
+        await postgrest.from('messages').select('id').gte('id', 1).execute();
     res.data.forEach((item) {
       expect(item['id'] < 1, false);
     });
   });
 
   test('lt', () async {
-    final res = await postgrest.from('messages').select('id').lt('id', 2).execute();
+    final res =
+        await postgrest.from('messages').select('id').lt('id', 2).execute();
     res.data.forEach((item) {
       expect(item['id'] < 2, true);
     });
   });
 
   test('lte', () async {
-    final res = await postgrest.from('messages').select('id').lte('id', 2).execute();
+    final res =
+        await postgrest.from('messages').select('id').lte('id', 2).execute();
     res.data.forEach((item) {
       expect(item['id'] > 2, false);
     });
   });
 
   test('like', () async {
-    final res =
-        await postgrest.from('users').select('username').like('username', '%supa%').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .like('username', '%supa%')
+        .execute();
     res.data.forEach((item) {
       expect(item['username'].contains('supa'), true);
     });
   });
 
   test('ilike', () async {
-    final res =
-        await postgrest.from('users').select('username').ilike('username', '%SUPA%').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .ilike('username', '%SUPA%')
+        .execute();
     res.data.forEach((item) {
       final user = item['username'].toLowerCase();
       expect(user.contains('supa'), true);
@@ -92,7 +112,11 @@ void main() {
   });
 
   test('is', () async {
-    final res = await postgrest.from('users').select('data').is_('data', null).execute();
+    final res = await postgrest
+        .from('users')
+        .select('data')
+        .is_('data', null)
+        .execute();
     res.data.forEach((item) {
       expect(item['data'], null);
     });
@@ -109,8 +133,11 @@ void main() {
   });
 
   test('contains', () async {
-    final res =
-        await postgrest.from('users').select('username').contains('age_range', '[1,2)').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .contains('age_range', '[1,2)')
+        .execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
@@ -124,30 +151,42 @@ void main() {
   });
 
   test('rangeLt', () async {
-    final res =
-        await postgrest.from('users').select('username').rangeLt('age_range', '[2,25)').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .rangeLt('age_range', '[2,25)')
+        .execute();
     expect(res.data[0]['username'], 'supabot');
   });
 
   test('rangeGt', () async {
-    final res =
-        await postgrest.from('users').select('age_range').rangeGt('age_range', '[2,25)').execute();
+    final res = await postgrest
+        .from('users')
+        .select('age_range')
+        .rangeGt('age_range', '[2,25)')
+        .execute();
     res.data.forEach((item) {
       expect(item['username'] != 'supabot', true);
     });
   });
 
   test('rangeGte', () async {
-    final res =
-        await postgrest.from('users').select('age_range').rangeGte('age_range', '[2,25)').execute();
+    final res = await postgrest
+        .from('users')
+        .select('age_range')
+        .rangeGte('age_range', '[2,25)')
+        .execute();
     res.data.forEach((item) {
       expect(item['username'] != 'supabot', true);
     });
   });
 
   test('rangeLte', () async {
-    final res =
-        await postgrest.from('users').select('username').rangeLte('age_range', '[2,25)').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .rangeLte('age_range', '[2,25)')
+        .execute();
     res.data.forEach((item) {
       expect(item['username'] == 'supabot', true);
     });
@@ -163,8 +202,11 @@ void main() {
   });
 
   test('overlaps', () async {
-    final res =
-        await postgrest.from('users').select('username').overlaps('age_range', '[2,25)').execute();
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .overlaps('age_range', '[2,25)')
+        .execute();
     expect(res.data[0]['username'], 'dragarcia');
   });
 
@@ -181,7 +223,8 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('username')
-        .textSearch('catchphrase', "'fat' & 'cat'", config: 'english', type: TextSearchType.plain)
+        .textSearch('catchphrase', "'fat' & 'cat'",
+            config: 'english', type: TextSearchType.plain)
         .execute();
     expect(res.data[0]['username'], 'supabot');
   });
@@ -190,7 +233,8 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('username')
-        .textSearch('catchphrase', 'cat', config: 'english', type: TextSearchType.phrase)
+        .textSearch('catchphrase', 'cat',
+            config: 'english', type: TextSearchType.phrase)
         .execute();
     expect(res.data.length, 2);
   });
@@ -219,8 +263,11 @@ void main() {
   });
 
   test('filter', () async {
-    final res =
-        await postgrest.from('users').select().filter('username', 'eq', 'supabot').execute();
+    final res = await postgrest
+        .from('users')
+        .select()
+        .filter('username', 'eq', 'supabot')
+        .execute();
     expect(res.data[0]['username'], 'supabot');
   });
 

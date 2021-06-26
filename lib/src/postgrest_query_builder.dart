@@ -58,10 +58,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     @Deprecated('Use `upsert()` method instead') String? onConflict,
   }) {
     method = 'POST';
-    headers['Prefer'] =
-        upsert ? 'return=representation,resolution=merge-duplicates' : 'return=representation';
+    headers['Prefer'] = upsert
+        ? 'return=representation,resolution=merge-duplicates'
+        : 'return=representation';
     if (onConflict != null) {
-      url = url.replace(queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
+      url = url.replace(
+          queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
     }
     body = values;
     return this;
@@ -79,7 +81,8 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     method = 'POST';
     headers['Prefer'] = 'return=representation,resolution=merge-duplicates';
     if (onConflict != null) {
-      url = url.replace(queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
+      url = url.replace(
+          queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
     }
     body = values;
     return this;

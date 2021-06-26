@@ -16,7 +16,8 @@ void main() {
   });
 
   test('stored procedure', () async {
-    final res = await postgrest.rpc('get_status', params: {'name_param': 'supabot'}).execute();
+    final res = await postgrest
+        .rpc('get_status', params: {'name_param': 'supabot'}).execute();
     expect(res.data, 'ONLINE');
   });
 
@@ -40,7 +41,8 @@ void main() {
 
   test('auth', () async {
     postgrest = PostgrestClient(rootUrl).auth('foo');
-    expect(postgrest.from('users').select().headers['Authorization'], 'Bearer foo');
+    expect(postgrest.from('users').select().headers['Authorization'],
+        'Bearer foo');
   });
 
   test('switch schema', () async {
@@ -50,16 +52,19 @@ void main() {
   });
 
   test('on_conflict upsert', () async {
-    final res = await postgrest
-        .from('users')
-        .upsert({'username': 'dragarcia', 'status': 'OFFLINE'}, onConflict: 'username').execute();
+    final res = await postgrest.from('users').upsert(
+        {'username': 'dragarcia', 'status': 'OFFLINE'},
+        onConflict: 'username').execute();
     expect(res.data[0]['status'], 'OFFLINE');
   });
 
   test('upsert', () async {
-    final res = await postgrest
-        .from('messages')
-        .upsert({'id': 3, 'message': 'foo', 'username': 'supabot', 'channel_id': 2}).execute();
+    final res = await postgrest.from('messages').upsert({
+      'id': 3,
+      'message': 'foo',
+      'username': 'supabot',
+      'channel_id': 2
+    }).execute();
     expect(res.data[0]['id'], 3);
 
     final resMsg = await postgrest.from('messages').select().execute();
@@ -75,18 +80,28 @@ void main() {
   });
 
   test('basic update', () async {
-    await postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo').execute();
+    await postgrest
+        .from('messages')
+        .update({'channel_id': 2})
+        .eq('message', 'foo')
+        .execute();
 
-    final resMsg =
-        await postgrest.from('messages').select().filter('message', 'eq', 'foo').execute();
+    final resMsg = await postgrest
+        .from('messages')
+        .select()
+        .filter('message', 'eq', 'foo')
+        .execute();
     resMsg.data.forEach((rec) => expect(rec['channel_id'], 2));
   });
 
   test('basic delete', () async {
     await postgrest.from('messages').delete().eq('message', 'foo').execute();
 
-    final resMsg =
-        await postgrest.from('messages').select().filter('message', 'eq', 'foo').execute();
+    final resMsg = await postgrest
+        .from('messages')
+        .select()
+        .filter('message', 'eq', 'foo')
+        .execute();
     expect(resMsg.data.length, 0);
   });
 
@@ -107,19 +122,27 @@ void main() {
   });
 
   test('select with head:true, count: exact', () async {
-    final res =
-        await postgrest.from('users').select().execute(head: true, count: CountOption.exact);
+    final res = await postgrest
+        .from('users')
+        .select()
+        .execute(head: true, count: CountOption.exact);
     expect(res.data, null);
     expect(res.count, 4);
   });
 
   test('select with  count: planned', () async {
-    final res = await postgrest.from('users').select().execute(count: CountOption.exact);
+    final res = await postgrest
+        .from('users')
+        .select()
+        .execute(count: CountOption.exact);
     expect(res.count, const TypeMatcher<int>());
   });
 
   test('select with head:true, count: estimated', () async {
-    final res = await postgrest.from('users').select().execute(count: CountOption.exact);
+    final res = await postgrest
+        .from('users')
+        .select()
+        .execute(count: CountOption.exact);
     expect(res.count, const TypeMatcher<int>());
   });
 
@@ -135,7 +158,8 @@ void main() {
   });
 
   test('stored procedure with count: exact', () async {
-    final res = await postgrest.rpc('get_status').execute(count: CountOption.exact);
+    final res =
+        await postgrest.rpc('get_status').execute(count: CountOption.exact);
     expect(res.error, isNotNull);
     expect(res.error!.hint, isNotNull);
     expect(res.error!.message, isNotNull);
