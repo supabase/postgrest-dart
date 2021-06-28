@@ -5,11 +5,14 @@ import 'package:postgrest/src/count_option.dart';
 dynamic main() async {
   const supabaseUrl = '';
   const supabaseKey = '';
-  final client =
-      PostgrestClient('$supabaseUrl/rest/v1', headers: {'apikey': supabaseKey}, schema: 'public');
+  final client = PostgrestClient('$supabaseUrl/rest/v1',
+      headers: {'apikey': supabaseKey}, schema: 'public');
 
   try {
-    final response = await client.from('countries').select().execute(count: CountOption.exact);
+    final response = await client
+        .from('countries')
+        .select()
+        .execute(count: CountOption.exact);
     if (response.error != null) {
       throw response.error!;
     }

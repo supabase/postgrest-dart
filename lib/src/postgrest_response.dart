@@ -14,7 +14,8 @@ class PostgrestResponse {
   final PostgrestError? error;
   final int? count;
 
-  factory PostgrestResponse.fromJson(Map<String, dynamic> json) => PostgrestResponse(
+  factory PostgrestResponse.fromJson(Map<String, dynamic> json) =>
+      PostgrestResponse(
         data: json['body'],
         status: json['status'] as int?,
         error: json['error'] == null

@@ -10,13 +10,19 @@ void main() {
   });
 
   test('order', () async {
-    final res = await postgrest.from('users').select().order('username').execute();
+    final res =
+        await postgrest.from('users').select().order('username').execute();
     expect(res.data[1]['username'], 'kiwicopple');
     expect(res.data[3]['username'], 'awailas');
   });
 
   test('order on multiple columns', () async {
-    final res = await postgrest.from('users').select().order('catchphrase', ascending: true).order('username').execute();
+    final res = await postgrest
+        .from('users')
+        .select()
+        .order('catchphrase', ascending: true)
+        .order('username')
+        .execute();
     expect(res.data[0]['username'], 'kiwicopple');
     expect(res.data[2]['username'], 'supabot');
     expect(res.data[3]['username'], 'dragarcia');
@@ -30,7 +36,8 @@ void main() {
   test('range', () async {
     const from = 1;
     const to = 3;
-    final res = await postgrest.from('users').select().range(from, to).execute();
+    final res =
+        await postgrest.from('users').select().range(from, to).execute();
     //from -1 so that the index is included
     expect(res.data.length, to - (from - 1));
   });
@@ -38,13 +45,15 @@ void main() {
   test('range 1-1', () async {
     const from = 1;
     const to = 1;
-    final res = await postgrest.from('users').select().range(from, to).execute();
+    final res =
+        await postgrest.from('users').select().range(from, to).execute();
     //from -1 so that the index is included
     expect(res.data.length, to - (from - 1));
   });
 
   test('single', () async {
-    final res = await postgrest.from('users').select().limit(1).single().execute();
+    final res =
+        await postgrest.from('users').select().limit(1).single().execute();
     expect(res.data['username'], 'supabot');
     expect(res.data['status'], 'ONLINE');
   });

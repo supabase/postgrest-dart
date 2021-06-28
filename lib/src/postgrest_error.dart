@@ -8,13 +8,13 @@ class PostgrestError {
   });
 
   String message;
-  dynamic? details;
+  dynamic details;
   String? hint;
   String? code;
 
   factory PostgrestError.fromJson(Map<String, dynamic> json) => PostgrestError(
         message: json['message'] as String,
-        details: json['details'] as dynamic?,
+        details: json['details'] as dynamic,
         hint: json['hint'] as String?,
         code: json['code'] as String?,
       );
