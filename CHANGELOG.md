@@ -1,3 +1,11 @@
+## [0.1.4]
+
+- feat: implement ReturningOption
+- feat: add ignoreDuplicates option to upsert
+- feat: create maybeSingle() function
+- feat: sorting by multiple columns
+- fix: export TextSearchType
+
 ## [0.1.3]
 
 - chore: added count_option export
