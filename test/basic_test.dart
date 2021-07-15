@@ -86,11 +86,12 @@ void main() {
   });
 
   test('basic update', () async {
-    await postgrest
+    final res = await postgrest
         .from('messages')
-        .update({'channel_id': 2})
+        .update({'channel_id': 2}, returning: ReturningOption.minimal)
         .eq('message', 'foo')
         .execute();
+    expect(res.data, null);
 
     final resMsg = await postgrest
         .from('messages')
@@ -101,7 +102,12 @@ void main() {
   });
 
   test('basic delete', () async {
-    await postgrest.from('messages').delete().eq('message', 'foo').execute();
+    final res = await postgrest
+        .from('messages')
+        .delete(returning: ReturningOption.minimal)
+        .eq('message', 'foo')
+        .execute();
+    expect(res.data, null);
 
     final resMsg = await postgrest
         .from('messages')

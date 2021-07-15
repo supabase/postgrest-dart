@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'postgrest_builder.dart';
 import 'postgrest_filter_builder.dart';
+import 'returning_option.dart';
 
 /// The query builder class provides a convenient interface to creating request queries.
 ///
@@ -49,18 +50,20 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an INSERT into the table.
   ///
+  /// By default the new record is returned. Set [returning] to minimal if you don't need this value.
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
   PostgrestBuilder insert(
     dynamic values, {
+    ReturningOption returning = ReturningOption.representation,
     @Deprecated('Use `upsert()` method instead') bool upsert = false,
     @Deprecated('Use `upsert()` method instead') String? onConflict,
   }) {
     method = 'POST';
     headers['Prefer'] = upsert
-        ? 'return=representation,resolution=merge-duplicates'
-        : 'return=representation';
+        ? 'return=${returning.name()},resolution=merge-duplicates'
+        : 'return=${returning.name()}';
     if (onConflict != null) {
       url = url.replace(
           queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
@@ -71,16 +74,21 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an UPSERT into the table.
   ///
+  /// By default the new record is returned. Set [returning] to minimal if you don't need this value.
   /// By specifying the [onConflict] query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
   /// [ignoreDuplicates] Specifies if duplicate rows should be ignored and not inserted.
   /// ```dart
   /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
-  PostgrestBuilder upsert(dynamic values,
-      {String? onConflict, bool ignoreDuplicates = false}) {
+  PostgrestBuilder upsert(
+    dynamic values, {
+    ReturningOption returning = ReturningOption.representation,
+    String? onConflict,
+    bool ignoreDuplicates = false,
+  }) {
     method = 'POST';
     headers['Prefer'] =
-        'return=representation,resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
+        'return=${returning.name()},resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
       url = url.replace(
           queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
@@ -91,24 +99,31 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an UPDATE on the table.
   ///
+  /// By default the updated record(s) will be returned. Set [returning] to minimal if you don't need this value.
   /// ```dart
   /// postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder update(Map values) {
+  PostgrestFilterBuilder update(
+    Map values, {
+    ReturningOption returning = ReturningOption.representation,
+  }) {
     method = 'PATCH';
-    headers['Prefer'] = 'return=representation';
+    headers['Prefer'] = 'return=${returning.name()}';
     body = values;
     return PostgrestFilterBuilder(this);
   }
 
   /// Performs a DELETE on the table.
   ///
+  /// By default the deleted record(s) will be returned. Set [returning] to minimal if you don't need this value.
   /// ```dart
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder delete() {
+  PostgrestFilterBuilder delete({
+    ReturningOption returning = ReturningOption.representation,
+  }) {
     method = 'DELETE';
-    headers['Prefer'] = 'return=representation';
+    headers['Prefer'] = 'return=${returning.name()}';
     return PostgrestFilterBuilder(this);
   }
 }
