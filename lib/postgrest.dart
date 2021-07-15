@@ -7,3 +7,4 @@ export 'src/postgrest_query_builder.dart';
 export 'src/postgrest_response.dart';
 export 'src/postgrest_rpc_builder.dart';
 export 'src/postgrest_transform_builder.dart';
+export 'src/text_search_type.dart';

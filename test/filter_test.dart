@@ -1,4 +1,3 @@
-import 'package:postgrest/src/text_search_type.dart';
 import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
 

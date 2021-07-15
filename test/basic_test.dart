@@ -1,4 +1,3 @@
-import 'package:postgrest/src/count_option.dart';
 import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
 

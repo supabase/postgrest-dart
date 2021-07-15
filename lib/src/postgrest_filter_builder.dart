@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:postgrest/src/text_search_type.dart';
-
 import 'postgrest_builder.dart';
 import 'postgrest_transform_builder.dart';
+import 'text_search_type.dart';
 
 class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   PostgrestFilterBuilder(PostgrestBuilder builder) : super(builder);

@@ -1,5 +1,4 @@
 import 'package:postgrest/postgrest.dart';
-import 'package:postgrest/src/count_option.dart';
 
 /// Example to use with Supabase API https://supabase.io/
 dynamic main() async {
