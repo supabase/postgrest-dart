@@ -48,4 +48,4 @@ jobs:
           time: "5s"
 
       - name: Run tests
-        run: pub run test test
+        run: pub run test
