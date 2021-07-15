@@ -17,9 +17,11 @@ abstract class PostgrestBuilder {
     this.method,
     this.body,
   });
+
   dynamic body;
   final List query = [];
   final Map<String, String> headers;
+  bool maybeEmpty = false;
   String? method;
   final String? schema;
   Uri url;
@@ -133,6 +135,10 @@ abstract class PostgrestBuilder {
           final Map<String, dynamic> errorJson =
               json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
+
+          if (maybeEmpty) {
+            return handleMaybeEmptyError(response, error);
+          }
         } catch (_) {
           error = PostgrestError(message: response.body);
         }
@@ -142,6 +148,25 @@ abstract class PostgrestBuilder {
             message: 'Error in Postgrest response for method HEAD');
       }
 
+      return PostgrestResponse(
+        status: response.statusCode,
+        error: error,
+      );
+    }
+  }
+
+  /// on maybeEmpty enable, check for error details contains
+  /// 'Results contain 0 rows' then
+  /// return PostgrestResponse with null data
+  PostgrestResponse handleMaybeEmptyError(
+      http.Response response, PostgrestError error) {
+    if (error.details is String &&
+        error.details.toString().contains('Results contain 0 rows')) {
+      return PostgrestResponse(
+        status: 200,
+        count: 0,
+      );
+    } else {
       return PostgrestResponse(
         status: response.statusCode,
         error: error,

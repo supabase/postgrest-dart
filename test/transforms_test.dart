@@ -52,9 +52,24 @@ void main() {
   });
 
   test('single', () async {
-    final res =
-        await postgrest.from('users').select().limit(1).single().execute();
+    final res = await postgrest
+        .from('users')
+        .select()
+        .eq('username', 'supabot')
+        .single()
+        .execute();
     expect(res.data['username'], 'supabot');
     expect(res.data['status'], 'ONLINE');
+  });
+
+  test('maybeSingle', () async {
+    final res = await postgrest
+        .from('users')
+        .select()
+        .eq('username', 'goldstein')
+        .maybeSingle()
+        .execute();
+    expect(res.status, 200);
+    expect(res.data, isNull);
   });
 }

@@ -85,12 +85,22 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
 
   /// Retrieves only one row from the result.
   ///
-  /// Result must be one row (e.g. using `limit`),otherwise this will result in an error.
+  /// Result must be one row (e.g. using `limit`), otherwise this will result in an error.
   /// ```dart
   /// postgrest.from('users').select().limit(1).single()
   /// ```
   PostgrestTransformBuilder single() {
     headers['Accept'] = 'application/vnd.pgrst.object+json';
+    return this;
+  }
+
+  /// Retrieves at most one row from the result.
+  ///
+  /// Result must be at most one row or nullable
+  /// (e.g. using `eq` on a UNIQUE column), otherwise this will result in an error.
+  PostgrestTransformBuilder maybeSingle() {
+    headers['Accept'] = 'application/vnd.pgrst.object+json';
+    maybeEmpty = true;
     return this;
   }
 

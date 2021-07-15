@@ -206,7 +206,6 @@ void main() {
       {'slug': 'new slug'}
     ]).execute();
     expect(res.data[0]['slug'], 'new slug');
-    expect(res.data[0]['id'], 3);
   });
 
   test('delete from uppercase table name', () async {
