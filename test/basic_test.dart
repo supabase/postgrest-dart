@@ -71,6 +71,13 @@ void main() {
     expect(resMsg.data.length, 3);
   });
 
+  test('ignoreDuplicates upsert', () async {
+    final res = await postgrest.from('users').upsert({'username': 'dragarcia'},
+        onConflict: 'username', ignoreDuplicates: true).execute();
+    expect(res.data.length, 0);
+    expect(res.error, isNull);
+  });
+
   test('bulk insert', () async {
     final res = await postgrest.from('messages').insert([
       {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},

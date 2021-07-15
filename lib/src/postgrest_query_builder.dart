@@ -71,15 +71,16 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an UPSERT into the table.
   ///
+  /// By specifying the [onConflict] query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
+  /// [ignoreDuplicates] Specifies if duplicate rows should be ignored and not inserted.
   /// ```dart
   /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
-  PostgrestBuilder upsert(
-    dynamic values, {
-    String? onConflict,
-  }) {
+  PostgrestBuilder upsert(dynamic values,
+      {String? onConflict, bool ignoreDuplicates = false}) {
     method = 'POST';
-    headers['Prefer'] = 'return=representation,resolution=merge-duplicates';
+    headers['Prefer'] =
+        'return=representation,resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
       url = url.replace(
           queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
