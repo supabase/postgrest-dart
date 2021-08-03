@@ -18,7 +18,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().not('status', 'eq', 'OFFLINE')
   /// ```
   PostgrestFilterBuilder not(String column, String operator, dynamic value) {
-    appendSearchParams(column, 'not.$operator.$value');
+    if (value is List) {
+      appendSearchParams(column, 'not.$operator.(${_cleanFilterArray(value)})');
+    } else {
+      appendSearchParams(column, 'not.$operator.$value');
+    }
     return this;
   }
 

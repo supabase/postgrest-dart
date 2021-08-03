@@ -20,6 +20,17 @@ void main() {
     });
   });
 
+  test('not with in filter', () async {
+    final res = await postgrest
+        .from('users')
+        .select('username')
+        .not('username', 'in', ['supabot', 'kiwicopple']).execute();
+    res.data.forEach((item) {
+      expect(item['username'] != ('supabot'), true);
+      expect(item['username'] != ('kiwicopple'), true);
+    });
+  });
+
   test('or', () async {
     final res = await postgrest
         .from('users')
