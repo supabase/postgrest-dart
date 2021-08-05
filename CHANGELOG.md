@@ -1,3 +1,7 @@
+## [0.1.5]
+
+- fix: bug when using `not` filter with `in`
+
 ## [0.1.4]
 
 - feat: implement ReturningOption
