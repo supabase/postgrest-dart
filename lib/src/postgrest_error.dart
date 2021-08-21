@@ -25,4 +25,10 @@ class PostgrestError {
         'hint': hint,
         'code': code,
       };
+
+  @override
+  String toString() {
+    return 'PostgrestError{message: $message, '
+        'details: $details, hint: $hint, code: $code}';
+  }
 }
