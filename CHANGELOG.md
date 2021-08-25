@@ -1,3 +1,7 @@
+## [0.1.6]
+
+- fix: bug where `List` of `num` is passes as filter parameter
+
 ## [0.1.5]
 
 - fix: bug when using `not` filter with `in`
