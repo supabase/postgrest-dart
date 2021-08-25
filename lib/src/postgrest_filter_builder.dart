@@ -9,7 +9,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
-    return filter.map((s) => '"$s"').join(',');
+    if (value is List<int> || value is List<double> || value is List<num>) {
+      return filter.map((s) => '$s').join(',');
+    } else {
+      return filter.map((s) => '"$s"').join(',');
+    }
   }
 
   /// Finds all rows which doesn't satisfy the filter.
@@ -19,17 +23,10 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder not(String column, String operator, dynamic value) {
     if (value is List) {
-      if (value is List<int> || value is List<double> || value is List<num>) {
-        appendSearchParams(
-          column,
-          'not.$operator.(${value.map((s) => '$s').join(',')})',
-        );
-      } else {
-        appendSearchParams(
-          column,
-          'not.$operator.(${_cleanFilterArray(value)})',
-        );
-      }
+      appendSearchParams(
+        column,
+        'not.$operator.(${_cleanFilterArray(value)})',
+      );
     } else {
       appendSearchParams(column, 'not.$operator.$value');
     }
