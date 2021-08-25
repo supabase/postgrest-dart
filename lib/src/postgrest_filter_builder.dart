@@ -9,7 +9,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
-    if (value is List<int> || value is List<double> || value is List<num>) {
+    if (filter is List<int> || filter is List<double> || filter is List<num>) {
       return filter.map((s) => '$s').join(',');
     } else {
       return filter.map((s) => '"$s"').join(',');
