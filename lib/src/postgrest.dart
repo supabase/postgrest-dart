@@ -1,3 +1,5 @@
+import 'package:postgrest/src/constants.dart';
+
 import 'postgrest_query_builder.dart';
 import 'postgrest_rpc_builder.dart';
 import 'postgrest_transform_builder.dart';
@@ -19,7 +21,7 @@ class PostgrestClient {
     this.url, {
     Map<String, String>? headers,
     this.schema,
-  }) : headers = headers ?? {};
+  }) : headers = {...defaultHeaders, if (headers != null) ...headers};
 
   /// Authenticates the request with JWT.
   PostgrestClient auth(String token) {
