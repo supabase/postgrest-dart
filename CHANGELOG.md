@@ -1,3 +1,7 @@
+## [0.1.7]
+
+- feat: added `X-Client-Info` header
+
 ## [0.1.6]
 
 - fix: bug where `List` of `num` is passes as filter parameter
