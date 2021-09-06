@@ -38,6 +38,13 @@ void main() {
     expect(postgrest.from('users').select().headers['apikey'], 'foo');
   });
 
+  test('override X-Client-Info', () async {
+    final postgrest = PostgrestClient(rootUrl,
+        headers: {'X-Client-Info': 'supabase-dart/0.0.0'});
+    expect(postgrest.from('users').select().headers['X-Client-Info'],
+        'supabase-dart/0.0.0');
+  });
+
   test('auth', () async {
     postgrest = PostgrestClient(rootUrl).auth('foo');
     expect(postgrest.from('users').select().headers['Authorization'],
