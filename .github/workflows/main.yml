@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Test / OS ${{ matrix.os }} / Node ${{ matrix.node }}
+    name: Test / OS ${{ matrix.os }} / Node ${{ matrix.node }} / SDK ${{ matrix.sdk }}
     strategy:
       matrix:
         os: [ubuntu-latest]
