@@ -43,8 +43,10 @@ void main() {
       rootUrl,
       headers: {'X-Client-Info': 'supabase-dart/0.0.0'},
     );
-    expect(postgrest.from('users').select().headers['X-Client-Info'],
-        'supabase-dart/0.0.0');
+    expect(
+      postgrest.from('users').select().headers['X-Client-Info'],
+      'supabase-dart/0.0.0',
+    );
   });
 
   test('auth', () async {
@@ -194,8 +196,9 @@ void main() {
 
   test('insert with count: exact', () async {
     final res = await postgrest.from('users').upsert(
-        {'username': 'countexact', 'status': 'OFFLINE'},
-        onConflict: 'username').execute(
+      {'username': 'countexact', 'status': 'OFFLINE'},
+      onConflict: 'username',
+    ).execute(
       count: CountOption.exact,
     );
     expect(res.count, 1);
