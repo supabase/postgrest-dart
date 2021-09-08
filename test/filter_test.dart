@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
+import 'package:test/test.dart';
 
 void main() {
   const rootUrl = 'http://localhost:3000';
@@ -38,8 +38,10 @@ void main() {
         .or('status.eq.OFFLINE,username.eq.supabot')
         .execute();
     res.data.forEach((item) {
-      expect(item['username'] == ('supabot') || item['status'] == ('OFFLINE'),
-          true);
+      expect(
+        item['username'] == ('supabot') || item['status'] == ('OFFLINE'),
+        true,
+      );
     });
   });
 
@@ -233,8 +235,12 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('username')
-        .textSearch('catchphrase', "'fat' & 'cat'",
-            config: 'english', type: TextSearchType.plain)
+        .textSearch(
+          'catchphrase',
+          "'fat' & 'cat'",
+          config: 'english',
+          type: TextSearchType.plain,
+        )
         .execute();
     expect(res.data[0]['username'], 'supabot');
   });
@@ -243,8 +249,12 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('username')
-        .textSearch('catchphrase', 'cat',
-            config: 'english', type: TextSearchType.phrase)
+        .textSearch(
+          'catchphrase',
+          'cat',
+          config: 'english',
+          type: TextSearchType.phrase,
+        )
         .execute();
     expect(res.data.length, 2);
   });
@@ -253,8 +263,12 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('username')
-        .textSearch('catchphrase', "'fat' & 'cat'",
-            config: 'english', type: TextSearchType.websearch)
+        .textSearch(
+          'catchphrase',
+          "'fat' & 'cat'",
+          config: 'english',
+          type: TextSearchType.websearch,
+        )
         .execute();
     expect(res.data[0]['username'], 'supabot');
   });

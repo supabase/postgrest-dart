@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
+import 'package:test/test.dart';
 
 void main() {
   const rootUrl = 'http://localhost:3000';
@@ -39,16 +39,20 @@ void main() {
   });
 
   test('override X-Client-Info', () async {
-    final postgrest = PostgrestClient(rootUrl,
-        headers: {'X-Client-Info': 'supabase-dart/0.0.0'});
+    final postgrest = PostgrestClient(
+      rootUrl,
+      headers: {'X-Client-Info': 'supabase-dart/0.0.0'},
+    );
     expect(postgrest.from('users').select().headers['X-Client-Info'],
         'supabase-dart/0.0.0');
   });
 
   test('auth', () async {
     postgrest = PostgrestClient(rootUrl).auth('foo');
-    expect(postgrest.from('users').select().headers['Authorization'],
-        'Bearer foo');
+    expect(
+      postgrest.from('users').select().headers['Authorization'],
+      'Bearer foo',
+    );
   });
 
   test('switch schema', () async {
@@ -59,8 +63,9 @@ void main() {
 
   test('on_conflict upsert', () async {
     final res = await postgrest.from('users').upsert(
-        {'username': 'dragarcia', 'status': 'OFFLINE'},
-        onConflict: 'username').execute();
+      {'username': 'dragarcia', 'status': 'OFFLINE'},
+      onConflict: 'username',
+    ).execute();
     expect(res.data[0]['status'], 'OFFLINE');
   });
 
@@ -78,8 +83,11 @@ void main() {
   });
 
   test('ignoreDuplicates upsert', () async {
-    final res = await postgrest.from('users').upsert({'username': 'dragarcia'},
-        onConflict: 'username', ignoreDuplicates: true).execute();
+    final res = await postgrest.from('users').upsert(
+      {'username': 'dragarcia'},
+      onConflict: 'username',
+      ignoreDuplicates: true,
+    ).execute();
     expect(res.data.length, 0);
     expect(res.error, isNull);
   });
@@ -187,7 +195,9 @@ void main() {
   test('insert with count: exact', () async {
     final res = await postgrest.from('users').upsert(
         {'username': 'countexact', 'status': 'OFFLINE'},
-        onConflict: 'username').execute(count: CountOption.exact);
+        onConflict: 'username').execute(
+      count: CountOption.exact,
+    );
     expect(res.count, 1);
   });
 

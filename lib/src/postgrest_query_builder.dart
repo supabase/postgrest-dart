@@ -65,8 +65,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
         ? 'return=${returning.name()},resolution=merge-duplicates'
         : 'return=${returning.name()}';
     if (onConflict != null) {
-      url = url.replace(
-          queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
+      url = url.replace(queryParameters: {
+        'on_conflict': onConflict,
+        ...url.queryParameters,
+      });
     }
     body = values;
     return this;
@@ -90,8 +92,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     headers['Prefer'] =
         'return=${returning.name()},resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
-      url = url.replace(
-          queryParameters: {'on_conflict': onConflict, ...url.queryParameters});
+      url = url.replace(queryParameters: {
+        'on_conflict': onConflict,
+        ...url.queryParameters,
+      });
     }
     body = values;
     return this;
