@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:postgrest/postgrest.dart';
+import 'package:test/test.dart';
 
 void main() {
   const rootUrl = 'http://localhost:3000';

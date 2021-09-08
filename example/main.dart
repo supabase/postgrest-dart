@@ -4,8 +4,11 @@ import 'package:postgrest/postgrest.dart';
 dynamic main() async {
   const supabaseUrl = '';
   const supabaseKey = '';
-  final client = PostgrestClient('$supabaseUrl/rest/v1',
-      headers: {'apikey': supabaseKey}, schema: 'public');
+  final client = PostgrestClient(
+    '$supabaseUrl/rest/v1',
+    headers: {'apikey': supabaseKey},
+    schema: 'public',
+  );
 
   try {
     final response = await client

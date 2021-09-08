@@ -144,8 +144,9 @@ abstract class PostgrestBuilder {
         }
       } else {
         error = PostgrestError(
-            code: response.statusCode.toString(),
-            message: 'Error in Postgrest response for method HEAD');
+          code: response.statusCode.toString(),
+          message: 'Error in Postgrest response for method HEAD',
+        );
       }
 
       return PostgrestResponse(
@@ -159,7 +160,9 @@ abstract class PostgrestBuilder {
   /// 'Results contain 0 rows' then
   /// return PostgrestResponse with null data
   PostgrestResponse handleMaybeEmptyError(
-      http.Response response, PostgrestError error) {
+    http.Response response,
+    PostgrestError error,
+  ) {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
       return PostgrestResponse(
