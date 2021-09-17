@@ -1,3 +1,7 @@
+## [0.1.8]
+
+- fix: bug where `filter` is not available on `rpc()`
+
 ## [0.1.7]
 
 - feat: added `X-Client-Info` header
