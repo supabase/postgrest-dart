@@ -302,4 +302,12 @@ void main() {
         .match({'username': 'supabot', 'status': 'ONLINE'}).execute();
     expect(res.data[0]['username'], 'supabot');
   });
+
+  test('filter on rpc', () async {
+    final res = await postgrest
+        .rpc('get_username_and_status', params: {'name_param': 'supabot'})
+        .neq('status', 'ONLINE')
+        .execute();
+    expect(res.data.isEmpty, true);
+  });
 }

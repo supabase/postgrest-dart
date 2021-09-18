@@ -1,5 +1,5 @@
+import 'package:postgrest/postgrest.dart';
 import 'postgrest_builder.dart';
-import 'postgrest_transform_builder.dart';
 
 class PostgrestRpcBuilder extends PostgrestBuilder {
   PostgrestRpcBuilder(
@@ -13,9 +13,9 @@ class PostgrestRpcBuilder extends PostgrestBuilder {
         );
 
   /// Performs stored procedures on the database.
-  PostgrestTransformBuilder rpc([dynamic params]) {
+  PostgrestFilterBuilder rpc([dynamic params]) {
     method = 'POST';
     body = params;
-    return PostgrestTransformBuilder(this);
+    return PostgrestFilterBuilder(this);
   }
 }
