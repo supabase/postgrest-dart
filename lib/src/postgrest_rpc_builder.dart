@@ -1,5 +1,4 @@
 import 'package:postgrest/postgrest.dart';
-import 'postgrest_builder.dart';
 
 class PostgrestRpcBuilder extends PostgrestBuilder {
   PostgrestRpcBuilder(
