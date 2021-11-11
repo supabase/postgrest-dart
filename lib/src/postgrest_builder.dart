@@ -69,21 +69,20 @@ abstract class PostgrestBuilder {
         headers['Content-Type'] = 'application/json';
       }
 
-      final client = http.Client();
       final bodyStr = json.encode(body);
 
       if (uppercaseMethod == 'GET') {
-        response = await client.get(url, headers: headers);
+        response = await http.get(url, headers: headers);
       } else if (uppercaseMethod == 'POST') {
-        response = await client.post(url, headers: headers, body: bodyStr);
+        response = await http.post(url, headers: headers, body: bodyStr);
       } else if (uppercaseMethod == 'PUT') {
-        response = await client.put(url, headers: headers, body: bodyStr);
+        response = await http.put(url, headers: headers, body: bodyStr);
       } else if (uppercaseMethod == 'PATCH') {
-        response = await client.patch(url, headers: headers, body: bodyStr);
+        response = await http.patch(url, headers: headers, body: bodyStr);
       } else if (uppercaseMethod == 'DELETE') {
-        response = await client.delete(url, headers: headers);
+        response = await http.delete(url, headers: headers);
       } else if (uppercaseMethod == 'HEAD') {
-        response = await client.head(url, headers: headers);
+        response = await http.head(url, headers: headers);
       }
 
       return parseResponse(response);
