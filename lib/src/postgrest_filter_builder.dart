@@ -363,7 +363,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().filter('username', 'eq', 'supabot')
   /// ```
   PostgrestFilterBuilder filter(String column, String operator, dynamic value) {
-    appendSearchParams(column, '$operator.$value');
+    if (value is List) {
+      appendSearchParams(column, '$operator.(${_cleanFilterArray(value)})');
+    } else {
+      appendSearchParams(column, '$operator.$value');
+    }
     return this;
   }
 
