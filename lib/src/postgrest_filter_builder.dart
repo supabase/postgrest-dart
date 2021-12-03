@@ -49,7 +49,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().eq('username', 'supabot')
   /// ```
   PostgrestFilterBuilder eq(String column, dynamic value) {
-    appendSearchParams(column, 'eq.$value');
+    if (value is List) {
+      appendSearchParams(column, 'eq.(${_cleanFilterArray(value)})');
+    } else {
+      appendSearchParams(column, 'eq.$value');
+    }
     return this;
   }
 
@@ -59,7 +63,11 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().neq('username', 'supabot')
   /// ```
   PostgrestFilterBuilder neq(String column, dynamic value) {
-    appendSearchParams(column, 'neq.$value');
+    if (value is List) {
+      appendSearchParams(column, 'eq.(${_cleanFilterArray(value)})');
+    } else {
+      appendSearchParams(column, 'neq.$value');
+    }
     return this;
   }
 
