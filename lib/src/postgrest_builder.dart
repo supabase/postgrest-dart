@@ -7,6 +7,8 @@ import 'count_option.dart';
 import 'postgrest_error.dart';
 import 'postgrest_response.dart';
 
+typedef PostgrestConverter<T> = T Function(dynamic data);
+
 /// The base builder class.
 abstract class PostgrestBuilder {
   PostgrestBuilder({
@@ -24,6 +26,17 @@ abstract class PostgrestBuilder {
   String? method;
   final String? schema;
   Uri url;
+  PostgrestConverter? _converter;
+
+  /// Converts any response that comes from the server into a type-safe response.
+  ///
+  /// ```dart
+  /// postgrest.from('users').select().withConverter((data) => User.fromJson(json.decode(data))).execute();
+  /// ```
+  PostgrestBuilder withConverter<T>(PostgrestConverter<T> converter) {
+    _converter = converter;
+    return this;
+  }
 
   /// Sends the request and returns a Future.
   /// catch any error and returns with status 500
@@ -85,7 +98,7 @@ abstract class PostgrestBuilder {
         response = await http.head(url, headers: headers);
       }
 
-      return parseResponse(response);
+      return _parseResponse(response);
     } catch (e) {
       final error =
           PostgrestError(code: e.runtimeType.toString(), message: e.toString());
@@ -97,7 +110,7 @@ abstract class PostgrestBuilder {
   }
 
   /// Parse request response to json object if possible
-  PostgrestResponse parseResponse(http.Response response) {
+  PostgrestResponse _parseResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
@@ -121,6 +134,10 @@ abstract class PostgrestBuilder {
             : int.parse(contentRange.split('/').last);
       }
 
+      if (_converter != null) {
+        body = _converter!(body);
+      }
+
       return PostgrestResponse(
         data: body,
         status: response.statusCode,
@@ -135,7 +152,7 @@ abstract class PostgrestBuilder {
           error = PostgrestError.fromJson(errorJson);
 
           if (maybeEmpty) {
-            return handleMaybeEmptyError(response, error);
+            return _handleMaybeEmptyError(response, error);
           }
         } catch (_) {
           error = PostgrestError(message: response.body);
@@ -157,7 +174,7 @@ abstract class PostgrestBuilder {
   /// on maybeEmpty enable, check for error details contains
   /// 'Results contain 0 rows' then
   /// return PostgrestResponse with null data
-  PostgrestResponse handleMaybeEmptyError(
+  PostgrestResponse _handleMaybeEmptyError(
     http.Response response,
     PostgrestError error,
   ) {
