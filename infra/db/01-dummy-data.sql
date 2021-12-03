@@ -17,7 +17,7 @@ INSERT INTO
 VALUES
     ('Hello World 👋', 1, 'supabot', '2021-06-25T04:28:21.598Z'),
     ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, 'supabot', '2021-06-29T04:28:21.598Z'),
-    ('Supabase Launch Week is on fire', 3, 'supabot', '2021-06-20T04:28:21.598Z');
+    ('Supabase Launch Week is on fire', 1, 'supabot', '2021-06-20T04:28:21.598Z');
 
 INSERT INTO
     personal.users (username, status, age_range)
