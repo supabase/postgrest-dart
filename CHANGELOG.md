@@ -1,3 +1,14 @@
+## [next]
+
+- feat: added `withConverter` to `PostgrestBuilder`
+    ```dart
+    final res = await postgrest
+      .from('users')
+      .select()
+      .withConverter<List>((data) => [data])
+      .execute();
+    ```
+
 ## [0.1.8]
 
 - fix: bug where `filter` is not available on `rpc()`
