@@ -310,4 +310,24 @@ void main() {
         .execute();
     expect(res.data.isEmpty, true);
   });
+
+  test('date range filter 1', () async {
+    final res = await postgrest
+        .from('messages')
+        .select()
+        .gte('inserted_at', DateTime.parse('2021-06-24').toIso8601String())
+        .lte('inserted_at', DateTime.parse('2021-06-26').toIso8601String())
+        .execute();
+    expect(res.data.length, 1);
+  });
+
+  test('date range filter 2', () async {
+    final res = await postgrest
+        .from('messages')
+        .select()
+        .gte('inserted_at', DateTime.parse('2021-06-24').toIso8601String())
+        .lte('inserted_at', DateTime.parse('2021-06-30').toIso8601String())
+        .execute();
+    expect(res.data.length, 2);
+  });
 }

@@ -31,7 +31,8 @@ CREATE TABLE public.messages (
   data jsonb DEFAULT null,
   message text,
   username text REFERENCES users NOT NULL,
-  channel_id bigint REFERENCES channels NOT NULL
+  channel_id bigint REFERENCES channels NOT NULL,
+  inserted_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 ALTER TABLE public.messages REPLICA IDENTITY FULL; -- Send "previous data" to supabase
 COMMENT ON COLUMN public.messages.data IS 'For unstructured data and prototyping.';
