@@ -330,14 +330,4 @@ void main() {
         .execute();
     expect(res.data.length, 2);
   });
-
-  test('withConverter', () async {
-    final res = await postgrest
-        .from('users')
-        .select()
-        .withConverter<List>((data) => [data])
-        .execute();
-    expect(res.data, isNotNull);
-    expect(res.data, isNotEmpty);
-  });
 }
