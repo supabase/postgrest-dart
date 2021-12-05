@@ -262,6 +262,7 @@ void main() {
         .execute();
     expect(res.data, isNotNull);
     expect(res.data, isNotEmpty);
-    expect(res.data.first, isNotEmpty);
+    expect(res.data!.first, isNotEmpty);
+    expect(res.data!.first, isA<List>());
   });
 }
