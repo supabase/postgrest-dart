@@ -166,7 +166,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'cs.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'cs.{${_cleanFilterArray(value)}}');
+      appendSearchParams(column, 'cs.(${_cleanFilterArray(value)})');
     } else {
       // json
       appendSearchParams(column, 'cs.${json.encode(value)}');
@@ -189,7 +189,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'cd.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'cd.{${_cleanFilterArray(value)}}');
+      appendSearchParams(column, 'cd.(${_cleanFilterArray(value)})');
     } else {
       // json
       appendSearchParams(column, 'cd.${json.encode(value)}');
@@ -277,7 +277,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'ov.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'ov.{${_cleanFilterArray(value)}}');
+      appendSearchParams(column, 'ov.(${_cleanFilterArray(value)})');
     }
     return this;
   }
