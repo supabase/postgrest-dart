@@ -176,9 +176,10 @@ abstract class PostgrestBuilder {
   }
 
   /// Update Uri queryParameters with new key:value
+  /// Use lists to allow multiple values for the same key
   void appendSearchParams(String key, String value) {
-    final searchParams = Map<String, dynamic>.from(url.queryParameters);
-    searchParams[key] = value;
+    final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
+    searchParams[key] = [...searchParams[key] ?? [], value];
     url = url.replace(queryParameters: searchParams);
   }
 }
