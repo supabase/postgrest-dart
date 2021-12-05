@@ -64,7 +64,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder neq(String column, dynamic value) {
     if (value is List) {
-      appendSearchParams(column, 'eq.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'neq.(${_cleanFilterArray(value)})');
     } else {
       appendSearchParams(column, 'neq.$value');
     }
