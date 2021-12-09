@@ -253,4 +253,16 @@ void main() {
     final res = await postgrest.from('sample').update({'id': 2}).execute();
     expect(res.error, isNotNull);
   });
+
+  test('withConverter', () async {
+    final res = await postgrest
+        .from('users')
+        .select()
+        .withConverter<List>((data) => [data])
+        .execute();
+    expect(res.data, isNotNull);
+    expect(res.data, isNotEmpty);
+    expect(res.data!.first, isNotEmpty);
+    expect(res.data!.first, isA<List>());
+  });
 }

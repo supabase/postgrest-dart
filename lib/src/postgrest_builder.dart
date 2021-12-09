@@ -7,8 +7,10 @@ import 'count_option.dart';
 import 'postgrest_error.dart';
 import 'postgrest_response.dart';
 
+typedef PostgrestConverter<T> = T Function(dynamic data);
+
 /// The base builder class.
-abstract class PostgrestBuilder {
+class PostgrestBuilder<T> {
   PostgrestBuilder({
     required this.url,
     required this.headers,
@@ -18,12 +20,30 @@ abstract class PostgrestBuilder {
   });
 
   dynamic body;
-  final List query = [];
   final Map<String, String> headers;
   bool maybeEmpty = false;
   String? method;
   final String? schema;
   Uri url;
+  PostgrestConverter? _converter;
+
+  /// Converts any response that comes from the server into a type-safe response.
+  ///
+  /// ```dart
+  /// postgrest.from('users').select().withConverter((data) => User.fromJson(json.decode(data))).execute();
+  /// ```
+  PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
+    _converter = converter;
+    return PostgrestBuilder<S>(
+      url: url,
+      headers: headers,
+      schema: schema,
+      method: method,
+      body: body,
+    )
+      ..maybeEmpty = maybeEmpty
+      .._converter = converter;
+  }
 
   /// Sends the request and returns a Future.
   /// catch any error and returns with status 500
@@ -34,7 +54,7 @@ abstract class PostgrestBuilder {
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
   /// Returns {Future} Resolves when the request has completed.
-  Future<PostgrestResponse> execute({
+  Future<PostgrestResponse<T>> execute({
     bool head = false,
     CountOption? count,
   }) async {
@@ -85,7 +105,7 @@ abstract class PostgrestBuilder {
         response = await http.head(url, headers: headers);
       }
 
-      return parseResponse(response);
+      return _parseResponse(response);
     } catch (e) {
       final error =
           PostgrestError(code: e.runtimeType.toString(), message: e.toString());
@@ -97,7 +117,7 @@ abstract class PostgrestBuilder {
   }
 
   /// Parse request response to json object if possible
-  PostgrestResponse parseResponse(http.Response response) {
+  PostgrestResponse<T> _parseResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
@@ -121,8 +141,12 @@ abstract class PostgrestBuilder {
             : int.parse(contentRange.split('/').last);
       }
 
-      return PostgrestResponse(
-        data: body,
+      if (_converter != null) {
+        body = _converter!(body);
+      }
+
+      return PostgrestResponse<T>(
+        data: body as T,
         status: response.statusCode,
         count: count,
       );
@@ -135,7 +159,7 @@ abstract class PostgrestBuilder {
           error = PostgrestError.fromJson(errorJson);
 
           if (maybeEmpty) {
-            return handleMaybeEmptyError(response, error);
+            return _handleMaybeEmptyError(response, error);
           }
         } catch (_) {
           error = PostgrestError(message: response.body);
@@ -157,13 +181,13 @@ abstract class PostgrestBuilder {
   /// on maybeEmpty enable, check for error details contains
   /// 'Results contain 0 rows' then
   /// return PostgrestResponse with null data
-  PostgrestResponse handleMaybeEmptyError(
+  PostgrestResponse<T> _handleMaybeEmptyError(
     http.Response response,
     PostgrestError error,
   ) {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
-      return PostgrestResponse(
+      return const PostgrestResponse(
         status: 200,
         count: 0,
       );
