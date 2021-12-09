@@ -25,7 +25,7 @@ class PostgrestBuilder<T> {
   String? method;
   final String? schema;
   Uri url;
-  PostgrestConverter? converter;
+  PostgrestConverter? _converter;
 
   /// Converts any response that comes from the server into a type-safe response.
   ///
@@ -33,7 +33,7 @@ class PostgrestBuilder<T> {
   /// postgrest.from('users').select().withConverter((data) => User.fromJson(json.decode(data))).execute();
   /// ```
   PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
-    this.converter = converter;
+    _converter = converter;
     return PostgrestBuilder<S>(
       url: url,
       headers: headers,
@@ -42,7 +42,7 @@ class PostgrestBuilder<T> {
       body: body,
     )
       ..maybeEmpty = maybeEmpty
-      ..converter = converter;
+      .._converter = converter;
   }
 
   /// Sends the request and returns a Future.
@@ -141,8 +141,8 @@ class PostgrestBuilder<T> {
             : int.parse(contentRange.split('/').last);
       }
 
-      if (converter != null) {
-        body = converter!(body);
+      if (_converter != null) {
+        body = _converter!(body);
       }
 
       return PostgrestResponse<T>(
