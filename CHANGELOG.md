@@ -1,13 +1,15 @@
-## [next]
+## [0.1.9]
 
 - feat: added `withConverter` to `PostgrestBuilder`
-    ```dart
-    final res = await postgrest
-      .from('users')
-      .select()
-      .withConverter<List>((data) => [data])
-      .execute();
-    ```
+  ```dart
+  final res = await postgrest
+    .from('users')
+    .select()
+    .withConverter<List>((data) => [data])
+    .execute();
+  ```
+- fix: allow multiple filters on the same column
+- fix: `List` passed to `filter`, `eq` or `neq` will correctly be formatted
 
 ## [0.1.8]
 
