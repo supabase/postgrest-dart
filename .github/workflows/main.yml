@@ -47,4 +47,4 @@ jobs:
           time: '5s'
 
       - name: Run tests
-        run: dart run test
+        run: dart test
