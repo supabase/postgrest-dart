@@ -12,7 +12,7 @@ The usage should be the same as postgrest-js except:
 - You need to call `execute()` to finish your query chain.
 - `is_` and `in_` filter methods are suffixed with `_` sign to avoid collisions with reserved keywords.
 
-You can find detail documentation from [here](https://supabase.io/docs/postgrest/client/postgrest-client).
+You can find detail documentation from [here](https://supabase.com/docs/reference/dart/select).
 
 #### Reading your data
 
