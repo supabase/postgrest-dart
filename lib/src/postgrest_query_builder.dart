@@ -1,8 +1,8 @@
 import 'dart:core';
 
-import 'postgrest_builder.dart';
-import 'postgrest_filter_builder.dart';
-import 'returning_option.dart';
+import 'package:postgrest/src/postgrest_builder.dart';
+import 'package:postgrest/src/postgrest_filter_builder.dart';
+import 'package:postgrest/src/returning_option.dart';
 
 /// The query builder class provides a convenient interface to creating request queries.
 ///

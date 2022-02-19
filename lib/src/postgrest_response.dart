@@ -1,4 +1,4 @@
-import 'postgrest_error.dart';
+import 'package:postgrest/src/postgrest_error.dart';
 
 /// A Postgrest response
 class PostgrestResponse<T> {

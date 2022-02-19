@@ -11,8 +11,14 @@ void main() {
 
   test('embedded select', () async {
     final res = await postgrest.from('users').select('messages(*)').execute();
-    expect(res.data[0]['messages'].length, 2);
-    expect(res.data[1]['messages'].length, 0);
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      2,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      0,
+    );
   });
 
   test('embedded eq', () async {
@@ -21,10 +27,22 @@ void main() {
         .select('messages(*)')
         .eq('messages.channel_id', 1)
         .execute();
-    expect(res.data[0]['messages'].length, 1);
-    expect(res.data[1]['messages'].length, 0);
-    expect(res.data[2]['messages'].length, 0);
-    expect(res.data[3]['messages'].length, 0);
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      1,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[2]['messages'] as List).length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[3]['messages'] as List).length,
+      0,
+    );
   });
 
   test('embedded order', () async {
@@ -33,9 +51,23 @@ void main() {
         .select('messages(*)')
         .order('channel_id', foreignTable: 'messages')
         .execute();
-    expect(res.data[0]['messages'].length, 2);
-    expect(res.data[1]['messages'].length, 0);
-    expect(res.data[0]['messages'][0]['id'], 2);
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages']
+              as List<Map<String, dynamic>>)
+          .length,
+      2,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[1]['messages']
+              as List<Map<String, dynamic>>)
+          .length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages']
+          as List<Map<String, dynamic>>)[0]['id'],
+      2,
+    );
   });
 
   test('embedded order on multiple columns', () async {
@@ -45,11 +77,25 @@ void main() {
         .order('username', ascending: true)
         .order('channel_id', foreignTable: 'messages')
         .execute();
-    expect(res.data[0]['username'], 'awailas');
-    expect(res.data[3]['username'], 'supabot');
-    expect(res.data[0]['messages'].length, 0);
-    expect(res.data[3]['messages'].length, 2);
-    expect(res.data[3]['messages'][0]['id'], 2);
+    expect((res.data as List<Map<String, dynamic>>)[0]['username'], 'awailas');
+    expect((res.data as List<Map<String, dynamic>>)[3]['username'], 'supabot');
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages']
+              as List<Map<String, dynamic>>)
+          .length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[3]['messages']
+              as List<Map<String, dynamic>>)
+          .length,
+      2,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[3]['messages']
+          as List<Map<String, dynamic>>)[0]['id'],
+      2,
+    );
   });
 
   test('embedded limit', () async {
@@ -58,10 +104,22 @@ void main() {
         .select('messages(*)')
         .limit(1, foreignTable: 'messages')
         .execute();
-    expect(res.data[0]['messages'].length, 1);
-    expect(res.data[1]['messages'].length, 0);
-    expect(res.data[2]['messages'].length, 0);
-    expect(res.data[3]['messages'].length, 0);
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      1,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[2]['messages'] as List).length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[3]['messages'] as List).length,
+      0,
+    );
   });
 
   test('embedded range', () async {
@@ -70,9 +128,21 @@ void main() {
         .select('messages(*)')
         .range(1, 1, foreignTable: 'messages')
         .execute();
-    expect(res.data[0]['messages'].length, 1);
-    expect(res.data[1]['messages'].length, 0);
-    expect(res.data[2]['messages'].length, 0);
-    expect(res.data[3]['messages'].length, 0);
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      1,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[2]['messages'] as List).length,
+      0,
+    );
+    expect(
+      ((res.data as List<Map<String, dynamic>>)[3]['messages'] as List).length,
+      0,
+    );
   });
 }
