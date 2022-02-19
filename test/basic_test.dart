@@ -81,10 +81,10 @@ void main() {
       'username': 'supabot',
       'channel_id': 2
     }).execute();
-    expect((res.data as List<Map<String, dynamic>>)[0]['id'], 3);
+    expect(((res.data as List)[0] as Map)['id'], 3);
 
     final resMsg = await postgrest.from('messages').select().execute();
-    expect((resMsg.data as List<Map<String, dynamic>>).length, 3);
+    expect((resMsg.data as List).length, 3);
   });
 
   test('ignoreDuplicates upsert', () async {
