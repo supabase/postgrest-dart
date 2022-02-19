@@ -13,10 +13,10 @@ void main() {
     final res =
         await postgrest.from('users').select().order('username').execute();
     expect(
-      (res.data as List<Map<String, dynamic>>)[1]['username'],
+      ((res.data as List)[1] as Map)['username'],
       'kiwicopple',
     );
-    expect((res.data as List<Map<String, dynamic>>)[3]['username'], 'awailas');
+    expect(((res.data as List)[3] as Map)['username'], 'awailas');
   });
 
   test('order on multiple columns', () async {
@@ -27,15 +27,15 @@ void main() {
         .order('username')
         .execute();
     expect(
-      (res.data as List<Map<String, dynamic>>)[0]['username'],
+      ((res.data as List)[0] as Map)['username'],
       'kiwicopple',
     );
     expect(
-      (res.data as List<Map<String, dynamic>>)[2]['username'],
+      ((res.data as List)[2] as Map)['username'],
       'supabot',
     );
     expect(
-      (res.data as List<Map<String, dynamic>>)[3]['username'],
+      ((res.data as List)[3] as Map)['username'],
       'dragarcia',
     );
   });
@@ -70,8 +70,8 @@ void main() {
         .eq('username', 'supabot')
         .single()
         .execute();
-    expect((res.data as Map<String, dynamic>)['username'], 'supabot');
-    expect((res.data as Map<String, dynamic>)['status'], 'ONLINE');
+    expect((res.data as Map)['username'], 'supabot');
+    expect((res.data as Map)['status'], 'ONLINE');
   });
 
   test('maybeSingle', () async {

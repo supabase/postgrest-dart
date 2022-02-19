@@ -11,7 +11,7 @@ void main() {
 
   test('basic select table', () async {
     final res = await postgrest.from('users').select().execute();
-    expect((res.data as Map<String, dynamic>).length, 4);
+    expect((res.data as List).length, 4);
   });
 
   test('stored procedure', () async {
@@ -25,7 +25,7 @@ void main() {
         .rpc('get_username_and_status', params: {'name_param': 'supabot'})
         .select('status')
         .execute();
-    expect((res.data as List<Map<String, dynamic>>)[0]['status'], 'ONLINE');
+    expect(((res.data as List)[0] as Map<String, dynamic>)['status'], 'ONLINE');
   });
 
   test('stored procedure returns void', () async {
@@ -60,7 +60,7 @@ void main() {
   test('switch schema', () async {
     final postgrest = PostgrestClient(rootUrl, schema: 'personal');
     final res = await postgrest.from('users').select().execute();
-    expect((res.data as List<Map<String, dynamic>>).length, 5);
+    expect((res.data as List).length, 5);
   });
 
   test('on_conflict upsert', () async {
@@ -68,7 +68,10 @@ void main() {
       {'username': 'dragarcia', 'status': 'OFFLINE'},
       onConflict: 'username',
     ).execute();
-    expect((res.data as List<Map<String, dynamic>>)[0]['status'], 'OFFLINE');
+    expect(
+      ((res.data as List)[0] as Map<String, dynamic>)['status'],
+      'OFFLINE',
+    );
   });
 
   test('upsert', () async {
@@ -90,7 +93,7 @@ void main() {
       onConflict: 'username',
       ignoreDuplicates: true,
     ).execute();
-    expect((res.data as List<Map<String, dynamic>>).length, 0);
+    expect((res.data as List).length, 0);
     expect(res.error, isNull);
   });
 
@@ -99,7 +102,7 @@ void main() {
       {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
       {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
     ]).execute();
-    expect((res.data as List<Map<String, dynamic>>).length, 2);
+    expect((res.data as List).length, 2);
   });
 
   test('basic update', () async {
@@ -115,8 +118,8 @@ void main() {
         .select()
         .filter('message', 'eq', 'foo')
         .execute();
-    for (final rec in resMsg.data as List<Map<String, dynamic>>) {
-      expect(rec['channel_id'], 2);
+    for (final rec in resMsg.data as List) {
+      expect((rec as Map<String, dynamic>)['channel_id'], 2);
     }
   });
 
@@ -133,7 +136,7 @@ void main() {
         .select()
         .filter('message', 'eq', 'foo')
         .execute();
-    expect((resMsg.data as List<Map<String, dynamic>>).length, 0);
+    expect((resMsg.data as List).length, 0);
   });
 
   test('missing table', () async {
@@ -232,14 +235,14 @@ void main() {
 
   test('select from uppercase table name', () async {
     final res = await postgrest.from('TestTable').select().execute();
-    expect((res.data as List<Map<String, dynamic>>).length, 2);
+    expect((res.data as List).length, 2);
   });
 
   test('insert from uppercase table name', () async {
     final res = await postgrest.from('TestTable').insert([
       {'slug': 'new slug'}
     ]).execute();
-    expect((res.data as List<Map<String, dynamic>>)[0]['slug'], 'new slug');
+    expect(((res.data as List)[0] as Map<String, dynamic>)['slug'], 'new slug');
   });
 
   test('delete from uppercase table name', () async {

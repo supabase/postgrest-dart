@@ -12,11 +12,11 @@ void main() {
   test('embedded select', () async {
     final res = await postgrest.from('users').select('messages(*)').execute();
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      (((res.data as List)[0] as Map)['messages'] as List).length,
       2,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      (((res.data as List)[1] as Map)['messages'] as List).length,
       0,
     );
   });
@@ -28,19 +28,19 @@ void main() {
         .eq('messages.channel_id', 1)
         .execute();
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      (((res.data as List)[0] as Map)['messages'] as List).length,
       1,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      (((res.data as List)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[2]['messages'] as List).length,
+      (((res.data as List)[2] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[3]['messages'] as List).length,
+      (((res.data as List)[3] as Map)['messages'] as List).length,
       0,
     );
   });
@@ -52,20 +52,15 @@ void main() {
         .order('channel_id', foreignTable: 'messages')
         .execute();
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages']
-              as List<Map<String, dynamic>>)
-          .length,
+      (((res.data as List)[0] as Map)['messages'] as List).length,
       2,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[1]['messages']
-              as List<Map<String, dynamic>>)
-          .length,
+      (((res.data as List)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages']
-          as List<Map<String, dynamic>>)[0]['id'],
+      ((((res.data as List)[0] as Map)['messages'] as List)[0] as Map)['id'],
       2,
     );
   });
@@ -77,23 +72,24 @@ void main() {
         .order('username', ascending: true)
         .order('channel_id', foreignTable: 'messages')
         .execute();
-    expect((res.data as List<Map<String, dynamic>>)[0]['username'], 'awailas');
-    expect((res.data as List<Map<String, dynamic>>)[3]['username'], 'supabot');
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages']
-              as List<Map<String, dynamic>>)
-          .length,
+      ((res.data as List)[0] as Map)['username'],
+      'awailas',
+    );
+    expect(
+      ((res.data as List)[3] as Map)['username'],
+      'supabot',
+    );
+    expect(
+      (((res.data as List)[0] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[3]['messages']
-              as List<Map<String, dynamic>>)
-          .length,
+      (((res.data as List)[3] as Map)['messages'] as List).length,
       2,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[3]['messages']
-          as List<Map<String, dynamic>>)[0]['id'],
+      ((((res.data as List)[3] as Map)['messages'] as List)[0] as Map)['id'],
       2,
     );
   });
@@ -105,19 +101,19 @@ void main() {
         .limit(1, foreignTable: 'messages')
         .execute();
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      (((res.data as List)[0] as Map)['messages'] as List).length,
       1,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      (((res.data as List)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[2]['messages'] as List).length,
+      (((res.data as List)[2] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[3]['messages'] as List).length,
+      (((res.data as List)[3] as Map)['messages'] as List).length,
       0,
     );
   });
@@ -129,19 +125,19 @@ void main() {
         .range(1, 1, foreignTable: 'messages')
         .execute();
     expect(
-      ((res.data as List<Map<String, dynamic>>)[0]['messages'] as List).length,
+      (((res.data as List)[0] as Map)['messages'] as List).length,
       1,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[1]['messages'] as List).length,
+      (((res.data as List)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[2]['messages'] as List).length,
+      (((res.data as List)[2] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((res.data as List<Map<String, dynamic>>)[3]['messages'] as List).length,
+      (((res.data as List)[3] as Map)['messages'] as List).length,
       0,
     );
   });
