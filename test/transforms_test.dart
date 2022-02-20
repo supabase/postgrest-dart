@@ -12,8 +12,11 @@ void main() {
   test('order', () async {
     final res =
         await postgrest.from('users').select().order('username').execute();
-    expect(res.data[1]['username'], 'kiwicopple');
-    expect(res.data[3]['username'], 'awailas');
+    expect(
+      ((res.data as List)[1] as Map)['username'],
+      'kiwicopple',
+    );
+    expect(((res.data as List)[3] as Map)['username'], 'awailas');
   });
 
   test('order on multiple columns', () async {
@@ -23,14 +26,23 @@ void main() {
         .order('catchphrase', ascending: true)
         .order('username')
         .execute();
-    expect(res.data[0]['username'], 'kiwicopple');
-    expect(res.data[2]['username'], 'supabot');
-    expect(res.data[3]['username'], 'dragarcia');
+    expect(
+      ((res.data as List)[0] as Map)['username'],
+      'kiwicopple',
+    );
+    expect(
+      ((res.data as List)[2] as Map)['username'],
+      'supabot',
+    );
+    expect(
+      ((res.data as List)[3] as Map)['username'],
+      'dragarcia',
+    );
   });
 
   test('limit', () async {
     final res = await postgrest.from('users').select().limit(1).execute();
-    expect(res.data.length, 1);
+    expect((res.data as List).length, 1);
   });
 
   test('range', () async {
@@ -39,7 +51,7 @@ void main() {
     final res =
         await postgrest.from('users').select().range(from, to).execute();
     //from -1 so that the index is included
-    expect(res.data.length, to - (from - 1));
+    expect((res.data as List).length, to - (from - 1));
   });
 
   test('range 1-1', () async {
@@ -48,7 +60,7 @@ void main() {
     final res =
         await postgrest.from('users').select().range(from, to).execute();
     //from -1 so that the index is included
-    expect(res.data.length, to - (from - 1));
+    expect((res.data as List).length, to - (from - 1));
   });
 
   test('single', () async {
@@ -58,8 +70,8 @@ void main() {
         .eq('username', 'supabot')
         .single()
         .execute();
-    expect(res.data['username'], 'supabot');
-    expect(res.data['status'], 'ONLINE');
+    expect((res.data as Map)['username'], 'supabot');
+    expect((res.data as Map)['status'], 'ONLINE');
   });
 
   test('maybeSingle', () async {

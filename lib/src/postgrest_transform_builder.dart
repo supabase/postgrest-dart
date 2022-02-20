@@ -1,4 +1,4 @@
-import 'postgrest_builder.dart';
+import 'package:postgrest/src/postgrest_builder.dart';
 
 class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   PostgrestTransformBuilder(PostgrestBuilder builder)
