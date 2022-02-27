@@ -23,7 +23,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select()
-        .order('catchphrase', ascending: true)
+        .order('status', ascending: true)
         .order('username')
         .execute();
     expect(
@@ -31,12 +31,16 @@ void main() {
       'kiwicopple',
     );
     expect(
+      ((res.data as List)[1] as Map)['username'],
+      'awailas',
+    );
+    expect(
       ((res.data as List)[2] as Map)['username'],
-      'supabot',
+      'dragarcia',
     );
     expect(
       ((res.data as List)[3] as Map)['username'],
-      'dragarcia',
+      'supabot',
     );
   });
 
