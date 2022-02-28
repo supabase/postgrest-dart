@@ -53,7 +53,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
     final value = '${existingOrder == null ? '' : '$existingOrder,'}'
         '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
-    appendSearchParams(key, value);
+    overrideSearchParams(key, value);
     return this;
   }
 
