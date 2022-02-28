@@ -21,6 +21,10 @@ void main() {
     );
   });
 
+  setUp(() {
+    postgrest = PostgrestClient(rootUrl);
+  });
+
   tearDown(() async {
     await postgrest.from('users').delete().execute();
     await postgrest.from('channels').delete().execute();
@@ -28,10 +32,6 @@ void main() {
     await postgrest.from('users').insert(users).execute();
     await postgrest.from('channels').insert(channels).execute();
     await postgrest.from('messages').insert(messages).execute();
-    final resetUsers = List<Map<String, dynamic>>.from(
-      (await postgrest.from('users').select().execute()).data as List,
-    );
-    print(resetUsers);
   });
 
   test('basic select table', () async {
@@ -93,7 +93,6 @@ void main() {
       {'username': 'dragarcia', 'status': 'OFFLINE'},
       onConflict: 'username',
     ).execute();
-    print(res.error.toString());
     expect(
       ((res.data as List)[0] as Map<String, dynamic>)['status'],
       'OFFLINE',
