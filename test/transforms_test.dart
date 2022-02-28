@@ -19,6 +19,7 @@ void main() {
     messages = List<Map<String, dynamic>>.from(
       (await postgrest.from('messages').select().execute()).data as List,
     );
+    print(users);
   });
 
   setUp(() {
