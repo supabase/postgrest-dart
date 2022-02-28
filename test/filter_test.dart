@@ -10,7 +10,7 @@ void main() {
 
   setUpAll(() async {
     postgrest = PostgrestClient(rootUrl);
-    resetHelper.initialize();
+    resetHelper.initialize(postgrest);
   });
 
   setUp(() {
