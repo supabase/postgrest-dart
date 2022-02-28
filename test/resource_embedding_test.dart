@@ -4,9 +4,34 @@ import 'package:test/test.dart';
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
+  late List<Map<String, dynamic>> users;
+  late List<Map<String, dynamic>> channels;
+  late List<Map<String, dynamic>> messages;
+
+  setUpAll(() async {
+    postgrest = PostgrestClient(rootUrl);
+    users = List<Map<String, dynamic>>.from(
+      (await postgrest.from('users').select().execute()).data as List,
+    );
+    channels = List<Map<String, dynamic>>.from(
+      (await postgrest.from('channels').select().execute()).data as List,
+    );
+    messages = List<Map<String, dynamic>>.from(
+      (await postgrest.from('messages').select().execute()).data as List,
+    );
+  });
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
+  });
+
+  tearDown(() async {
+    await postgrest.from('users').delete().execute();
+    await postgrest.from('channels').delete().execute();
+    await postgrest.from('messages').delete().execute();
+    await postgrest.from('users').insert(users).execute();
+    await postgrest.from('channels').insert(channels).execute();
+    await postgrest.from('messages').insert(messages).execute();
   });
 
   test('embedded select', () async {
