@@ -19,9 +19,6 @@ void main() {
     messages = List<Map<String, dynamic>>.from(
       (await postgrest.from('messages').select().execute()).data as List,
     );
-    print(users);
-    print(channels);
-    print(messages);
   });
 
   tearDown(() async {
@@ -92,6 +89,7 @@ void main() {
       {'username': 'dragarcia', 'status': 'OFFLINE'},
       onConflict: 'username',
     ).execute();
+    print(res.error.toString());
     expect(
       ((res.data as List)[0] as Map<String, dynamic>)['status'],
       'OFFLINE',
