@@ -28,19 +28,19 @@ void main() {
         .execute();
     expect(
       ((res.data as List)[0] as Map)['username'],
-      'kiwicopple',
+      'supabot',
     );
     expect(
       ((res.data as List)[1] as Map)['username'],
-      'awailas',
-    );
-    expect(
-      ((res.data as List)[2] as Map)['username'],
       'dragarcia',
     );
     expect(
+      ((res.data as List)[2] as Map)['username'],
+      'awailas',
+    );
+    expect(
       ((res.data as List)[3] as Map)['username'],
-      'supabot',
+      'kiwicopple',
     );
   });
 
