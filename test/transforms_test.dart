@@ -26,6 +26,7 @@ void main() {
         .order('status', ascending: true)
         .order('username')
         .execute();
+    print(res.data);
     expect(
       (res.data as List).map((row) => (row as Map)['username']),
       [
