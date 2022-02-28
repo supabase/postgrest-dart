@@ -38,7 +38,7 @@ void main() {
     final res = await postgrest.from('users').select('messages(*)').execute();
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
-      2,
+      3,
     );
     expect(
       (((res.data as List)[1] as Map)['messages'] as List).length,
@@ -54,7 +54,7 @@ void main() {
         .execute();
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
-      1,
+      2,
     );
     expect(
       (((res.data as List)[1] as Map)['messages'] as List).length,
@@ -78,7 +78,7 @@ void main() {
         .execute();
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
-      2,
+      3,
     );
     expect(
       (((res.data as List)[1] as Map)['messages'] as List).length,
@@ -111,7 +111,7 @@ void main() {
     );
     expect(
       (((res.data as List)[3] as Map)['messages'] as List).length,
-      2,
+      3,
     );
     expect(
       ((((res.data as List)[3] as Map)['messages'] as List)[0] as Map)['id'],
