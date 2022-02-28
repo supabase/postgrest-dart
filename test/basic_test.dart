@@ -4,18 +4,18 @@ import 'package:test/test.dart';
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
-  late Map<String, dynamic> users;
-  late Map<String, dynamic> channels;
-  late Map<String, dynamic> messages;
+  late List<Map<String, dynamic>> users;
+  late List<Map<String, dynamic>> channels;
+  late List<Map<String, dynamic>> messages;
 
   setUpAll(() async {
     postgrest = PostgrestClient(rootUrl);
     users = (await postgrest.from('users').select().execute()).data
-        as Map<String, dynamic>;
+        as List<Map<String, dynamic>>;
     channels = (await postgrest.from('channels').select().execute()).data
-        as Map<String, dynamic>;
+        as List<Map<String, dynamic>>;
     messages = (await postgrest.from('messages').select().execute()).data
-        as Map<String, dynamic>;
+        as List<Map<String, dynamic>>;
   });
 
   tearDown(() async {
