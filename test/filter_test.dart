@@ -27,9 +27,9 @@ void main() {
   });
 
   tearDown(() async {
-    await postgrest.from('users').delete().execute();
-    await postgrest.from('channels').delete().execute();
-    await postgrest.from('messages').delete().execute();
+    await postgrest.from('messages').delete().neq('message', 'dne').execute();
+    await postgrest.from('channels').delete().neq('slug', 'dne').execute();
+    await postgrest.from('users').delete().neq('username', 'dne').execute();
     await postgrest.from('users').insert(users).execute();
     await postgrest.from('channels').insert(channels).execute();
     await postgrest.from('messages').insert(messages).execute();

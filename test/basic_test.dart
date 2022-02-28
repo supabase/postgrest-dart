@@ -27,27 +27,12 @@ void main() {
   });
 
   tearDown(() async {
-    final messageDeleteRes = await postgrest
-        .from('messages')
-        .delete()
-        .neq('message', 'dne')
-        .execute();
-    print(messageDeleteRes.data);
-    print(messageDeleteRes.error.toString());
+    await postgrest.from('messages').delete().neq('message', 'dne').execute();
     await postgrest.from('channels').delete().neq('slug', 'dne').execute();
-    final deleteRes =
-        await postgrest.from('users').delete().neq('username', 'dne').execute();
-    print(deleteRes.data);
-    print(deleteRes.error.toString());
-    final res = await postgrest.from('users').insert(users).execute();
-    print(res.data);
-    print(res.error.toString());
+    await postgrest.from('users').delete().neq('username', 'dne').execute();
+    await postgrest.from('users').insert(users).execute();
     await postgrest.from('channels').insert(channels).execute();
     await postgrest.from('messages').insert(messages).execute();
-    final resetUsers = List<Map<String, dynamic>>.from(
-      (await postgrest.from('users').select().execute()).data as List,
-    );
-    print(resetUsers);
   });
 
   test('basic select table', () async {
