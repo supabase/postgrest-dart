@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
-  late List<Map<String, dynamic>> users;
-  late List<Map<String, dynamic>> channels;
-  late List<Map<String, dynamic>> messages;
+  late final List<Map<String, dynamic>> users;
+  late final List<Map<String, dynamic>> channels;
+  late final List<Map<String, dynamic>> messages;
 
   setUpAll(() async {
     postgrest = PostgrestClient(rootUrl);
@@ -51,6 +51,15 @@ void main() {
         .order('status', ascending: true)
         .order('username')
         .execute();
+    expect(
+      (res.data as List).map((row) => (row as Map)['status']),
+      [
+        'ONLINE',
+        'ONLINE',
+        'ONLINE',
+        'OFFLINE',
+      ],
+    );
     expect(
       (res.data as List).map((row) => (row as Map)['username']),
       [
