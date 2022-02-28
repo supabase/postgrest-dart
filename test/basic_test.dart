@@ -10,12 +10,15 @@ void main() {
 
   setUpAll(() async {
     postgrest = PostgrestClient(rootUrl);
-    users = (await postgrest.from('users').select().execute()).data
-        as List<Map<String, dynamic>>;
-    channels = (await postgrest.from('channels').select().execute()).data
-        as List<Map<String, dynamic>>;
-    messages = (await postgrest.from('messages').select().execute()).data
-        as List<Map<String, dynamic>>;
+    users = List<Map<String, dynamic>>.from(
+      (await postgrest.from('users').select().execute()).data as List,
+    );
+    channels = List<Map<String, dynamic>>.from(
+      (await postgrest.from('channels').select().execute()).data as List,
+    );
+    messages = List<Map<String, dynamic>>.from(
+      (await postgrest.from('messages').select().execute()).data as List,
+    );
   });
 
   tearDown(() async {
