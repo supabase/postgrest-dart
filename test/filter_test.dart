@@ -30,11 +30,28 @@ void main() {
     await postgrest.from('messages').delete().neq('message', 'dne').execute();
     await postgrest.from('channels').delete().neq('slug', 'dne').execute();
     await postgrest.from('users').delete().neq('username', 'dne').execute();
-    await postgrest.from('users').insert(users).execute();
-    await postgrest.from('channels').insert(channels).execute();
-    await postgrest.from('messages').insert(messages).execute();
+    final usersInsertRes =
+        await postgrest.from('users').insert(users).execute();
+    final channelsInsertRes =
+        await postgrest.from('channels').insert(channels).execute();
+    final messagesInsertRes =
+        await postgrest.from('messages').insert(messages).execute();
+    if (usersInsertRes.hasError) {
+      fail(
+        'users table was not properly reset. ${usersInsertRes.error.toString()}',
+      );
+    }
+    if (channelsInsertRes.hasError) {
+      fail(
+        'channels table was not properly reset. ${channelsInsertRes.error.toString()}',
+      );
+    }
+    if (messagesInsertRes.hasError) {
+      fail(
+        'messages table was not properly reset. ${messagesInsertRes.error.toString()}',
+      );
+    }
   });
-
   test('not', () async {
     final res = await postgrest
         .from('users')
