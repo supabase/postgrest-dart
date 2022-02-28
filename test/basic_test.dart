@@ -239,7 +239,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .update({'status': 'ONLINE'})
-        .eq('username', 'countexact')
+        .eq('username', 'kiwicopple')
         .execute(count: CountOption.exact);
     expect(res.count, 1);
   });
@@ -248,7 +248,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .delete()
-        .eq('username', 'countexact')
+        .eq('username', 'kiwicopple')
         .execute(count: CountOption.exact);
 
     expect(res.count, 1);
