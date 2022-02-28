@@ -27,20 +27,13 @@ void main() {
         .order('username')
         .execute();
     expect(
-      ((res.data as List)[0] as Map)['username'],
-      'supabot',
-    );
-    expect(
-      ((res.data as List)[1] as Map)['username'],
-      'dragarcia',
-    );
-    expect(
-      ((res.data as List)[2] as Map)['username'],
-      'awailas',
-    );
-    expect(
-      ((res.data as List)[3] as Map)['username'],
-      'kiwicopple',
+      (res.data as List).map((row) => (row as Map)['username']),
+      [
+        'supabot',
+        'dragarcia',
+        'awailas',
+        'kiwicopple',
+      ],
     );
   });
 
