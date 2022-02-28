@@ -1,3 +1,7 @@
+## [next]
+
+- fix: bug where multiple `order` does not reorder the result
+
 ## [0.1.9]
 
 - feat: added `withConverter` to `PostgrestBuilder`

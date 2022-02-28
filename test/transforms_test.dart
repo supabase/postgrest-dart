@@ -48,20 +48,26 @@ void main() {
     final res = await postgrest
         .from('users')
         .select()
-        .order('catchphrase', ascending: true)
+        .order('status', ascending: true)
         .order('username')
         .execute();
     expect(
-      ((res.data as List)[0] as Map)['username'],
-      'kiwicopple',
+      (res.data as List).map((row) => (row as Map)['status']),
+      [
+        'ONLINE',
+        'ONLINE',
+        'OFFLINE',
+        'OFFLINE',
+      ],
     );
     expect(
-      ((res.data as List)[2] as Map)['username'],
-      'supabot',
-    );
-    expect(
-      ((res.data as List)[3] as Map)['username'],
-      'dragarcia',
+      (res.data as List).map((row) => (row as Map)['username']),
+      [
+        'supabot',
+        'awailas',
+        'kiwicopple',
+        'dragarcia',
+      ],
     );
   });
 
