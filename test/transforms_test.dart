@@ -10,7 +10,7 @@ void main() {
 
   setUpAll(() async {
     postgrest = PostgrestClient(rootUrl);
-    resetHelper.initialize(postgrest);
+    await resetHelper.initialize(postgrest);
   });
 
   setUp(() {
@@ -18,7 +18,7 @@ void main() {
   });
 
   tearDown(() async {
-    resetHelper.reset();
+    await resetHelper.reset();
   });
 
   test('order', () async {
