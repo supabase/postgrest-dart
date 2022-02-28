@@ -28,6 +28,10 @@ void main() {
     await postgrest.from('users').insert(users).execute();
     await postgrest.from('channels').insert(channels).execute();
     await postgrest.from('messages').insert(messages).execute();
+    final resetUsers = List<Map<String, dynamic>>.from(
+      (await postgrest.from('users').select().execute()).data as List,
+    );
+    print(resetUsers);
   });
 
   test('basic select table', () async {
