@@ -27,11 +27,14 @@ void main() {
   });
 
   tearDown(() async {
-    final messageDeleteRes =
-        await postgrest.from('messages').delete().neq('slug', 'dne').execute();
+    final messageDeleteRes = await postgrest
+        .from('messages')
+        .delete()
+        .neq('message', 'dne')
+        .execute();
     print(messageDeleteRes.data);
     print(messageDeleteRes.error.toString());
-    await postgrest.from('channels').delete().neq('message', 'dne').execute();
+    await postgrest.from('channels').delete().neq('slug', 'dne').execute();
     final deleteRes =
         await postgrest.from('users').delete().neq('username', 'dne').execute();
     print(deleteRes.data);
