@@ -30,7 +30,9 @@ void main() {
     await postgrest.from('users').delete().execute();
     await postgrest.from('channels').delete().execute();
     await postgrest.from('messages').delete().execute();
-    await postgrest.from('users').insert(users).execute();
+    final res = await postgrest.from('users').insert(users).execute();
+    print(res.data);
+    print(res.error.toString());
     await postgrest.from('channels').insert(channels).execute();
     await postgrest.from('messages').insert(messages).execute();
     final resetUsers = List<Map<String, dynamic>>.from(
