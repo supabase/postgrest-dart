@@ -1,25 +1,16 @@
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
+import 'reset_helper.dart';
+
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
-  late final List<Map<String, dynamic>> users;
-  late final List<Map<String, dynamic>> channels;
-  late final List<Map<String, dynamic>> messages;
+  final resetHelper = ResetHelper();
 
   setUpAll(() async {
     postgrest = PostgrestClient(rootUrl);
-    users = List<Map<String, dynamic>>.from(
-      (await postgrest.from('users').select().execute()).data as List,
-    );
-    channels = List<Map<String, dynamic>>.from(
-      (await postgrest.from('channels').select().execute()).data as List,
-    );
-    messages = List<Map<String, dynamic>>.from(
-      (await postgrest.from('messages').select().execute()).data as List,
-    );
-    print(users);
+    resetHelper.initialize();
   });
 
   setUp(() {
@@ -27,31 +18,9 @@ void main() {
   });
 
   tearDown(() async {
-    await postgrest.from('messages').delete().neq('message', 'dne').execute();
-    await postgrest.from('channels').delete().neq('slug', 'dne').execute();
-    await postgrest.from('users').delete().neq('username', 'dne').execute();
-    final usersInsertRes =
-        await postgrest.from('users').insert(users).execute();
-    final channelsInsertRes =
-        await postgrest.from('channels').insert(channels).execute();
-    final messagesInsertRes =
-        await postgrest.from('messages').insert(messages).execute();
-    if (usersInsertRes.hasError) {
-      fail(
-        'users table was not properly reset. ${usersInsertRes.error.toString()}',
-      );
-    }
-    if (channelsInsertRes.hasError) {
-      fail(
-        'channels table was not properly reset. ${channelsInsertRes.error.toString()}',
-      );
-    }
-    if (messagesInsertRes.hasError) {
-      fail(
-        'messages table was not properly reset. ${messagesInsertRes.error.toString()}',
-      );
-    }
+    resetHelper.reset();
   });
+
   test('order', () async {
     final res =
         await postgrest.from('users').select().order('username').execute();
