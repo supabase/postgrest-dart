@@ -1,12 +1,24 @@
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
+import 'reset_helper.dart';
+
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
+  final resetHelper = ResetHelper();
+
+  setUpAll(() async {
+    postgrest = PostgrestClient(rootUrl);
+    await resetHelper.initialize(postgrest);
+  });
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
+  });
+
+  tearDown(() async {
+    await resetHelper.reset();
   });
 
   test('order', () async {
@@ -31,7 +43,7 @@ void main() {
       [
         'ONLINE',
         'ONLINE',
-        'OFFLINE',
+        'ONLINE',
         'OFFLINE',
       ],
     );
@@ -39,9 +51,9 @@ void main() {
       (res.data as List).map((row) => (row as Map)['username']),
       [
         'supabot',
+        'dragarcia',
         'awailas',
         'kiwicopple',
-        'dragarcia',
       ],
     );
   });

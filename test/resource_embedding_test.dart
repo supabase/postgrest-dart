@@ -1,19 +1,31 @@
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
+import 'reset_helper.dart';
+
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
+  final resetHelper = ResetHelper();
+
+  setUpAll(() async {
+    postgrest = PostgrestClient(rootUrl);
+    await resetHelper.initialize(postgrest);
+  });
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
+  });
+
+  tearDown(() async {
+    await resetHelper.reset();
   });
 
   test('embedded select', () async {
     final res = await postgrest.from('users').select('messages(*)').execute();
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
-      2,
+      3,
     );
     expect(
       (((res.data as List)[1] as Map)['messages'] as List).length,
@@ -29,7 +41,7 @@ void main() {
         .execute();
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
-      1,
+      2,
     );
     expect(
       (((res.data as List)[1] as Map)['messages'] as List).length,
@@ -53,7 +65,7 @@ void main() {
         .execute();
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
-      2,
+      3,
     );
     expect(
       (((res.data as List)[1] as Map)['messages'] as List).length,
@@ -86,7 +98,7 @@ void main() {
     );
     expect(
       (((res.data as List)[3] as Map)['messages'] as List).length,
-      2,
+      3,
     );
     expect(
       ((((res.data as List)[3] as Map)['messages'] as List)[0] as Map)['id'],

@@ -1,12 +1,24 @@
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
+import 'reset_helper.dart';
+
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
+  final resetHelper = ResetHelper();
+
+  setUpAll(() async {
+    postgrest = PostgrestClient(rootUrl);
+    await resetHelper.initialize(postgrest);
+  });
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
+  });
+
+  tearDown(() async {
+    await resetHelper.reset();
   });
 
   test('basic select table', () async {
@@ -213,7 +225,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .update({'status': 'ONLINE'})
-        .eq('username', 'countexact')
+        .eq('username', 'kiwicopple')
         .execute(count: CountOption.exact);
     expect(res.count, 1);
   });
@@ -222,7 +234,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .delete()
-        .eq('username', 'countexact')
+        .eq('username', 'kiwicopple')
         .execute(count: CountOption.exact);
 
     expect(res.count, 1);

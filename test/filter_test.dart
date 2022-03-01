@@ -1,12 +1,24 @@
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
+import 'reset_helper.dart';
+
 void main() {
   const rootUrl = 'http://localhost:3000';
   late PostgrestClient postgrest;
+  final resetHelper = ResetHelper();
+
+  setUpAll(() async {
+    postgrest = PostgrestClient(rootUrl);
+    await resetHelper.initialize(postgrest);
+  });
 
   setUp(() {
     postgrest = PostgrestClient(rootUrl);
+  });
+
+  tearDown(() async {
+    await resetHelper.reset();
   });
 
   test('not', () async {
