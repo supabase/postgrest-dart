@@ -1,5 +1,5 @@
 INSERT INTO
-    public.users (username, status, age_range, catchphrase)
+    public.users (username, status, age_range, catchphrase, interests)
 VALUES
     ('supabot', 'ONLINE', '[1,2)'::int4range, 'fat cat'::tsvector, '{"basketball", "baseball"}'),
     ('kiwicopple', 'OFFLINE', '[25,35)'::int4range, 'cat bat'::tsvector, '{"football"}'),
