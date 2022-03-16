@@ -31,6 +31,21 @@ void main() {
     }
   });
 
+  test('not with List of values', () async {
+    final res = await postgrest
+        .from('users')
+        .select('status')
+        .not('interests', 'cs', ['baseball', 'basketball']).execute();
+    expect((res.data as List).length, 2);
+    for (final item in res.data as List) {
+      expect(
+        ((item as Map)['interests'] as List)
+            .contains(['baseball', 'basketball']),
+        false,
+      );
+    }
+  });
+
   test('or', () async {
     final res = await postgrest
         .from('users')
@@ -303,6 +318,20 @@ void main() {
         .filter('username', 'eq', 'supabot')
         .execute();
     expect(((res.data as List)[0] as Map)['username'], 'supabot');
+  });
+
+  test('filter with List of values', () async {
+    final res = await postgrest
+        .from('users')
+        .select('status')
+        .filter('interests', 'cs', ['basketball']).execute();
+    expect((res.data as List).length, 2);
+    for (final item in res.data as List) {
+      expect(
+        ((item as Map)['interests'] as List).contains('basketball'),
+        true,
+      );
+    }
   });
 
   test('match', () async {
