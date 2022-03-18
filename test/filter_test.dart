@@ -48,11 +48,13 @@ void main() {
         .from('users')
         .select('status')
         .not('interests', 'cs', ['baseball', 'basketball']).execute();
-    print(res.error.toString());
+    if (res.hasError) {
+      fail(res.error.toString());
+    }
     expect((res.data as List).length, 2);
     for (final item in res.data as List) {
       expect(
-        ((item as Map)['interests'] as List)
+        (((item as Map)['interests'] ?? []) as List)
             .contains(['baseball', 'basketball']),
         false,
       );
@@ -338,7 +340,9 @@ void main() {
         .from('users')
         .select()
         .filter('interests', 'cs', ['basketball']).execute();
-    print(res.error.toString());
+    if (res.hasError) {
+      fail(res.error.toString());
+    }
     expect((res.data as List).length, 2);
     for (final item in res.data as List) {
       expect(
