@@ -48,6 +48,7 @@ void main() {
         .from('users')
         .select('status')
         .not('interests', 'cs', ['baseball', 'basketball']).execute();
+    print(res.error.toString());
     expect((res.data as List).length, 2);
     for (final item in res.data as List) {
       expect(
@@ -332,11 +333,12 @@ void main() {
     expect(((res.data as List)[0] as Map)['username'], 'supabot');
   });
 
-  test('filter with List of values', () async {
+  test('filter cs with List of values', () async {
     final res = await postgrest
         .from('users')
-        .select('status')
+        .select()
         .filter('interests', 'cs', ['basketball']).execute();
+    print(res.error.toString());
     expect((res.data as List).length, 2);
     for (final item in res.data as List) {
       expect(
