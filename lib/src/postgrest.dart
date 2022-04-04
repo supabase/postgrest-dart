@@ -18,6 +18,8 @@ class PostgrestClient {
   /// PostgrestClient(REST_URL)
   /// PostgrestClient(REST_URL, headers: {'apikey': 'foo'})
   /// ```
+  ///
+  /// [httpClient] is optional and can be used to provide a custom http client
   PostgrestClient(
     this.url, {
     Map<String, String>? headers,
