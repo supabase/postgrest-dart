@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:http/http.dart';
 import 'package:postgrest/src/postgrest_builder.dart';
 import 'package:postgrest/src/postgrest_filter_builder.dart';
 import 'package:postgrest/src/returning_option.dart';
@@ -17,10 +18,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     String url, {
     Map<String, String>? headers,
     String? schema,
+    BaseClient? httpClient,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},
           schema: schema,
+          httpClient: httpClient,
         );
 
   /// Performs horizontal filtering with SELECT.

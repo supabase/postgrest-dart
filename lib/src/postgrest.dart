@@ -1,3 +1,4 @@
+import 'package:http/http.dart';
 import 'package:postgrest/src/constants.dart';
 import 'package:postgrest/src/postgrest_filter_builder.dart';
 import 'package:postgrest/src/postgrest_query_builder.dart';
@@ -8,6 +9,7 @@ class PostgrestClient {
   final String url;
   final Map<String, String> headers;
   final String? schema;
+  final BaseClient? httpClient;
 
   /// To create a [PostgrestClient], you need to provide an [url] endpoint.
   ///
@@ -20,6 +22,7 @@ class PostgrestClient {
     this.url, {
     Map<String, String>? headers,
     this.schema,
+    this.httpClient,
   }) : headers = {...defaultHeaders, if (headers != null) ...headers};
 
   /// Authenticates the request with JWT.
@@ -31,7 +34,12 @@ class PostgrestClient {
   /// Perform a table operation.
   PostgrestQueryBuilder from(String table) {
     final url = '${this.url}/$table';
-    return PostgrestQueryBuilder(url, headers: headers, schema: schema);
+    return PostgrestQueryBuilder(
+      url,
+      headers: headers,
+      schema: schema,
+      httpClient: httpClient,
+    );
   }
 
   /// Perform a stored procedure call.
@@ -41,7 +49,11 @@ class PostgrestClient {
   /// ```
   PostgrestFilterBuilder rpc(String fn, {Map? params}) {
     final url = '${this.url}/rpc/$fn';
-    return PostgrestRpcBuilder(url, headers: headers, schema: schema)
-        .rpc(params);
+    return PostgrestRpcBuilder(
+      url,
+      headers: headers,
+      schema: schema,
+      httpClient: httpClient,
+    ).rpc(params);
   }
 }
