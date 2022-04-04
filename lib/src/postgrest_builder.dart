@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:postgrest/src/count_option.dart';
 import 'package:postgrest/src/postgrest_error.dart';
 import 'package:postgrest/src/postgrest_response.dart';
@@ -16,6 +17,7 @@ class PostgrestBuilder<T> {
     this.schema,
     this.method,
     this.body,
+    this.httpClient,
   });
 
   dynamic body;
@@ -25,6 +27,7 @@ class PostgrestBuilder<T> {
   final String? schema;
   Uri url;
   PostgrestConverter? _converter;
+  final BaseClient? httpClient;
 
   /// Converts any response that comes from the server into a type-safe response.
   ///
@@ -91,17 +94,38 @@ class PostgrestBuilder<T> {
       final bodyStr = json.encode(body);
 
       if (uppercaseMethod == 'GET') {
-        response = await http.get(url, headers: headers);
+        response = await (httpClient?.get ?? http.get)(
+          url,
+          headers: headers,
+        );
       } else if (uppercaseMethod == 'POST') {
-        response = await http.post(url, headers: headers, body: bodyStr);
+        response = await (httpClient?.post ?? http.post)(
+          url,
+          headers: headers,
+          body: bodyStr,
+        );
       } else if (uppercaseMethod == 'PUT') {
-        response = await http.put(url, headers: headers, body: bodyStr);
+        response = await (httpClient?.put ?? http.put)(
+          url,
+          headers: headers,
+          body: bodyStr,
+        );
       } else if (uppercaseMethod == 'PATCH') {
-        response = await http.patch(url, headers: headers, body: bodyStr);
+        response = await (httpClient?.patch ?? http.patch)(
+          url,
+          headers: headers,
+          body: bodyStr,
+        );
       } else if (uppercaseMethod == 'DELETE') {
-        response = await http.delete(url, headers: headers);
+        response = await (httpClient?.delete ?? http.delete)(
+          url,
+          headers: headers,
+        );
       } else if (uppercaseMethod == 'HEAD') {
-        response = await http.head(url, headers: headers);
+        response = await (httpClient?.head ?? http.head)(
+          url,
+          headers: headers,
+        );
       }
 
       return _parseResponse(response);
