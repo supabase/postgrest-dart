@@ -18,7 +18,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     String url, {
     Map<String, String>? headers,
     String? schema,
-    BaseClient? httpClient,
+    Client? httpClient,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},

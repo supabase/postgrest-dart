@@ -27,7 +27,7 @@ class PostgrestBuilder<T> {
   final String? schema;
   Uri url;
   PostgrestConverter? _converter;
-  final BaseClient? httpClient;
+  final Client? httpClient;
 
   /// Converts any response that comes from the server into a type-safe response.
   ///
