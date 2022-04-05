@@ -1,5 +1,6 @@
-## [next]
+## [0.1.10]
 
+- feat: allow custom http client
 - fix: bug where multiple `order` does not reorder the result
 
 ## [0.1.9]

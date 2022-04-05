@@ -9,7 +9,7 @@ class PostgrestClient {
   final String url;
   final Map<String, String> headers;
   final String? schema;
-  final BaseClient? httpClient;
+  final Client? httpClient;
 
   /// To create a [PostgrestClient], you need to provide an [url] endpoint.
   ///
