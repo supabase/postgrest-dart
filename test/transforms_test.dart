@@ -58,6 +58,23 @@ void main() {
     );
   });
 
+  test('order with filters on the same column', () async {
+    final res = await postgrest
+        .from('users')
+        .select()
+        .gt('username', 'b')
+        .lt('username', 'r')
+        .order('username')
+        .execute();
+    expect(
+      (res.data as List).map((row) => (row as Map)['username']),
+      [
+        'kiwicopple',
+        'dragarcia',
+      ],
+    );
+  });
+
   test('limit', () async {
     final res = await postgrest.from('users').select().limit(1).execute();
     expect((res.data as List).length, 1);

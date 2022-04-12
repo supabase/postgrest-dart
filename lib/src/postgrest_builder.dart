@@ -232,7 +232,7 @@ class PostgrestBuilder<T> {
 
   /// Overrides Uri queryParameters with new key:value
   void overrideSearchParams(String key, String value) {
-    final searchParams = Map<String, dynamic>.from(url.queryParameters);
+    final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
     searchParams[key] = value;
     url = url.replace(queryParameters: searchParams);
   }
