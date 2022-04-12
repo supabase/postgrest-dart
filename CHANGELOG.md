@@ -1,3 +1,7 @@
+## [0.1.10+1]
+
+- fix: bug where using multiple filters on the same field with order will wipe out the filters except the last one. 
+
 ## [0.1.10]
 
 - feat: allow custom http client
