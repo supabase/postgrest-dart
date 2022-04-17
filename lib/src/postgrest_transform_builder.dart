@@ -1,7 +1,7 @@
 import 'package:postgrest/src/postgrest_builder.dart';
 
-class PostgrestTransformBuilder<T> extends PostgrestBuilder {
-  PostgrestTransformBuilder(PostgrestBuilder builder)
+class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
+  PostgrestTransformBuilder(PostgrestBuilder<T> builder)
       : super(
           url: builder.url,
           method: builder.method,

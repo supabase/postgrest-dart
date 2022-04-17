@@ -11,15 +11,6 @@ typedef PostgrestConverter<T> = T Function(dynamic data);
 
 /// The base builder class.
 class PostgrestBuilder<T> {
-  PostgrestBuilder({
-    required this.url,
-    required this.headers,
-    this.schema,
-    this.method,
-    this.body,
-    this.httpClient,
-  });
-
   dynamic body;
   final Map<String, String> headers;
   bool maybeEmpty = false;
@@ -28,6 +19,15 @@ class PostgrestBuilder<T> {
   Uri url;
   PostgrestConverter? _converter;
   final Client? httpClient;
+
+  PostgrestBuilder({
+    required this.url,
+    required this.headers,
+    this.schema,
+    this.method,
+    this.body,
+    this.httpClient,
+  });
 
   /// Converts any response that comes from the server into a type-safe response.
   ///
@@ -129,12 +129,10 @@ class PostgrestBuilder<T> {
       }
 
       return _parseResponse(response);
-    } catch (e) {
-      final error =
-          PostgrestError(code: e.runtimeType.toString(), message: e.toString());
-      return PostgrestResponse(
-        status: 500,
-        error: error,
+    } catch (error) {
+      throw PostgrestError(
+        code: '${error.runtimeType}',
+        message: '$error',
       );
     }
   }
@@ -177,8 +175,7 @@ class PostgrestBuilder<T> {
       PostgrestError error;
       if (response.request!.method != 'HEAD') {
         try {
-          final Map<String, dynamic> errorJson =
-              json.decode(response.body) as Map<String, dynamic>;
+          final errorJson = json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
 
           if (maybeEmpty) {
@@ -194,10 +191,7 @@ class PostgrestBuilder<T> {
         );
       }
 
-      return PostgrestResponse(
-        status: response.statusCode,
-        error: error,
-      );
+      throw error;
     }
   }
 
@@ -210,15 +204,13 @@ class PostgrestBuilder<T> {
   ) {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
-      return const PostgrestResponse(
+      return PostgrestResponse<T>(
+        data: null,
         status: 200,
         count: 0,
       );
     } else {
-      return PostgrestResponse(
-        status: response.statusCode,
-        error: error,
-      );
+      throw error;
     }
   }
 
