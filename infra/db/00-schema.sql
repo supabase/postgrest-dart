@@ -11,7 +11,8 @@ CREATE TABLE public.users (
   data jsonb DEFAULT null,
   age_range int4range DEFAULT null,
   status user_status DEFAULT 'ONLINE'::public.user_status,
-  catchphrase tsvector DEFAULT null
+  catchphrase tsvector DEFAULT null,
+  interests text[] DEFAULT null
 );
 ALTER TABLE public.users REPLICA IDENTITY FULL; -- Send "previous data" to supabase 
 COMMENT ON COLUMN public.users.data IS 'For unstructured data and prototyping.';
