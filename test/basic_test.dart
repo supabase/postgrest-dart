@@ -113,7 +113,6 @@ void main() {
         ignoreDuplicates: true,
       ).execute();
       expect((res.data as List).length, 0);
-      expect(res.error, isNull);
     });
 
     test('bulk insert', () async {
@@ -159,14 +158,22 @@ void main() {
     });
 
     test('missing table', () async {
-      final res = await postgrest.from('missing_table').select().execute();
-      expect(res.error, isNotNull);
+      try {
+        await postgrest.from('missing_table').select().execute();
+        fail('Found missing table');
+      } catch (error) {
+        expect(error, isNotNull);
+      }
     });
 
     test('connection error', () async {
-      final postgrest = PostgrestClient('http://this.url.does.not.exist');
-      final res = await postgrest.from('user').select().execute();
-      expect(res.error!.code, 'SocketException');
+      try {
+        final postgrest = PostgrestClient('http://this.url.does.not.exist');
+        await postgrest.from('user').select().execute();
+        fail('Success on connection error');
+      } on PostgrestError catch (error) {
+        expect(error.code, 'SocketException');
+      }
     });
 
     test('select with head:true', () async {
@@ -205,17 +212,24 @@ void main() {
     });
 
     test('stored procedure with head: true', () async {
-      final res = await postgrest.rpc('get_status').execute(head: true);
-      expect(res.error, isNotNull);
-      expect(res.error!.code, '404');
+      try {
+        await postgrest.rpc('get_status').execute(head: true);
+        fail('Not possible to run a stored procedure with head: true');
+      } on PostgrestError catch (error) {
+        expect(error, isNotNull);
+        expect(error.code, '404');
+      }
     });
 
     test('stored procedure with count: exact', () async {
-      final res =
-          await postgrest.rpc('get_status').execute(count: CountOption.exact);
-      expect(res.error, isNotNull);
-      expect(res.error!.hint, isNotNull);
-      expect(res.error!.message, isNotNull);
+      try {
+        await postgrest.rpc('get_status').execute(count: CountOption.exact);
+        fail('Not possible to run a stored procedure with count: exact');
+      } on PostgrestError catch (error) {
+        expect(error, isNotNull);
+        expect(error.hint, isNotNull);
+        expect(error.message, isNotNull);
+      }
     });
 
     test('insert with count: exact', () async {
@@ -248,8 +262,12 @@ void main() {
     });
 
     test('execute without table operation', () async {
-      final res = await postgrest.from('users').execute();
-      expect(res.error, isNotNull);
+      try {
+        await postgrest.from('users').execute();
+        fail('can not execute without table operation');
+      } on PostgrestError catch (error) {
+        expect(error, isNotNull);
+      }
     });
 
     test('select from uppercase table name', () async {
@@ -277,8 +295,12 @@ void main() {
     });
 
     test('row level security error', () async {
-      final res = await postgrest.from('sample').update({'id': 2}).execute();
-      expect(res.error, isNotNull);
+      try {
+        await postgrest.from('sample').update({'id': 2}).execute();
+        fail('Returned even with row level security');
+      } on PostgrestError catch (error) {
+        expect(error, isNotNull);
+      }
     });
 
     test('withConverter', () async {

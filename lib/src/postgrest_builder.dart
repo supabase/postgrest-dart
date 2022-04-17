@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
@@ -10,7 +11,7 @@ import 'package:postgrest/src/postgrest_response.dart';
 typedef PostgrestConverter<T> = T Function(dynamic data);
 
 /// The base builder class.
-class PostgrestBuilder<T> {
+class PostgrestBuilder<T> implements Future<T> {
   dynamic body;
   final Map<String, String> headers;
   bool maybeEmpty = false;
@@ -227,5 +228,46 @@ class PostgrestBuilder<T> {
     final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
     searchParams[key] = value;
     url = url.replace(queryParameters: searchParams);
+  }
+
+  @override
+  Stream<T> asStream() {
+    // TODO: implement asStream
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<T> catchError(Function onError, {bool Function(Object error)? test}) {
+    // TODO: implement catchError
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<R> then<R>(
+    FutureOr<R> Function(T value) onValue, {
+    Function? onError,
+  }) async {
+    // super.then();
+    assert(R is T);
+    try {
+      final response = await execute();
+      // ignore: null_check_on_nullable_type_parameter
+      final data = response.data!;
+      onValue(data);
+      return data as R;
+    } catch (error, stack) {
+      onError?.call(error, stack);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<T> whenComplete(FutureOr<void> Function() action) {
+    throw UnimplementedError();
   }
 }

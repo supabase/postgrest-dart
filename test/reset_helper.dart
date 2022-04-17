@@ -24,20 +24,20 @@ class ResetHelper {
     await _postgrest.from('messages').delete().neq('message', 'dne').execute();
     await _postgrest.from('channels').delete().neq('slug', 'dne').execute();
     await _postgrest.from('users').delete().neq('username', 'dne').execute();
-    final usersInsertRes =
-        await _postgrest.from('users').insert(_users).execute();
-    final channelsInsertRes =
-        await _postgrest.from('channels').insert(_channels).execute();
-    final messagesInsertRes =
-        await _postgrest.from('messages').insert(_messages).execute();
-    if (usersInsertRes.hasError) {
-      throw 'users table was not properly reset. ${usersInsertRes.error.toString()}';
+    try {
+      await _postgrest.from('users').insert(_users).execute();
+    } on PostgrestError catch (error) {
+      throw 'users table was not properly reset. $error';
     }
-    if (channelsInsertRes.hasError) {
-      throw 'channels table was not properly reset. ${channelsInsertRes.error.toString()}';
+    try {
+      await _postgrest.from('channels').insert(_channels).execute();
+    } on PostgrestError catch (error) {
+      throw 'channels table was not properly reset. $error';
     }
-    if (messagesInsertRes.hasError) {
-      throw 'messages table was not properly reset. ${messagesInsertRes.error.toString()}';
+    try {
+      await _postgrest.from('messages').insert(_messages).execute();
+    } on PostgrestError catch (error) {
+      throw 'messages table was not properly reset. $error';
     }
   }
 }

@@ -48,9 +48,6 @@ void main() {
         .from('users')
         .select('status')
         .not('interests', 'cs', ['baseball', 'basketball']).execute();
-    if (res.hasError) {
-      fail(res.error.toString());
-    }
     expect((res.data as List).length, 2);
     for (final item in res.data as List) {
       expect(
@@ -340,9 +337,6 @@ void main() {
         .from('users')
         .select()
         .filter('interests', 'cs', ['basketball']).execute();
-    if (res.hasError) {
-      fail(res.error.toString());
-    }
     expect((res.data as List).length, 2);
     for (final item in res.data as List) {
       expect(

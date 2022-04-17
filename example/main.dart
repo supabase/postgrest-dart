@@ -15,9 +15,6 @@ dynamic main() async {
         .from('countries')
         .select()
         .execute(count: CountOption.exact);
-    if (response.error != null) {
-      throw response.error!;
-    }
     return response.data;
   } on PostgrestError catch (e) {
     // handle PostgrestError
