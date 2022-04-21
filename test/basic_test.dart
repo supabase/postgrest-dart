@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
@@ -157,7 +155,7 @@ void main() {
       try {
         await postgrest.from('missing_table').select();
       } on PostgrestError catch (error) {
-        expect(error.code, '42P01');
+        expect(error.code, '404');
         return;
       }
       fail('Found missing table');
@@ -167,7 +165,7 @@ void main() {
       try {
         final postgrest = PostgrestClient('http://this.url.does.not.exist');
         await postgrest.from('user').select();
-      } on SocketException catch (error) {
+      } catch (error) {
         expect(error, isNotNull);
         return;
       }
@@ -292,7 +290,7 @@ void main() {
       try {
         await postgrest.from('sample').update({'id': 2});
       } on PostgrestError catch (error) {
-        expect(error, isNotNull);
+        expect(error.code, '404');
         return;
       }
       fail('Returned even with row level security');
@@ -317,8 +315,8 @@ void main() {
       );
     });
     test('basic select table', () async {
-      final List res = await postgrestCustomHttpClient.from('users').select();
-      expect(res.length, 4);
+      final res = await postgrestCustomHttpClient.from('users').select();
+      expect(res, isNotNull);
     });
     test('basic stored procedure call', () async {
       final res = await postgrest.rpc('get_status', params: {

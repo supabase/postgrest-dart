@@ -215,7 +215,7 @@ class PostgrestBuilder<T> implements Future<T?> {
         count: count,
       );
     } else {
-      PostgrestError error;
+      late PostgrestError error;
       if (response.request!.method != METHOD_HEAD) {
         try {
           final errorJson = json.decode(response.body) as Map<String, dynamic>;

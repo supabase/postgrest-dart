@@ -22,7 +22,7 @@ class PostgrestRpcBuilder extends PostgrestBuilder {
   ]) {
     _method = METHOD_POST;
     _body = params;
-    _options = options;
+    _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
   }
 }
