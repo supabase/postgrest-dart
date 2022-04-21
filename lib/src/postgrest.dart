@@ -1,6 +1,6 @@
 import 'package:http/http.dart';
+import 'package:postgrest/postgrest.dart';
 import 'package:postgrest/src/constants.dart';
-import 'package:postgrest/src/postgrest_builder.dart';
 
 /// A PostgREST api client written in Dartlang. The goal of this library is to make an "ORM-like" restful interface.
 class PostgrestClient {
@@ -47,13 +47,17 @@ class PostgrestClient {
   /// ```dart
   /// postgrest.rpc('get_status', params: {'name_param': 'supabot'})
   /// ```
-  PostgrestFilterBuilder rpc(String fn, {Map? params}) {
+  PostgrestFilterBuilder rpc(
+    String fn, {
+    Map? params,
+    FetchOptions options = const FetchOptions(),
+  }) {
     final url = '${this.url}/rpc/$fn';
     return PostgrestRpcBuilder(
       url,
       headers: headers,
       schema: schema,
       httpClient: httpClient,
-    ).rpc(params);
+    ).rpc(params, options);
   }
 }

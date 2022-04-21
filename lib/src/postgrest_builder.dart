@@ -31,6 +31,8 @@ class PostgrestBuilder<T> implements Future<T> {
   late Uri _url;
   PostgrestConverter? _converter;
   late final Client? _httpClient;
+  // ignore: prefer_final_fields
+  FetchOptions _options = const FetchOptions();
 
   PostgrestBuilder({
     required Uri url,
@@ -86,26 +88,21 @@ class PostgrestBuilder<T> implements Future<T> {
   /// }
   /// ```
   @Deprecated('Use async/await or .then instead. Deprecated in 0.2.0')
-  Future<PostgrestResponse<T>> execute({
-    bool head = false,
-    CountOption? count,
-  }) async {
-    return _execute(head: head, count: count);
+  Future<PostgrestResponse<T>> execute() async {
+    return _execute();
   }
 
-  Future<PostgrestResponse<T>> _execute({
-    bool head = false,
-    CountOption? count,
-  }) async {
-    if (head) {
+  Future<PostgrestResponse<T>> _execute() async {
+    if (_options.head) {
       _method = METHOD_HEAD;
     }
 
-    if (count != null) {
-      if (_headers['Prefer'] == null) {
-        _headers['Prefer'] = 'count=${count.name()}';
+    if (_options.count != null) {
+      if (_headers['Prefer'] != null) {
+        final oldPreferHeader = _headers['Prefer'];
+        _headers['Prefer'] = '$oldPreferHeader,count=${_options.count}';
       } else {
-        _headers['Prefer'] = '${_headers['Prefer']!},count=${count.name()}';
+        _headers['Prefer'] = 'count=${_options.count}';
       }
     }
 
@@ -242,7 +239,7 @@ class PostgrestBuilder<T> implements Future<T> {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
       return PostgrestResponse<T>(
-        data: null,
+        data: '' as T,
         status: 200,
         count: 0,
       );
@@ -306,8 +303,13 @@ class PostgrestBuilder<T> implements Future<T> {
       final response = await _execute();
       // ignore: null_check_on_nullable_type_parameter
       final data = response.data!;
-      onValue(data);
-      return data as R;
+      if (data.runtimeType is T) {
+        return onValue(data);
+      } else {
+        return onValue(response as T);
+      }
+      // onValue(data);
+      // return data as R;
     } catch (error, stack) {
       if (onError != null) {
         if (onError is Function(Object, StackTrace)) {

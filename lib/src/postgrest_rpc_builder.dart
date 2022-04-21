@@ -14,9 +14,13 @@ class PostgrestRpcBuilder extends PostgrestBuilder {
         );
 
   /// Performs stored procedures on the database.
-  PostgrestFilterBuilder rpc([dynamic params]) {
+  PostgrestFilterBuilder rpc([
+    dynamic params,
+    FetchOptions options = const FetchOptions(),
+  ]) {
     _method = METHOD_POST;
     _body = params;
+    _options = options;
     return PostgrestFilterBuilder(this);
   }
 }

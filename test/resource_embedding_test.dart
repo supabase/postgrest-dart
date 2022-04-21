@@ -22,7 +22,7 @@ void main() {
   });
 
   test('embedded select', () async {
-    final res = await postgrest.from('users').select('messages(*)').execute();
+    final res = await postgrest.from('users').select('messages(*)');
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
       3,
@@ -37,8 +37,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .eq('messages.channel_id', 1)
-        .execute();
+        .eq('messages.channel_id', 1);
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
       2,
@@ -61,8 +60,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .order('channel_id', foreignTable: 'messages')
-        .execute();
+        .order('channel_id', foreignTable: 'messages');
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
       3,
@@ -82,8 +80,7 @@ void main() {
         .from('users')
         .select('username, messages(*)')
         .order('username', ascending: true)
-        .order('channel_id', foreignTable: 'messages')
-        .execute();
+        .order('channel_id', foreignTable: 'messages');
     expect(
       ((res.data as List)[0] as Map)['username'],
       'awailas',
@@ -110,8 +107,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .limit(1, foreignTable: 'messages')
-        .execute();
+        .limit(1, foreignTable: 'messages');
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
       1,
@@ -134,8 +130,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .range(1, 1, foreignTable: 'messages')
-        .execute();
+        .range(1, 1, foreignTable: 'messages');
     expect(
       (((res.data as List)[0] as Map)['messages'] as List).length,
       1,

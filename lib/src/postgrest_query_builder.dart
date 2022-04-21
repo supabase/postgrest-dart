@@ -26,7 +26,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestFilterBuilder select([String columns = '*']) {
+  PostgrestFilterBuilder select([
+    String columns = '*',
+    FetchOptions options = const FetchOptions(),
+  ]) {
     _method = METHOD_GET;
 
     // Remove whitespaces except when quoted
@@ -43,6 +46,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }).join();
 
     appendSearchParams('select', cleanedColumns);
+    _options = options;
     return PostgrestFilterBuilder(this);
   }
 
@@ -87,6 +91,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     ReturningOption returning = ReturningOption.representation,
     String? onConflict,
     bool ignoreDuplicates = false,
+    FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_POST;
     _headers['Prefer'] =
@@ -100,6 +105,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
       );
     }
     _body = values;
+    _options = options.ensureNotHead();
     return this;
   }
 
@@ -112,10 +118,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestFilterBuilder update(
     Map values, {
     ReturningOption returning = ReturningOption.representation,
+    FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_PATCH;
     _headers['Prefer'] = 'return=${returning.name()}';
     _body = values;
+    _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
   }
 
@@ -127,9 +135,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```
   PostgrestFilterBuilder delete({
     ReturningOption returning = ReturningOption.representation,
+    FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_DELETE;
     _headers['Prefer'] = 'return=${returning.name()}';
+    _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
   }
 }

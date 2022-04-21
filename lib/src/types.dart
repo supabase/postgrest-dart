@@ -36,7 +36,7 @@ class PostgrestResponse<T> {
     this.count,
   });
 
-  final T? data;
+  final T data;
 
   final int status;
 
@@ -91,5 +91,22 @@ enum TextSearchType {
 extension TextSearchTypeName on TextSearchType {
   String name() {
     return toString().split('.').last;
+  }
+}
+
+class FetchOptions {
+  final bool head;
+  final CountOption? count;
+
+  const FetchOptions({
+    this.head = false,
+    this.count,
+  });
+
+  FetchOptions ensureNotHead() {
+    return FetchOptions(
+      head: false,
+      count: count,
+    );
   }
 }
