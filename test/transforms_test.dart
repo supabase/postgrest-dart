@@ -24,10 +24,10 @@ void main() {
   test('order', () async {
     final res = await postgrest.from('users').select().order('username');
     expect(
-      ((res.data as List)[1] as Map)['username'],
+      ((res as List)[1] as Map)['username'],
       'kiwicopple',
     );
-    expect(((res.data as List)[3] as Map)['username'], 'awailas');
+    expect(((res)[3] as Map)['username'], 'awailas');
   });
 
   test('order on multiple columns', () async {
@@ -37,7 +37,7 @@ void main() {
         .order('status', ascending: true)
         .order('username');
     expect(
-      (res.data as List).map((row) => (row as Map)['status']),
+      (res as List).map((row) => (row as Map)['status']),
       [
         'ONLINE',
         'ONLINE',
@@ -46,7 +46,7 @@ void main() {
       ],
     );
     expect(
-      (res.data as List).map((row) => (row as Map)['username']),
+      (res).map((row) => (row as Map)['username']),
       [
         'supabot',
         'dragarcia',
@@ -64,7 +64,7 @@ void main() {
         .lt('username', 'r')
         .order('username');
     expect(
-      (res.data as List).map((row) => (row as Map)['username']),
+      (res as List).map((row) => (row as Map)['username']),
       [
         'kiwicopple',
         'dragarcia',
@@ -74,7 +74,7 @@ void main() {
 
   test('limit', () async {
     final res = await postgrest.from('users').select().limit(1);
-    expect((res.data as List).length, 1);
+    expect((res as List).length, 1);
   });
 
   test('range', () async {
@@ -82,7 +82,7 @@ void main() {
     const to = 3;
     final res = await postgrest.from('users').select().range(from, to);
     //from -1 so that the index is included
-    expect((res.data as List).length, to - (from - 1));
+    expect((res as List).length, to - (from - 1));
   });
 
   test('range 1-1', () async {
@@ -90,7 +90,7 @@ void main() {
     const to = 1;
     final res = await postgrest.from('users').select().range(from, to);
     //from -1 so that the index is included
-    expect((res.data as List).length, to - (from - 1));
+    expect((res as List).length, to - (from - 1));
   });
 
   test('single', () async {
@@ -99,8 +99,8 @@ void main() {
         .select()
         .eq('username', 'supabot')
         .single();
-    expect((res.data as Map)['username'], 'supabot');
-    expect((res.data as Map)['status'], 'ONLINE');
+    expect((res as Map)['username'], 'supabot');
+    expect((res)['status'], 'ONLINE');
   });
 
   test('maybeSingle', () async {
@@ -110,6 +110,6 @@ void main() {
         .eq('username', 'goldstein')
         .maybeSingle();
     expect(res.status, 200);
-    expect(res.data, isNull);
+    expect(res, isNull);
   });
 }

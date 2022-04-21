@@ -22,7 +22,7 @@ const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
 /// The base builder class.
-class PostgrestBuilder<T> implements Future<T> {
+class PostgrestBuilder<T> implements Future<T?> {
   dynamic _body;
   late final Headers _headers;
   bool _maybeEmpty = false;
@@ -264,8 +264,8 @@ class PostgrestBuilder<T> implements Future<T> {
   }
 
   @override
-  Stream<T> asStream() {
-    final controller = StreamController<T>.broadcast();
+  Stream<T?> asStream() {
+    final controller = StreamController<T?>.broadcast();
 
     then((value) {
       controller.add(value);
@@ -285,7 +285,7 @@ class PostgrestBuilder<T> implements Future<T> {
 
   @override
   Future<R> then<R>(
-    FutureOr<R> Function(T value) onValue, {
+    FutureOr<R> Function(T? value) onValue, {
     Function? onError,
   }) async {
     if (onError != null &&
@@ -302,8 +302,9 @@ class PostgrestBuilder<T> implements Future<T> {
     try {
       final response = await _execute();
       // ignore: null_check_on_nullable_type_parameter
-      final data = response.data!;
-      if (data.runtimeType is T) {
+      final data = response.data;
+      // ignore: unnecessary_type_check
+      if (data.runtimeType is T || T is dynamic) {
         return onValue(data);
       } else {
         return onValue(response as T);
@@ -325,12 +326,12 @@ class PostgrestBuilder<T> implements Future<T> {
   }
 
   @override
-  Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) {
+  Future<T> timeout(Duration timeLimit, {FutureOr<T?> Function()? onTimeout}) {
     throw UnimplementedError('timeout should not be called on this future');
   }
 
   @override
-  Future<T> whenComplete(FutureOr<void> Function() action) {
+  Future<T?> whenComplete(FutureOr<void> Function() action) {
     return then(
       (v) {
         final f2 = action();

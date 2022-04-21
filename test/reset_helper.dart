@@ -10,13 +10,13 @@ class ResetHelper {
   Future<void> initialize(PostgrestClient postgrest) async {
     _postgrest = postgrest;
     _users = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('users').select()).data as List,
+      (await _postgrest.from('users').select()) as List,
     );
     _channels = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('channels').select()).data as List,
+      (await _postgrest.from('channels').select()) as List,
     );
     _messages = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('messages').select()).data as List,
+      (await _postgrest.from('messages').select()) as List,
     );
   }
 

@@ -36,7 +36,7 @@ class PostgrestResponse<T> {
     this.count,
   });
 
-  final T data;
+  final T? data;
 
   final int status;
 

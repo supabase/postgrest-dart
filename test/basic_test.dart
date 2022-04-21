@@ -27,27 +27,27 @@ void main() {
 
     test('basic select table', () async {
       final res = await postgrest.from('users').select();
-      expect((res.data as List).length, 4);
+      expect((res as List).length, 4);
     });
 
     test('stored procedure', () async {
       final res =
           await postgrest.rpc('get_status', params: {'name_param': 'supabot'});
-      expect(res.data, 'ONLINE');
+      expect(res, 'ONLINE');
     });
 
     test('select on stored procedure', () async {
       final res = await postgrest.rpc('get_username_and_status',
           params: {'name_param': 'supabot'}).select('status');
       expect(
-        ((res.data as List)[0] as Map<String, dynamic>)['status'],
+        ((res as List)[0] as Map<String, dynamic>)['status'],
         'ONLINE',
       );
     });
 
     test('stored procedure returns void', () async {
       final res = await postgrest.rpc('void_func');
-      expect(res.data, isNull);
+      expect(res, isNull);
     });
 
     // test('custom headers', () async {
@@ -86,7 +86,7 @@ void main() {
         onConflict: 'username',
       );
       expect(
-        ((res.data as List)[0] as Map<String, dynamic>)['status'],
+        ((res as List)[0] as Map<String, dynamic>)['status'],
         'OFFLINE',
       );
     });
@@ -94,10 +94,10 @@ void main() {
     test('upsert', () async {
       final res = await postgrest.from('messages').upsert(
           {'id': 3, 'message': 'foo', 'username': 'supabot', 'channel_id': 2});
-      expect(((res.data as List)[0] as Map)['id'], 3);
+      expect(((res as List)[0] as Map)['id'], 3);
 
       final resMsg = await postgrest.from('messages').select();
-      expect((resMsg.data as List).length, 3);
+      expect((resMsg as List).length, 3);
     });
 
     test('ignoreDuplicates upsert', () async {
@@ -106,7 +106,7 @@ void main() {
         onConflict: 'username',
         ignoreDuplicates: true,
       );
-      expect((res.data as List).length, 0);
+      expect((res as List).length, 0);
     });
 
     test('bulk insert', () async {
@@ -114,19 +114,21 @@ void main() {
         {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
         {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
       ]);
-      expect((res.data as List).length, 2);
+      expect((res as List).length, 2);
     });
 
     test('basic update', () async {
-      final res = await postgrest.from('messages').update({'channel_id': 2},
-          returning: ReturningOption.minimal).eq('message', 'foo');
-      expect(res.data, null);
+      final res = await postgrest.from('messages').update(
+        {'channel_id': 2},
+        returning: ReturningOption.minimal,
+      ).eq('message', 'foo');
+      expect(res, null);
 
       final resMsg = await postgrest
           .from('messages')
           .select()
           .filter('message', 'eq', 'foo');
-      for (final rec in resMsg.data as List) {
+      for (final rec in resMsg as List) {
         expect((rec as Map<String, dynamic>)['channel_id'], 2);
       }
     });
@@ -136,13 +138,13 @@ void main() {
           .from('messages')
           .delete(returning: ReturningOption.minimal)
           .eq('message', 'foo');
-      expect(res.data, null);
+      expect(res, null);
 
       final resMsg = await postgrest
           .from('messages')
           .select()
           .filter('message', 'eq', 'foo');
-      expect((resMsg.data as List).length, 0);
+      expect((resMsg as List).length, 0);
     });
 
     test('missing table', () async {
@@ -169,7 +171,7 @@ void main() {
             '*',
             FetchOptions(head: true),
           );
-      expect(res.data, null);
+      expect(res, null);
     });
 
     test('select with head:true, count: exact', () async {
@@ -177,7 +179,7 @@ void main() {
             '*',
             FetchOptions(head: true, count: CountOption.exact),
           );
-      expect(res.data, null);
+      expect(res, null);
       expect(res.count, 4);
     });
 
@@ -197,7 +199,7 @@ void main() {
 
     test('select with csv', () async {
       final res = await postgrest.from('users').select().csv();
-      expect(res.data, const TypeMatcher<String>());
+      expect(res, const TypeMatcher<String>());
     });
 
     test('stored procedure with head: true', () async {
@@ -261,7 +263,7 @@ void main() {
 
     test('select from uppercase table name', () async {
       final res = await postgrest.from('TestTable').select();
-      expect((res.data as List).length, 2);
+      expect((res as List).length, 2);
     });
 
     test('insert from uppercase table name', () async {
@@ -269,7 +271,7 @@ void main() {
         {'slug': 'new slug'}
       ]);
       expect(
-        ((res.data as List)[0] as Map<String, dynamic>)['slug'],
+        ((res as List)[0] as Map<String, dynamic>)['slug'],
         'new slug',
       );
     });
@@ -292,12 +294,13 @@ void main() {
     });
 
     test('withConverter', () async {
-      final List res = await postgrest
+      final List? res = await postgrest
           .from('users')
           .select()
           .withConverter<List>((data) => [data]);
+      expect(res, isNotNull);
       expect(res, isNotEmpty);
-      expect(res.first, isNotEmpty);
+      expect(res!.first, isNotEmpty);
       expect(res.first, isA<List>());
     });
   });
