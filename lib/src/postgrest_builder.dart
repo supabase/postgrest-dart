@@ -32,7 +32,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   PostgrestConverter? _converter;
   late final Client? _httpClient;
   // ignore: prefer_final_fields
-  FetchOptions _options = const FetchOptions();
+  FetchOptions? _options;
 
   PostgrestBuilder({
     required Uri url,
@@ -41,13 +41,15 @@ class PostgrestBuilder<T> implements Future<T?> {
     String? method,
     dynamic body,
     Client? httpClient,
+    FetchOptions? options,
   }) {
     _url = url;
-    _headers = _headers;
+    _headers = headers;
     _schema = schema;
-    _method = _method;
+    _method = method;
     _body = body;
     _httpClient = httpClient;
+    _options = options;
   }
 
   /// Converts any response that comes from the server into a type-safe response.
@@ -93,16 +95,17 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   Future<PostgrestResponse<T>> _execute() async {
-    if (_options.head) {
+    if (_options?.head ?? false) {
       _method = METHOD_HEAD;
     }
 
-    if (_options.count != null) {
+    if (_options?.count != null) {
       if (_headers['Prefer'] != null) {
         final oldPreferHeader = _headers['Prefer'];
-        _headers['Prefer'] = '$oldPreferHeader,count=${_options.count}';
+        _headers['Prefer'] =
+            '$oldPreferHeader,count=${_options!.count!.name()}';
       } else {
-        _headers['Prefer'] = 'count=${_options.count}';
+        _headers['Prefer'] = 'count=${_options!.count!.name()}';
       }
     }
 
@@ -303,14 +306,16 @@ class PostgrestBuilder<T> implements Future<T?> {
       final response = await _execute();
       // ignore: null_check_on_nullable_type_parameter
       final data = response.data;
-      // ignore: unnecessary_type_check
-      if (data.runtimeType is T || T is dynamic) {
-        return onValue(data);
+
+      if (_converter != null) {
+        return onValue(data as T);
       } else {
-        return onValue(response as T);
+        if (response.count != null) {
+          return onValue(response as T);
+        } else {
+          return onValue(data as T);
+        }
       }
-      // onValue(data);
-      // return data as R;
     } catch (error, stack) {
       if (onError != null) {
         if (onError is Function(Object, StackTrace)) {

@@ -58,6 +58,7 @@ class PostgrestClient {
       headers: headers,
       schema: schema,
       httpClient: httpClient,
+      options: options,
     ).rpc(params, options);
   }
 }

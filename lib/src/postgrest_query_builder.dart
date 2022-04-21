@@ -14,11 +14,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     Map<String, String>? headers,
     String? schema,
     Client? httpClient,
+    FetchOptions? options,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},
           schema: schema,
           httpClient: httpClient,
+          options: options,
         );
 
   /// Performs horizontal filtering with SELECT.
