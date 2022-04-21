@@ -111,7 +111,9 @@ class PostgrestBuilder<T> implements Future<T?> {
 
     try {
       if (_method == null) {
-        throw "Missing table operation: select, insert, update or delete";
+        throw ArgumentError(
+          "Missing table operation: select, insert, update or delete",
+        );
       }
 
       final uppercaseMethod = _method!.toUpperCase();
@@ -167,10 +169,7 @@ class PostgrestBuilder<T> implements Future<T?> {
 
       return _parseResponse(response);
     } catch (error) {
-      throw PostgrestError(
-        code: '${error.runtimeType}',
-        message: '$error',
-      );
+      rethrow;
     }
   }
 

@@ -107,9 +107,8 @@ void main() {
     final res = await postgrest
         .from('users')
         .select()
-        .eq('username', 'goldstein')
+        .eq('username', 'dragarcia')
         .maybeSingle();
-    expect(res.status, 200);
     expect(res, isNull);
   });
 }
