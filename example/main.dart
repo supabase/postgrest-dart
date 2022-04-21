@@ -11,11 +11,8 @@ dynamic main() async {
   );
 
   try {
-    final response = await client
-        .from('countries')
-        .select()
-        .execute(count: CountOption.exact);
-    return response.data;
+    final response = await client.from('countries').select();
+    print(response);
   } on PostgrestError catch (e) {
     // handle PostgrestError
     print(e.code);
