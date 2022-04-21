@@ -104,11 +104,12 @@ void main() {
   });
 
   test('maybeSingle', () async {
-    final res = await postgrest
+    final Map<String, dynamic> user = await postgrest
         .from('users')
         .select()
         .eq('username', 'dragarcia')
         .maybeSingle();
-    expect(res, isNull);
+    expect(user, isNotNull);
+    expect(user['username'], 'dragarcia');
   });
 }

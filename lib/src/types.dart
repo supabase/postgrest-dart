@@ -15,12 +15,19 @@ class PostgrestError {
     this.hint,
   });
 
-  factory PostgrestError.fromJson(Map<String, dynamic> json) => PostgrestError(
-        message: json['message'] as String,
-        code: json['code'] as String,
-        details: json['details'] as dynamic,
-        hint: json['hint'] as String,
-      );
+  factory PostgrestError.fromJson(
+    Map<String, dynamic> json, {
+    String? message,
+    int? code,
+    String? details,
+  }) {
+    return PostgrestError(
+      message: (json['message'] ?? message) as String,
+      code: (json['code'] ?? '$code') as String,
+      details: (json['details'] ?? details) as dynamic,
+      hint: json['hint'] as String,
+    );
+  }
 
   @override
   String toString() {

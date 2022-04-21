@@ -90,7 +90,14 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// }
   /// ```
   @Deprecated('Use async/await or .then instead. Deprecated in 0.2.0')
-  Future<PostgrestResponse<T>> execute() async {
+  Future<PostgrestResponse<T>> execute({
+    bool head = false,
+    CountOption? count,
+  }) async {
+    _options = FetchOptions(
+      head: head,
+      count: count ?? _options?.count,
+    );
     return _execute();
   }
 
@@ -112,7 +119,7 @@ class PostgrestBuilder<T> implements Future<T?> {
     try {
       if (_method == null) {
         throw ArgumentError(
-          "Missing table operation: select, insert, update or delete",
+          'Missing table operation: select, insert, update or delete',
         );
       }
 
@@ -212,18 +219,29 @@ class PostgrestBuilder<T> implements Future<T?> {
       if (response.request!.method != METHOD_HEAD) {
         try {
           final errorJson = json.decode(response.body) as Map<String, dynamic>;
-          error = PostgrestError.fromJson(errorJson);
+          error = PostgrestError.fromJson(
+            errorJson,
+            message: response.body,
+            code: response.statusCode,
+            details: response.reasonPhrase,
+          );
 
           if (_maybeEmpty) {
             return _handleMaybeEmptyError(response, error);
           }
         } catch (_) {
-          error = PostgrestError(message: response.body);
+          error = PostgrestError(
+            message: response.body,
+            code: '${response.statusCode}',
+            details: response.reasonPhrase,
+          );
         }
       } else {
         error = PostgrestError(
-          code: response.statusCode.toString(),
-          message: 'Error in Postgrest response for method HEAD',
+          code: '${response.statusCode}',
+          message: response.body,
+          details: 'Error in Postgrest response for method HEAD',
+          hint: response.reasonPhrase,
         );
       }
 
