@@ -17,6 +17,7 @@ part 'postgrest_transform_builder.dart';
 const METHOD_GET = 'GET';
 const METHOD_HEAD = 'HEAD';
 const METHOD_POST = 'POST';
+const METHOD_PUT = 'PUT';
 const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
@@ -50,7 +51,10 @@ class PostgrestBuilder<T> implements Future<T> {
   /// Converts any response that comes from the server into a type-safe response.
   ///
   /// ```dart
-  /// postgrest.from('users').select().withConverter((data) => User.fromJson(json.decode(data))).execute();
+  /// final User user = await postgrest
+  ///     .from('users')
+  ///     .select()
+  ///     .withConverter<User>((data) => User.fromJson(json.decode(data)));
   /// ```
   PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
     _converter = converter;
@@ -65,16 +69,31 @@ class PostgrestBuilder<T> implements Future<T> {
       .._converter = converter;
   }
 
-  /// Sends the request and returns a Future.
-  /// catch any error and returns with status 500
+  /// Sends the request and returns a [PostgrestResponse]
   ///
   /// [head] to trigger a HEAD request
   ///
-  /// [count] if you want to returns the count value. Support exact, planned and estimated count options.
+  /// [count] if you want to returns the count value. Support exact, planned and
+  /// estimated count options.
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
-  /// Returns {Future} Resolves when the request has completed.
+  ///
+  /// ```dart
+  /// try {
+  ///   final client.from('countries').select().execute();
+  /// } on PostgrestError catch (error) {
+  ///   print(error.code);
+  /// }
+  /// ```
+  @Deprecated('Use async/await or .then instead. Deprecated in 0.2.0')
   Future<PostgrestResponse<T>> execute({
+    bool head = false,
+    CountOption? count,
+  }) async {
+    return _execute(head: head, count: count);
+  }
+
+  Future<PostgrestResponse<T>> _execute({
     bool head = false,
     CountOption? count,
   }) async {
@@ -100,46 +119,46 @@ class PostgrestBuilder<T> implements Future<T> {
 
       if (_schema == null) {
         // skip
-      } else if (['GET', 'HEAD'].contains(_method)) {
+      } else if ([METHOD_GET, METHOD_HEAD].contains(_method)) {
         _headers['Accept-Profile'] = _schema!;
       } else {
         _headers['Content-Profile'] = _schema!;
       }
-      if (_method != 'GET' && _method != 'HEAD') {
+      if (_method != METHOD_GET && _method != METHOD_HEAD) {
         _headers['Content-Type'] = 'application/json';
       }
 
       final bodyStr = json.encode(_body);
 
-      if (uppercaseMethod == 'GET') {
+      if (uppercaseMethod == METHOD_GET) {
         response = await (_httpClient?.get ?? http.get)(
           _url,
           headers: _headers,
         );
-      } else if (uppercaseMethod == 'POST') {
+      } else if (uppercaseMethod == METHOD_POST) {
         response = await (_httpClient?.post ?? http.post)(
           _url,
           headers: _headers,
           body: bodyStr,
         );
-      } else if (uppercaseMethod == 'PUT') {
+      } else if (uppercaseMethod == METHOD_PUT) {
         response = await (_httpClient?.put ?? http.put)(
           _url,
           headers: _headers,
           body: bodyStr,
         );
-      } else if (uppercaseMethod == 'PATCH') {
+      } else if (uppercaseMethod == METHOD_PATCH) {
         response = await (_httpClient?.patch ?? http.patch)(
           _url,
           headers: _headers,
           body: bodyStr,
         );
-      } else if (uppercaseMethod == 'DELETE') {
+      } else if (uppercaseMethod == METHOD_DELETE) {
         response = await (_httpClient?.delete ?? http.delete)(
           _url,
           headers: _headers,
         );
-      } else if (uppercaseMethod == 'HEAD') {
+      } else if (uppercaseMethod == METHOD_HEAD) {
         response = await (_httpClient?.head ?? http.head)(
           _url,
           headers: _headers,
@@ -161,7 +180,7 @@ class PostgrestBuilder<T> implements Future<T> {
       dynamic body;
       int? count;
 
-      if (response.request!.method != 'HEAD') {
+      if (response.request!.method != METHOD_HEAD) {
         if (response.request!.headers['Accept'] == 'text/csv') {
           body = response.body;
         } else {
@@ -174,7 +193,7 @@ class PostgrestBuilder<T> implements Future<T> {
       }
 
       final contentRange = response.headers['content-range'];
-      if (contentRange != null) {
+      if (contentRange != null && contentRange.length > 1) {
         count = contentRange.split('/').last == '*'
             ? null
             : int.parse(contentRange.split('/').last);
@@ -191,7 +210,7 @@ class PostgrestBuilder<T> implements Future<T> {
       );
     } else {
       PostgrestError error;
-      if (response.request!.method != 'HEAD') {
+      if (response.request!.method != METHOD_HEAD) {
         try {
           final errorJson = json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
@@ -205,7 +224,7 @@ class PostgrestBuilder<T> implements Future<T> {
       } else {
         error = PostgrestError(
           code: response.statusCode.toString(),
-          message: 'Error in Postgrest response for _method HEAD',
+          message: 'Error in Postgrest response for method HEAD',
         );
       }
 
@@ -284,7 +303,7 @@ class PostgrestBuilder<T> implements Future<T> {
     }
 
     try {
-      final response = await execute();
+      final response = await _execute();
       // ignore: null_check_on_nullable_type_parameter
       final data = response.data!;
       onValue(data);
