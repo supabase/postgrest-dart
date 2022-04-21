@@ -27,7 +27,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('users').select('id, messages');
   /// ```
   PostgrestFilterBuilder select([String columns = '*']) {
-    _method = 'GET';
+    _method = METHOD_GET;
 
     // Remove whitespaces except when quoted
     var quoted = false;
@@ -58,7 +58,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     @Deprecated('Use `upsert()` method instead') bool upsert = false,
     @Deprecated('Use `upsert()` method instead') String? onConflict,
   }) {
-    _method = 'POST';
+    _method = METHOD_POST;
     _headers['Prefer'] = upsert
         ? 'return=${returning.name()},resolution=merge-duplicates'
         : 'return=${returning.name()}';
@@ -88,7 +88,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     String? onConflict,
     bool ignoreDuplicates = false,
   }) {
-    _method = 'POST';
+    _method = METHOD_POST;
     _headers['Prefer'] =
         'return=${returning.name()},resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
@@ -113,7 +113,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     Map values, {
     ReturningOption returning = ReturningOption.representation,
   }) {
-    _method = 'PATCH';
+    _method = METHOD_PATCH;
     _headers['Prefer'] = 'return=${returning.name()}';
     _body = values;
     return PostgrestFilterBuilder(this);
@@ -128,7 +128,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestFilterBuilder delete({
     ReturningOption returning = ReturningOption.representation,
   }) {
-    _method = 'DELETE';
+    _method = METHOD_DELETE;
     _headers['Prefer'] = 'return=${returning.name()}';
     return PostgrestFilterBuilder(this);
   }

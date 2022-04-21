@@ -1,4 +1,5 @@
 typedef Headers = Map<String, String>;
+typedef PostgrestConverter<S> = S Function(dynamic data);
 
 /// A Postgrest response error
 class PostgrestError {
@@ -21,16 +22,9 @@ class PostgrestError {
         hint: json['hint'] as String,
       );
 
-  Map<String, dynamic> toJson() => {
-        'message': message,
-        'code': code,
-        'details': details,
-        'hint': hint,
-      };
-
   @override
   String toString() {
-    return 'PostgrestError(message: $message, code: $code, details: ${details?.toString()}, hint: $hint)';
+    return 'PostgrestError(message: $message, code: $code, details: $details, hint: $hint)';
   }
 }
 
@@ -54,12 +48,6 @@ class PostgrestResponse<T> {
         status: json['status'] as int,
         count: json['count'] as int?,
       );
-
-  Map<String, dynamic> toJson() => {
-        'data': data,
-        'status': status,
-        'count': count,
-      };
 }
 
 /// Returns count as part of the response when specified.

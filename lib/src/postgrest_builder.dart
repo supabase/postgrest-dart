@@ -1,9 +1,12 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:postgrest/postgrest.dart';
 import 'package:postgrest/src/types.dart';
 
 part 'postgrest_filter_builder.dart';
@@ -11,7 +14,11 @@ part 'postgrest_query_builder.dart';
 part 'postgrest_rpc_builder.dart';
 part 'postgrest_transform_builder.dart';
 
-typedef PostgrestConverter<T> = T Function(dynamic data);
+const METHOD_GET = 'GET';
+const METHOD_HEAD = 'HEAD';
+const METHOD_POST = 'POST';
+const METHOD_PATCH = 'PATCH';
+const METHOD_DELETE = 'DELETE';
 
 /// The base builder class.
 class PostgrestBuilder<T> implements Future<T> {
@@ -72,7 +79,7 @@ class PostgrestBuilder<T> implements Future<T> {
     CountOption? count,
   }) async {
     if (head) {
-      _method = 'HEAD';
+      _method = METHOD_HEAD;
     }
 
     if (count != null) {
