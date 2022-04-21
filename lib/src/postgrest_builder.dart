@@ -232,14 +232,22 @@ class PostgrestBuilder<T> implements Future<T> {
 
   @override
   Stream<T> asStream() {
-    // TODO: implement asStream
-    throw UnimplementedError();
+    final controller = StreamController<T>.broadcast();
+
+    then((value) {
+      controller.add(value);
+    }).catchError((Object error, StackTrace stack) {
+      controller.addError(error, stack);
+    }).whenComplete(() {
+      controller.close();
+    });
+
+    return controller.stream;
   }
 
   @override
   Future<T> catchError(Function onError, {bool Function(Object error)? test}) {
-    // TODO: implement catchError
-    throw UnimplementedError();
+    throw UnimplementedError('catchError should not be called in this future');
   }
 
   @override
@@ -247,8 +255,17 @@ class PostgrestBuilder<T> implements Future<T> {
     FutureOr<R> Function(T value) onValue, {
     Function? onError,
   }) async {
-    // super.then();
-    assert(R is T);
+    if (onError != null &&
+        onError is! Function(Object, StackTrace) &&
+        onError is! Function(Object)) {
+      throw ArgumentError.value(
+        onError,
+        "onError",
+        "Error handler must accept one Object or one Object and a StackTrace"
+            " as arguments, and return a value of the returned future's type",
+      );
+    }
+
     try {
       final response = await execute();
       // ignore: null_check_on_nullable_type_parameter
@@ -256,18 +273,41 @@ class PostgrestBuilder<T> implements Future<T> {
       onValue(data);
       return data as R;
     } catch (error, stack) {
-      onError?.call(error, stack);
+      if (onError != null) {
+        if (onError is Function(Object, StackTrace)) {
+          onError(error, stack);
+        } else if (onError is Function(Object)) {
+          onError(error);
+        } else {
+          rethrow;
+        }
+      }
       rethrow;
     }
   }
 
   @override
   Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) {
-    throw UnimplementedError();
+    throw UnimplementedError('timeout should not be called on this future');
   }
 
   @override
   Future<T> whenComplete(FutureOr<void> Function() action) {
-    throw UnimplementedError();
+    return then(
+      (v) {
+        final f2 = action();
+        if (f2 is Future) return f2.then((_) => v);
+        return v;
+      },
+      onError: (Object e) {
+        final f2 = action();
+        if (f2 is Future) {
+          return f2.then((_) {
+            throw e;
+          });
+        }
+        throw e;
+      },
+    );
   }
 }
