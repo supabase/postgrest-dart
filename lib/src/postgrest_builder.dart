@@ -6,27 +6,39 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:postgrest/src/types.dart';
 
+part 'postgrest_filter_builder.dart';
+part 'postgrest_query_builder.dart';
+part 'postgrest_rpc_builder.dart';
+part 'postgrest_transform_builder.dart';
+
 typedef PostgrestConverter<T> = T Function(dynamic data);
 
 /// The base builder class.
 class PostgrestBuilder<T> implements Future<T> {
-  dynamic body;
-  final Map<String, String> headers;
-  bool maybeEmpty = false;
-  String? method;
-  final String? schema;
-  Uri url;
+  dynamic _body;
+  late final Headers _headers;
+  bool _maybeEmpty = false;
+  String? _method;
+  late final String? _schema;
+  late Uri _url;
   PostgrestConverter? _converter;
-  final Client? httpClient;
+  late final Client? _httpClient;
 
   PostgrestBuilder({
-    required this.url,
-    required this.headers,
-    this.schema,
-    this.method,
-    this.body,
-    this.httpClient,
-  });
+    required Uri url,
+    required Headers headers,
+    String? schema,
+    String? method,
+    dynamic body,
+    Client? httpClient,
+  }) {
+    _url = url;
+    _headers = _headers;
+    _schema = schema;
+    _method = _method;
+    _body = body;
+    _httpClient = httpClient;
+  }
 
   /// Converts any response that comes from the server into a type-safe response.
   ///
@@ -36,13 +48,13 @@ class PostgrestBuilder<T> implements Future<T> {
   PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
     _converter = converter;
     return PostgrestBuilder<S>(
-      url: url,
-      headers: headers,
-      schema: schema,
-      method: method,
-      body: body,
+      url: _url,
+      headers: _headers,
+      schema: _schema,
+      method: _method,
+      body: _body,
     )
-      ..maybeEmpty = maybeEmpty
+      .._maybeEmpty = _maybeEmpty
       .._converter = converter;
   }
 
@@ -60,70 +72,70 @@ class PostgrestBuilder<T> implements Future<T> {
     CountOption? count,
   }) async {
     if (head) {
-      method = 'HEAD';
+      _method = 'HEAD';
     }
 
     if (count != null) {
-      if (headers['Prefer'] == null) {
-        headers['Prefer'] = 'count=${count.name()}';
+      if (_headers['Prefer'] == null) {
+        _headers['Prefer'] = 'count=${count.name()}';
       } else {
-        headers['Prefer'] = '${headers['Prefer']!},count=${count.name()}';
+        _headers['Prefer'] = '${_headers['Prefer']!},count=${count.name()}';
       }
     }
 
     try {
-      if (method == null) {
+      if (_method == null) {
         throw "Missing table operation: select, insert, update or delete";
       }
 
-      final uppercaseMethod = method!.toUpperCase();
+      final uppercaseMethod = _method!.toUpperCase();
       late http.Response response;
 
-      if (schema == null) {
+      if (_schema == null) {
         // skip
-      } else if (['GET', 'HEAD'].contains(method)) {
-        headers['Accept-Profile'] = schema!;
+      } else if (['GET', 'HEAD'].contains(_method)) {
+        _headers['Accept-Profile'] = _schema!;
       } else {
-        headers['Content-Profile'] = schema!;
+        _headers['Content-Profile'] = _schema!;
       }
-      if (method != 'GET' && method != 'HEAD') {
-        headers['Content-Type'] = 'application/json';
+      if (_method != 'GET' && _method != 'HEAD') {
+        _headers['Content-Type'] = 'application/json';
       }
 
-      final bodyStr = json.encode(body);
+      final bodyStr = json.encode(_body);
 
       if (uppercaseMethod == 'GET') {
-        response = await (httpClient?.get ?? http.get)(
-          url,
-          headers: headers,
+        response = await (_httpClient?.get ?? http.get)(
+          _url,
+          headers: _headers,
         );
       } else if (uppercaseMethod == 'POST') {
-        response = await (httpClient?.post ?? http.post)(
-          url,
-          headers: headers,
+        response = await (_httpClient?.post ?? http.post)(
+          _url,
+          headers: _headers,
           body: bodyStr,
         );
       } else if (uppercaseMethod == 'PUT') {
-        response = await (httpClient?.put ?? http.put)(
-          url,
-          headers: headers,
+        response = await (_httpClient?.put ?? http.put)(
+          _url,
+          headers: _headers,
           body: bodyStr,
         );
       } else if (uppercaseMethod == 'PATCH') {
-        response = await (httpClient?.patch ?? http.patch)(
-          url,
-          headers: headers,
+        response = await (_httpClient?.patch ?? http.patch)(
+          _url,
+          headers: _headers,
           body: bodyStr,
         );
       } else if (uppercaseMethod == 'DELETE') {
-        response = await (httpClient?.delete ?? http.delete)(
-          url,
-          headers: headers,
+        response = await (_httpClient?.delete ?? http.delete)(
+          _url,
+          headers: _headers,
         );
       } else if (uppercaseMethod == 'HEAD') {
-        response = await (httpClient?.head ?? http.head)(
-          url,
-          headers: headers,
+        response = await (_httpClient?.head ?? http.head)(
+          _url,
+          headers: _headers,
         );
       }
 
@@ -177,7 +189,7 @@ class PostgrestBuilder<T> implements Future<T> {
           final errorJson = json.decode(response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(errorJson);
 
-          if (maybeEmpty) {
+          if (_maybeEmpty) {
             return _handleMaybeEmptyError(response, error);
           }
         } catch (_) {
@@ -186,7 +198,7 @@ class PostgrestBuilder<T> implements Future<T> {
       } else {
         error = PostgrestError(
           code: response.statusCode.toString(),
-          message: 'Error in Postgrest response for method HEAD',
+          message: 'Error in Postgrest response for _method HEAD',
         );
       }
 
@@ -216,16 +228,16 @@ class PostgrestBuilder<T> implements Future<T> {
   /// Update Uri queryParameters with new key:value
   /// Use lists to allow multiple values for the same key
   void appendSearchParams(String key, String value) {
-    final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
+    final searchParams = Map<String, dynamic>.from(_url.queryParametersAll);
     searchParams[key] = [...searchParams[key] ?? [], value];
-    url = url.replace(queryParameters: searchParams);
+    _url = _url.replace(queryParameters: searchParams);
   }
 
   /// Overrides Uri queryParameters with new key:value
   void overrideSearchParams(String key, String value) {
-    final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
+    final searchParams = Map<String, dynamic>.from(_url.queryParametersAll);
     searchParams[key] = value;
-    url = url.replace(queryParameters: searchParams);
+    _url = _url.replace(queryParameters: searchParams);
   }
 
   @override

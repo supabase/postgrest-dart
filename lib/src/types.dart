@@ -1,3 +1,5 @@
+typedef Headers = Map<String, String>;
+
 /// A Postgrest response error
 class PostgrestError {
   final String message;

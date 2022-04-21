@@ -1,5 +1,4 @@
-import 'package:http/http.dart';
-import 'package:postgrest/postgrest.dart';
+part of 'postgrest_builder.dart';
 
 class PostgrestRpcBuilder extends PostgrestBuilder {
   PostgrestRpcBuilder(
@@ -16,8 +15,8 @@ class PostgrestRpcBuilder extends PostgrestBuilder {
 
   /// Performs stored procedures on the database.
   PostgrestFilterBuilder rpc([dynamic params]) {
-    method = 'POST';
-    body = params;
+    _method = 'POST';
+    _body = params;
     return PostgrestFilterBuilder(this);
   }
 }

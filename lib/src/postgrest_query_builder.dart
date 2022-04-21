@@ -1,9 +1,4 @@
-import 'dart:core';
-
-import 'package:http/http.dart';
-import 'package:postgrest/src/postgrest_builder.dart';
-import 'package:postgrest/src/postgrest_filter_builder.dart';
-import 'package:postgrest/src/types.dart';
+part of 'postgrest_builder.dart';
 
 /// The query builder class provides a convenient interface to creating request queries.
 ///
@@ -32,7 +27,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// postgrest.from('users').select('id, messages');
   /// ```
   PostgrestFilterBuilder select([String columns = '*']) {
-    method = 'GET';
+    _method = 'GET';
 
     // Remove whitespaces except when quoted
     var quoted = false;
@@ -63,19 +58,19 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     @Deprecated('Use `upsert()` method instead') bool upsert = false,
     @Deprecated('Use `upsert()` method instead') String? onConflict,
   }) {
-    method = 'POST';
-    headers['Prefer'] = upsert
+    _method = 'POST';
+    _headers['Prefer'] = upsert
         ? 'return=${returning.name()},resolution=merge-duplicates'
         : 'return=${returning.name()}';
     if (onConflict != null) {
-      url = url.replace(
+      _url = _url.replace(
         queryParameters: {
           'on_conflict': onConflict,
-          ...url.queryParameters,
+          ..._url.queryParameters,
         },
       );
     }
-    body = values;
+    _body = values;
     return this;
   }
 
@@ -93,18 +88,18 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     String? onConflict,
     bool ignoreDuplicates = false,
   }) {
-    method = 'POST';
-    headers['Prefer'] =
+    _method = 'POST';
+    _headers['Prefer'] =
         'return=${returning.name()},resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
-      url = url.replace(
+      _url = _url.replace(
         queryParameters: {
           'on_conflict': onConflict,
-          ...url.queryParameters,
+          ..._url.queryParameters,
         },
       );
     }
-    body = values;
+    _body = values;
     return this;
   }
 
@@ -118,9 +113,9 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     Map values, {
     ReturningOption returning = ReturningOption.representation,
   }) {
-    method = 'PATCH';
-    headers['Prefer'] = 'return=${returning.name()}';
-    body = values;
+    _method = 'PATCH';
+    _headers['Prefer'] = 'return=${returning.name()}';
+    _body = values;
     return PostgrestFilterBuilder(this);
   }
 
@@ -133,8 +128,8 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestFilterBuilder delete({
     ReturningOption returning = ReturningOption.representation,
   }) {
-    method = 'DELETE';
-    headers['Prefer'] = 'return=${returning.name()}';
+    _method = 'DELETE';
+    _headers['Prefer'] = 'return=${returning.name()}';
     return PostgrestFilterBuilder(this);
   }
 }
