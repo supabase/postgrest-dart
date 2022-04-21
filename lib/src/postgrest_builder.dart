@@ -4,9 +4,7 @@ import 'dart:core';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:postgrest/src/count_option.dart';
-import 'package:postgrest/src/postgrest_error.dart';
-import 'package:postgrest/src/postgrest_response.dart';
+import 'package:postgrest/src/types.dart';
 
 typedef PostgrestConverter<T> = T Function(dynamic data);
 

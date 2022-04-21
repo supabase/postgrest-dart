@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:postgrest/src/postgrest_builder.dart';
 import 'package:postgrest/src/postgrest_transform_builder.dart';
-import 'package:postgrest/src/text_search_type.dart';
+import 'package:postgrest/src/types.dart';
 
 class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   PostgrestFilterBuilder(PostgrestBuilder builder) : super(builder);
