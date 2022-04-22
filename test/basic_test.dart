@@ -153,16 +153,19 @@ void main() {
       expect(resMsg, isEmpty);
     });
 
-    test('missing table', () async {
+    test('missing table', () {
       postgrest.from('missing_table').select().then(
-        (value) => fail('found missing table'),
+        (value) {
+          fail('found missing table');
+        },
         onError: (error) {
           expect(error, isA<PostgrestError>());
+          expect(error.code, '404');
         },
       );
     });
 
-    test('connection error', () async {
+    test('connection error', () {
       final postgrest = PostgrestClient('http://this.url.does.not.exist');
       postgrest.from('user').select().then(
         (value) {
@@ -192,11 +195,11 @@ void main() {
       expect(res.count, 4);
     });
 
-    test('select with  count: planned', () async {
+    test('select with count: planned', () async {
       final PostgrestResponse res = await postgrest
           .from('users')
-          .select('*', FetchOptions(count: CountOption.exact));
-      expect(res.count, const TypeMatcher<int>());
+          .select('*', FetchOptions(count: CountOption.planned));
+      expect(res.count, isNotNull);
     });
 
     test('select with head:true, count: estimated', () async {
@@ -255,9 +258,11 @@ void main() {
       expect(res.count, 1);
     });
 
-    test('execute without table operation', () async {
-      await postgrest.from('users').then(
-        (value) => fail('can not execute without table operation'),
+    test('execute without table operation', () {
+      postgrest.from('users').then(
+        (value) {
+          fail('can not execute without table operation');
+        },
         onError: (error) {
           expect(error, isA<ArgumentError>());
         },
@@ -287,9 +292,11 @@ void main() {
       expect(res.count, 1);
     });
 
-    test('row level security error', () async {
-      await postgrest.from('sample').update({'id': 2}).then(
-        (value) => fail('Returned even with row level security'),
+    test('row level security error', () {
+      postgrest.from('sample').update({'id': 2}).then(
+        (value) {
+          fail('Returned even with row level security');
+        },
         onError: (error) {
           expect(error, isA<PostgrestError>());
           expect(error.code, '404');
@@ -317,7 +324,9 @@ void main() {
     });
     test('basic select table', () async {
       await postgrestCustomHttpClient.from('users').select().then(
-        (value) => fail(''),
+        (value) {
+          fail('Table was able to be selected, even tho it does not exist');
+        },
         onError: (error) {
           expect(error, isA<PostgrestError>());
           expect(error.code, '420');

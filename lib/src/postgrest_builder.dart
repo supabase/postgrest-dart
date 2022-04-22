@@ -325,9 +325,13 @@ class PostgrestBuilder<T> implements Future<T?> {
       final data = response.data;
 
       if (_converter != null) {
+        assert(
+          !(_options?.forceResponse ?? false),
+          'converter and forceReponse can not be set at the same time',
+        );
         return onValue(data as T);
       } else {
-        if (response.count != null) {
+        if ((_options?.forceResponse ?? false) || response.count != null) {
           return onValue(response as T);
         } else {
           return onValue(data as T);

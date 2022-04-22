@@ -104,16 +104,19 @@ extension TextSearchTypeName on TextSearchType {
 class FetchOptions {
   final bool head;
   final CountOption? count;
+  final bool forceResponse;
 
   const FetchOptions({
     this.head = false,
     this.count,
+    this.forceResponse = false,
   });
 
   FetchOptions ensureNotHead() {
     return FetchOptions(
       head: false,
       count: count,
+      forceResponse: forceResponse,
     );
   }
 }
