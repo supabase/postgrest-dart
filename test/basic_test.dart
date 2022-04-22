@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
@@ -152,24 +154,24 @@ void main() {
     });
 
     test('missing table', () async {
-      try {
-        await postgrest.from('missing_table').select();
-      } on PostgrestError catch (error) {
-        expect(error.code, '404');
-        return;
-      }
-      fail('Found missing table');
+      postgrest.from('missing_table').select().then(
+        (value) => fail('found missing table'),
+        onError: (error) {
+          expect(error, isA<PostgrestError>());
+        },
+      );
     });
 
     test('connection error', () async {
-      try {
-        final postgrest = PostgrestClient('http://this.url.does.not.exist');
-        await postgrest.from('user').select();
-      } catch (error) {
-        expect(error, isNotNull);
-        return;
-      }
-      fail('Success on connection error');
+      final postgrest = PostgrestClient('http://this.url.does.not.exist');
+      postgrest.from('user').select().then(
+        (value) {
+          fail('Success on connection error');
+        },
+        onError: (error) {
+          expect(error, isA<SocketException>());
+        },
+      );
     });
 
     test('select with head:true', () async {
@@ -254,13 +256,12 @@ void main() {
     });
 
     test('execute without table operation', () async {
-      try {
-        await postgrest.from('users');
-      } catch (error) {
-        expect(error, isA<ArgumentError>());
-        return;
-      }
-      fail('can not execute without table operation');
+      await postgrest.from('users').then(
+        (value) => fail('can not execute without table operation'),
+        onError: (error) {
+          expect(error, isA<ArgumentError>());
+        },
+      );
     });
 
     test('select from uppercase table name', () async {
@@ -287,13 +288,13 @@ void main() {
     });
 
     test('row level security error', () async {
-      try {
-        await postgrest.from('sample').update({'id': 2});
-      } on PostgrestError catch (error) {
-        expect(error.code, '404');
-        return;
-      }
-      fail('Returned even with row level security');
+      await postgrest.from('sample').update({'id': 2}).then(
+        (value) => fail('Returned even with row level security'),
+        onError: (error) {
+          expect(error, isA<PostgrestError>());
+          expect(error.code, '404');
+        },
+      );
     });
 
     test('withConverter', () async {
@@ -315,8 +316,13 @@ void main() {
       );
     });
     test('basic select table', () async {
-      final res = await postgrestCustomHttpClient.from('users').select();
-      expect(res, isNotNull);
+      await postgrestCustomHttpClient.from('users').select().then(
+        (value) => fail(''),
+        onError: (error) {
+          expect(error, isA<PostgrestError>());
+          expect(error.code, '420');
+        },
+      );
     });
     test('basic stored procedure call', () async {
       final res = await postgrest.rpc('get_status', params: {
