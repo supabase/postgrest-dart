@@ -162,7 +162,10 @@ void main() {
           expect(error, isA<PostgrestError>());
           expect(error.code, '404');
         },
-      );
+      ).catchError((error) {
+        expect(error, isA<PostgrestError>());
+        expect(error.code, '404');
+      });
     });
 
     test('connection error', () {
@@ -266,7 +269,9 @@ void main() {
         onError: (error) {
           expect(error, isA<ArgumentError>());
         },
-      );
+      ).catchError((error) {
+        expect(error, isA<ArgumentError>());
+      });
     });
 
     test('select from uppercase table name', () async {
@@ -301,7 +306,10 @@ void main() {
           expect(error, isA<PostgrestError>());
           expect(error.code, '404');
         },
-      );
+      ).catchError((error) {
+        expect(error, isA<PostgrestError>());
+        expect(error.code, '404');
+      });
     });
 
     test('withConverter', () async {
@@ -323,7 +331,7 @@ void main() {
       );
     });
     test('basic select table', () async {
-      await postgrestCustomHttpClient.from('users').select().then(
+      postgrestCustomHttpClient.from('users').select().then(
         (value) {
           fail('Table was able to be selected, even tho it does not exist');
         },
@@ -331,7 +339,10 @@ void main() {
           expect(error, isA<PostgrestError>());
           expect(error.code, '420');
         },
-      );
+      ).catchError((error) {
+        expect(error, isA<PostgrestError>());
+        expect(error.code, '420');
+      });
     });
     test('basic stored procedure call', () async {
       final res = await postgrest.rpc('get_status', params: {
