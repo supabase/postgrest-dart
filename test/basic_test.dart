@@ -153,8 +153,8 @@ void main() {
       expect(resMsg, isEmpty);
     });
 
-    test('missing table', () {
-      postgrest.from('missing_table').select().then(
+    test('missing table', () async {
+      await postgrest.from('missing_table').select().then(
         (value) {
           fail('found missing table');
         },
@@ -162,7 +162,7 @@ void main() {
           expect(error, isA<PostgrestError>());
           expect(error.code, '404');
         },
-      ).catchError((error) {
+      ).catchError((error) async {
         expect(error, isA<PostgrestError>());
         expect(error.code, '404');
       });
@@ -261,15 +261,15 @@ void main() {
       expect(res.count, 1);
     });
 
-    test('execute without table operation', () {
-      postgrest.from('users').then(
+    test('execute without table operation', () async {
+      await postgrest.from('users').then(
         (value) {
           fail('can not execute without table operation');
         },
         onError: (error) {
           expect(error, isA<ArgumentError>());
         },
-      ).catchError((error) {
+      ).catchError((error) async {
         expect(error, isA<ArgumentError>());
       });
     });
@@ -297,8 +297,8 @@ void main() {
       expect(res.count, 1);
     });
 
-    test('row level security error', () {
-      postgrest.from('sample').update({'id': 2}).then(
+    test('row level security error', () async {
+      await postgrest.from('sample').update({'id': 2}).then(
         (value) {
           fail('Returned even with row level security');
         },
@@ -306,7 +306,7 @@ void main() {
           expect(error, isA<PostgrestError>());
           expect(error.code, '404');
         },
-      ).catchError((error) {
+      ).catchError((error) async {
         expect(error, isA<PostgrestError>());
         expect(error.code, '404');
       });
@@ -331,7 +331,7 @@ void main() {
       );
     });
     test('basic select table', () async {
-      postgrestCustomHttpClient.from('users').select().then(
+      await postgrestCustomHttpClient.from('users').select().then(
         (value) {
           fail('Table was able to be selected, even tho it does not exist');
         },
@@ -339,7 +339,7 @@ void main() {
           expect(error, isA<PostgrestError>());
           expect(error.code, '420');
         },
-      ).catchError((error) {
+      ).catchError((error) async {
         expect(error, isA<PostgrestError>());
         expect(error.code, '420');
       });
