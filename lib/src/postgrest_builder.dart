@@ -303,6 +303,7 @@ class PostgrestBuilder<T> implements Future<T?> {
     throw UnimplementedError('catchError should not be called in this future');
   }
 
+  /// Register callbacks to be called when this future completes.
   @override
   Future<R> then<R>(
     FutureOr<R> Function(T? value) onValue, {
