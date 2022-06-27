@@ -6,6 +6,7 @@ class ResetHelper {
   late final List<Map<String, dynamic>> _users;
   late final List<Map<String, dynamic>> _channels;
   late final List<Map<String, dynamic>> _messages;
+  late final List<Map<String, dynamic>> _reactions;
 
   Future<void> initialize(PostgrestClient postgrest) async {
     _postgrest = postgrest;
@@ -18,9 +19,13 @@ class ResetHelper {
     _messages = List<Map<String, dynamic>>.from(
       (await _postgrest.from('messages').select().execute()).data as List,
     );
+    _reactions = List<Map<String, dynamic>>.from(
+      (await _postgrest.from('reactions').select().execute()).data as List,
+    );
   }
 
   Future<void> reset() async {
+    await _postgrest.from("reactions").delete().neq("emoji", "dne").execute();
     await _postgrest.from('messages').delete().neq('message', 'dne').execute();
     await _postgrest.from('channels').delete().neq('slug', 'dne').execute();
     await _postgrest.from('users').delete().neq('username', 'dne').execute();
@@ -30,6 +35,8 @@ class ResetHelper {
         await _postgrest.from('channels').insert(_channels).execute();
     final messagesInsertRes =
         await _postgrest.from('messages').insert(_messages).execute();
+    final reactionsInsertRes =
+        await _postgrest.from('reactions').insert(_reactions).execute();
     if (usersInsertRes.hasError) {
       throw 'users table was not properly reset. ${usersInsertRes.error.toString()}';
     }
@@ -38,6 +45,9 @@ class ResetHelper {
     }
     if (messagesInsertRes.hasError) {
       throw 'messages table was not properly reset. ${messagesInsertRes.error.toString()}';
+    }
+    if (reactionsInsertRes.hasError) {
+      throw 'reactions table was not properly reset. ${reactionsInsertRes.error.toString()}';
     }
   }
 }
