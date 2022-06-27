@@ -49,10 +49,10 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
     bool nullsFirst = false,
     String? foreignTable,
   }) {
-    final key = foreignTable == null ? 'order' : '"$foreignTable".order';
+    final key = foreignTable == null ? 'order' : '$foreignTable.order';
     final existingOrder = url.queryParameters[key];
     final value = '${existingOrder == null ? '' : '$existingOrder,'}'
-        '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
+        '$column.${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
     overrideSearchParams(key, value);
     return this;
