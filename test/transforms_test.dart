@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
@@ -73,6 +74,41 @@ void main() {
         'dragarcia',
       ],
     );
+  });
+
+  test("order on foreign table", () async {
+    final response = await postgrest
+        .from("users")
+        .select(
+          '''
+          username,
+          messages(
+            id,
+            reactions(
+              emoji,
+              created_at
+            )
+          )
+        ''',
+        )
+        .eq("username", "supabot")
+        .order("created_at",
+            foreignTable: "messages.reactions", ascending: false)
+        .single()
+        .execute();
+
+    final data = response.data as Map;
+    final messages = data['messages'] as List;
+
+    for (final message in messages) {
+      final reactions = (message as Map)["reactions"] as List;
+      final isSorted = reactions.isSorted((a, b) {
+        final aCreatedAt = DateTime.parse((a as Map)["created_at"].toString());
+        final bCreatedAt = DateTime.parse((b as Map)["created_at"].toString());
+        return bCreatedAt.compareTo(aCreatedAt);
+      });
+      expect(isSorted, isTrue);
+    }
   });
 
   test('limit', () async {
