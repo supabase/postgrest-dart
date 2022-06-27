@@ -79,9 +79,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').range(1, 1, foreignTable: 'messages')
   /// ```
   PostgrestTransformBuilder range(int from, int to, {String? foreignTable}) {
-    final keyOffset =
-        foreignTable == null ? 'offset' : '"$foreignTable".offset';
-    final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
+    final keyOffset = foreignTable == null ? 'offset' : '$foreignTable.offset';
+    final keyLimit = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
     appendSearchParams(keyOffset, '$from');
     appendSearchParams(keyLimit, '${to - from + 1}');
