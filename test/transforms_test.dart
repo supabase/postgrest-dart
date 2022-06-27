@@ -92,8 +92,7 @@ void main() {
         ''',
         )
         .eq("username", "supabot")
-        .order("created_at",
-            foreignTable: "messages.reactions", ascending: false)
+        .order("created_at", foreignTable: "messages.reactions")
         .single()
         .execute();
 
