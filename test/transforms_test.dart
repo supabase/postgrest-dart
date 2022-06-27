@@ -116,6 +116,37 @@ void main() {
     expect((res.data as List).length, 1);
   });
 
+  test("limit on foreign table", () async {
+    final response = await postgrest
+        .from("users")
+        .select(
+          '''
+            username,
+            messages(
+              id,
+              reactions(
+                emoji,
+                created_at
+              )
+            )
+          ''',
+        )
+        .eq("username", "supabot")
+        .limit(1, foreignTable: "messages.reactions")
+        .single()
+        .execute();
+
+    final data = response.data as Map;
+    final messages = data['messages'] as List;
+
+    for (final message in messages) {
+      final reactions = (message as Map)["reactions"] as List;
+      if (reactions.isNotEmpty) {
+        expect(reactions.length, 1);
+      }
+    }
+  });
+
   test('range', () async {
     const from = 1;
     const to = 3;

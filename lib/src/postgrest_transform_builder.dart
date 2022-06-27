@@ -66,7 +66,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').limit(1, foreignTable: 'messages')
   /// ```
   PostgrestTransformBuilder limit(int count, {String? foreignTable}) {
-    final key = foreignTable == null ? 'limit' : '"$foreignTable".limit';
+    final key = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
     appendSearchParams(key, '$count');
     return this;
