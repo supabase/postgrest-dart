@@ -49,10 +49,10 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
     bool nullsFirst = false,
     String? foreignTable,
   }) {
-    final key = foreignTable == null ? 'order' : '"$foreignTable".order';
+    final key = foreignTable == null ? 'order' : '$foreignTable.order';
     final existingOrder = url.queryParameters[key];
     final value = '${existingOrder == null ? '' : '$existingOrder,'}'
-        '"$column".${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
+        '$column.${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
     overrideSearchParams(key, value);
     return this;
@@ -66,7 +66,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').limit(1, foreignTable: 'messages')
   /// ```
   PostgrestTransformBuilder limit(int count, {String? foreignTable}) {
-    final key = foreignTable == null ? 'limit' : '"$foreignTable".limit';
+    final key = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
     appendSearchParams(key, '$count');
     return this;
@@ -79,9 +79,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select('messages(*)').range(1, 1, foreignTable: 'messages')
   /// ```
   PostgrestTransformBuilder range(int from, int to, {String? foreignTable}) {
-    final keyOffset =
-        foreignTable == null ? 'offset' : '"$foreignTable".offset';
-    final keyLimit = foreignTable == null ? 'limit' : '"$foreignTable".limit';
+    final keyOffset = foreignTable == null ? 'offset' : '$foreignTable.offset';
+    final keyLimit = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
     appendSearchParams(keyOffset, '$from');
     appendSearchParams(keyLimit, '${to - from + 1}');
