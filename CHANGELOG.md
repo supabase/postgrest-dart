@@ -1,3 +1,8 @@
+## [0.1.11]
+
+- fix: `order()` and `limit()` not working as expected with foreign table bug
+- feat: add foreignTable arg to `or` filter
+
 ## [0.1.10+1]
 
 - fix: bug where using multiple filters on the same field with order will wipe out the filters except the last one. 
