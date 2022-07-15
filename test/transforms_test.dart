@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:postgrest/postgrest.dart';
 import 'package:test/test.dart';
 
@@ -72,9 +73,74 @@ void main() {
     );
   });
 
+  test("order on foreign table", () async {
+    final response = await postgrest
+        .from("users")
+        .select(
+          '''
+          username,
+          messages(
+            id,
+            reactions(
+              emoji,
+              created_at
+            )
+          )
+        ''',
+        )
+        .eq("username", "supabot")
+        .order("created_at", foreignTable: "messages.reactions")
+        .single()
+        .execute();
+
+    final data = response.data as Map;
+    final messages = data['messages'] as List;
+
+    for (final message in messages) {
+      final reactions = (message as Map)["reactions"] as List;
+      final isSorted = reactions.isSorted((a, b) {
+        final aCreatedAt = DateTime.parse((a as Map)["created_at"].toString());
+        final bCreatedAt = DateTime.parse((b as Map)["created_at"].toString());
+        return bCreatedAt.compareTo(aCreatedAt);
+      });
+      expect(isSorted, isTrue);
+    }
+  });
+
   test('limit', () async {
     final res = await postgrest.from('users').select().limit(1);
     expect((res as List).length, 1);
+  });
+
+  test("limit on foreign table", () async {
+    final response = await postgrest
+        .from("users")
+        .select(
+          '''
+            username,
+            messages(
+              id,
+              reactions(
+                emoji,
+                created_at
+              )
+            )
+          ''',
+        )
+        .eq("username", "supabot")
+        .limit(1, foreignTable: "messages.reactions")
+        .single()
+        .execute();
+
+    final data = response.data as Map;
+    final messages = data['messages'] as List;
+
+    for (final message in messages) {
+      final reactions = (message as Map)["reactions"] as List;
+      if (reactions.isNotEmpty) {
+        expect(reactions.length, 1);
+      }
+    }
   });
 
   test('range', () async {
@@ -91,6 +157,64 @@ void main() {
     final res = await postgrest.from('users').select().range(from, to);
     //from -1 so that the index is included
     expect((res as List).length, to - (from - 1));
+  });
+
+  test("range on foreign table", () async {
+    const from = 0;
+    const to = 2;
+    final response = await postgrest
+        .from("users")
+        .select(
+          '''
+            username,
+            messages(
+              id,
+              reactions(
+                emoji,
+                created_at
+              )
+            )
+          ''',
+        )
+        .eq("username", "supabot")
+        .eq("messages.id", 1)
+        .range(from, to, foreignTable: "messages.reactions")
+        .single()
+        .execute();
+
+    final data = response.data as Map;
+    final message = (data['messages'] as List)[0];
+    final reactions = (message as Map)["reactions"] as List;
+    expect(reactions.length, to - (from - 1));
+  });
+
+  test("range 1-1 on foreign table", () async {
+    const from = 1;
+    const to = 1;
+    final response = await postgrest
+        .from("users")
+        .select(
+          '''
+            username,
+            messages(
+              id,
+              reactions(
+                emoji,
+                created_at
+              )
+            )
+          ''',
+        )
+        .eq("username", "supabot")
+        .eq("messages.id", 1)
+        .range(from, to, foreignTable: "messages.reactions")
+        .single()
+        .execute();
+
+    final data = response.data as Map;
+    final message = (data['messages'] as List)[0];
+    final reactions = (message as Map)["reactions"] as List;
+    expect(reactions.length, to - (from - 1));
   });
 
   test('single', () async {

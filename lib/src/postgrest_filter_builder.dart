@@ -42,8 +42,9 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().or('status.eq.OFFLINE,username.eq.supabot')
   /// ```
-  PostgrestFilterBuilder or(String filters) {
-    appendSearchParams('or', '($filters)');
+  PostgrestFilterBuilder or(String filters, {String? foreignTable}) {
+    final key = foreignTable != null ? '"$foreignTable".or' : 'or';
+    appendSearchParams(key, '($filters)');
     return this;
   }
 
