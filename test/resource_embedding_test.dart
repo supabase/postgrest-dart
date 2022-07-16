@@ -22,13 +22,13 @@ void main() {
   });
 
   test('embedded select', () async {
-    final res = await postgrest.from('users').select('messages(*)').execute();
+    final res = await postgrest.from('users').select('messages(*)');
     expect(
-      (((res.data as List)[0] as Map)['messages'] as List).length,
+      (((res as List)[0] as Map)['messages'] as List).length,
       3,
     );
     expect(
-      (((res.data as List)[1] as Map)['messages'] as List).length,
+      (((res)[1] as Map)['messages'] as List).length,
       0,
     );
   });
@@ -37,22 +37,21 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .eq('messages.channel_id', 1)
-        .execute();
+        .eq('messages.channel_id', 1);
     expect(
-      (((res.data as List)[0] as Map)['messages'] as List).length,
+      (((res as List)[0] as Map)['messages'] as List).length,
       2,
     );
     expect(
-      (((res.data as List)[1] as Map)['messages'] as List).length,
+      (((res)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[2] as Map)['messages'] as List).length,
+      (((res)[2] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[3] as Map)['messages'] as List).length,
+      (((res)[3] as Map)['messages'] as List).length,
       0,
     );
   });
@@ -61,18 +60,17 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .order('channel_id', foreignTable: 'messages')
-        .execute();
+        .order('channel_id', foreignTable: 'messages');
     expect(
-      (((res.data as List)[0] as Map)['messages'] as List).length,
+      (((res as List)[0] as Map)['messages'] as List).length,
       3,
     );
     expect(
-      (((res.data as List)[1] as Map)['messages'] as List).length,
+      (((res)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      ((((res.data as List)[0] as Map)['messages'] as List)[0] as Map)['id'],
+      ((((res)[0] as Map)['messages'] as List)[0] as Map)['id'],
       2,
     );
   });
@@ -82,26 +80,25 @@ void main() {
         .from('users')
         .select('username, messages(*)')
         .order('username', ascending: true)
-        .order('channel_id', foreignTable: 'messages')
-        .execute();
+        .order('channel_id', foreignTable: 'messages');
     expect(
-      ((res.data as List)[0] as Map)['username'],
+      ((res as List)[0] as Map)['username'],
       'awailas',
     );
     expect(
-      ((res.data as List)[3] as Map)['username'],
+      ((res)[3] as Map)['username'],
       'supabot',
     );
     expect(
-      (((res.data as List)[0] as Map)['messages'] as List).length,
+      (((res)[0] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[3] as Map)['messages'] as List).length,
+      (((res)[3] as Map)['messages'] as List).length,
       3,
     );
     expect(
-      ((((res.data as List)[3] as Map)['messages'] as List)[0] as Map)['id'],
+      ((((res)[3] as Map)['messages'] as List)[0] as Map)['id'],
       2,
     );
   });
@@ -110,22 +107,21 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .limit(1, foreignTable: 'messages')
-        .execute();
+        .limit(1, foreignTable: 'messages');
     expect(
-      (((res.data as List)[0] as Map)['messages'] as List).length,
+      (((res as List)[0] as Map)['messages'] as List).length,
       1,
     );
     expect(
-      (((res.data as List)[1] as Map)['messages'] as List).length,
+      (((res)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[2] as Map)['messages'] as List).length,
+      (((res)[2] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[3] as Map)['messages'] as List).length,
+      (((res)[3] as Map)['messages'] as List).length,
       0,
     );
   });
@@ -134,22 +130,21 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('messages(*)')
-        .range(1, 1, foreignTable: 'messages')
-        .execute();
+        .range(1, 1, foreignTable: 'messages');
     expect(
-      (((res.data as List)[0] as Map)['messages'] as List).length,
+      (((res as List)[0] as Map)['messages'] as List).length,
       1,
     );
     expect(
-      (((res.data as List)[1] as Map)['messages'] as List).length,
+      (((res)[1] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[2] as Map)['messages'] as List).length,
+      (((res)[2] as Map)['messages'] as List).length,
       0,
     );
     expect(
-      (((res.data as List)[3] as Map)['messages'] as List).length,
+      (((res)[3] as Map)['messages'] as List).length,
       0,
     );
   });

@@ -1,9 +1,4 @@
-import 'dart:core';
-
-import 'package:http/http.dart';
-import 'package:postgrest/src/postgrest_builder.dart';
-import 'package:postgrest/src/postgrest_filter_builder.dart';
-import 'package:postgrest/src/returning_option.dart';
+part of 'postgrest_builder.dart';
 
 /// The query builder class provides a convenient interface to creating request queries.
 ///
@@ -19,11 +14,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     Map<String, String>? headers,
     String? schema,
     Client? httpClient,
+    FetchOptions? options,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},
           schema: schema,
           httpClient: httpClient,
+          options: options,
         );
 
   /// Performs horizontal filtering with SELECT.
@@ -31,8 +28,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestFilterBuilder select([String columns = '*']) {
-    method = 'GET';
+  PostgrestFilterBuilder select([
+    String columns = '*',
+    FetchOptions options = const FetchOptions(),
+  ]) {
+    _method = METHOD_GET;
 
     // Remove whitespaces except when quoted
     var quoted = false;
@@ -48,6 +48,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }).join();
 
     appendSearchParams('select', cleanedColumns);
+    _options = options;
     return PostgrestFilterBuilder(this);
   }
 
@@ -63,19 +64,19 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     @Deprecated('Use `upsert()` method instead') bool upsert = false,
     @Deprecated('Use `upsert()` method instead') String? onConflict,
   }) {
-    method = 'POST';
-    headers['Prefer'] = upsert
+    _method = METHOD_POST;
+    _headers['Prefer'] = upsert
         ? 'return=${returning.name()},resolution=merge-duplicates'
         : 'return=${returning.name()}';
     if (onConflict != null) {
-      url = url.replace(
+      _url = _url.replace(
         queryParameters: {
           'on_conflict': onConflict,
-          ...url.queryParameters,
+          ..._url.queryParameters,
         },
       );
     }
-    body = values;
+    _body = values;
     return this;
   }
 
@@ -92,19 +93,21 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     ReturningOption returning = ReturningOption.representation,
     String? onConflict,
     bool ignoreDuplicates = false,
+    FetchOptions options = const FetchOptions(),
   }) {
-    method = 'POST';
-    headers['Prefer'] =
+    _method = METHOD_POST;
+    _headers['Prefer'] =
         'return=${returning.name()},resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
-      url = url.replace(
+      _url = _url.replace(
         queryParameters: {
           'on_conflict': onConflict,
-          ...url.queryParameters,
+          ..._url.queryParameters,
         },
       );
     }
-    body = values;
+    _body = values;
+    _options = options.ensureNotHead();
     return this;
   }
 
@@ -117,10 +120,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestFilterBuilder update(
     Map values, {
     ReturningOption returning = ReturningOption.representation,
+    FetchOptions options = const FetchOptions(),
   }) {
-    method = 'PATCH';
-    headers['Prefer'] = 'return=${returning.name()}';
-    body = values;
+    _method = METHOD_PATCH;
+    _headers['Prefer'] = 'return=${returning.name()}';
+    _body = values;
+    _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
   }
 
@@ -132,9 +137,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```
   PostgrestFilterBuilder delete({
     ReturningOption returning = ReturningOption.representation,
+    FetchOptions options = const FetchOptions(),
   }) {
-    method = 'DELETE';
-    headers['Prefer'] = 'return=${returning.name()}';
+    _method = METHOD_DELETE;
+    _headers['Prefer'] = 'return=${returning.name()}';
+    _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
   }
 }

@@ -11,43 +11,45 @@ class ResetHelper {
   Future<void> initialize(PostgrestClient postgrest) async {
     _postgrest = postgrest;
     _users = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('users').select().execute()).data as List,
+      (await _postgrest.from('users').select()) as List,
     );
     _channels = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('channels').select().execute()).data as List,
+      (await _postgrest.from('channels').select()) as List,
     );
     _messages = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('messages').select().execute()).data as List,
+      (await _postgrest.from('messages').select()) as List,
     );
     _reactions = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('reactions').select().execute()).data as List,
+      (await _postgrest.from('reactions').select()).data as List,
     );
   }
 
   Future<void> reset() async {
-    await _postgrest.from("reactions").delete().neq("emoji", "dne").execute();
-    await _postgrest.from('messages').delete().neq('message', 'dne').execute();
-    await _postgrest.from('channels').delete().neq('slug', 'dne').execute();
-    await _postgrest.from('users').delete().neq('username', 'dne').execute();
-    final usersInsertRes =
-        await _postgrest.from('users').insert(_users).execute();
-    final channelsInsertRes =
-        await _postgrest.from('channels').insert(_channels).execute();
-    final messagesInsertRes =
-        await _postgrest.from('messages').insert(_messages).execute();
-    final reactionsInsertRes =
-        await _postgrest.from('reactions').insert(_reactions).execute();
-    if (usersInsertRes.hasError) {
-      throw 'users table was not properly reset. ${usersInsertRes.error.toString()}';
+    await _postgrest.from("reactions").delete().neq("emoji", "dne");
+    await _postgrest.from('messages').delete().neq('message', 'dne');
+    await _postgrest.from('channels').delete().neq('slug', 'dne');
+    await _postgrest.from('users').delete().neq('username', 'dne');
+    try {
+      await _postgrest.from('users').insert(_users);
+    } on PostgrestError catch (error) {
+      throw 'users table was not properly reset. $error';
     }
-    if (channelsInsertRes.hasError) {
-      throw 'channels table was not properly reset. ${channelsInsertRes.error.toString()}';
+
+    try {
+      await _postgrest.from('channels').insert(_channels);
+    } on PostgrestError catch (error) {
+      throw 'channels table was not properly reset. $error';
     }
-    if (messagesInsertRes.hasError) {
-      throw 'messages table was not properly reset. ${messagesInsertRes.error.toString()}';
+    try {
+      await _postgrest.from('messages').insert(_messages);
+    } on PostgrestError catch (error) {
+      throw 'messages table was not properly reset. $error';
     }
-    if (reactionsInsertRes.hasError) {
-      throw 'reactions table was not properly reset. ${reactionsInsertRes.error.toString()}';
+
+    try {
+      await _postgrest.from('reactions').insert(_reactions);
+    } on PostgrestError catch (error) {
+      throw 'reactions table was not properly reset. $error';
     }
   }
 }

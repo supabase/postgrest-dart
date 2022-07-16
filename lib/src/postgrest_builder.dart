@@ -1,141 +1,182 @@
+// ignore_for_file: constant_identifier_names
+
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:postgrest/src/count_option.dart';
-import 'package:postgrest/src/postgrest_error.dart';
-import 'package:postgrest/src/postgrest_response.dart';
+import 'package:postgrest/postgrest.dart';
+import 'package:postgrest/src/types.dart';
 
-typedef PostgrestConverter<T> = T Function(dynamic data);
+part 'postgrest_filter_builder.dart';
+part 'postgrest_query_builder.dart';
+part 'postgrest_rpc_builder.dart';
+part 'postgrest_transform_builder.dart';
+
+const METHOD_GET = 'GET';
+const METHOD_HEAD = 'HEAD';
+const METHOD_POST = 'POST';
+const METHOD_PUT = 'PUT';
+const METHOD_PATCH = 'PATCH';
+const METHOD_DELETE = 'DELETE';
 
 /// The base builder class.
-class PostgrestBuilder<T> {
-  PostgrestBuilder({
-    required this.url,
-    required this.headers,
-    this.schema,
-    this.method,
-    this.body,
-    this.httpClient,
-  });
-
-  dynamic body;
-  final Map<String, String> headers;
-  bool maybeEmpty = false;
-  String? method;
-  final String? schema;
-  Uri url;
+class PostgrestBuilder<T> implements Future<T?> {
+  dynamic _body;
+  late final Headers _headers;
+  bool _maybeEmpty = false;
+  String? _method;
+  late final String? _schema;
+  late Uri _url;
   PostgrestConverter? _converter;
-  final Client? httpClient;
+  late final Client? _httpClient;
+  // ignore: prefer_final_fields
+  FetchOptions? _options;
+
+  PostgrestBuilder({
+    required Uri url,
+    required Headers headers,
+    String? schema,
+    String? method,
+    dynamic body,
+    Client? httpClient,
+    FetchOptions? options,
+  }) {
+    _url = url;
+    _headers = headers;
+    _schema = schema;
+    _method = method;
+    _body = body;
+    _httpClient = httpClient;
+    _options = options;
+  }
 
   /// Converts any response that comes from the server into a type-safe response.
   ///
   /// ```dart
-  /// postgrest.from('users').select().withConverter((data) => User.fromJson(json.decode(data))).execute();
+  /// final User user = await postgrest
+  ///     .from('users')
+  ///     .select()
+  ///     .withConverter<User>((data) => User.fromJson(json.decode(data)));
   /// ```
   PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
     _converter = converter;
     return PostgrestBuilder<S>(
-      url: url,
-      headers: headers,
-      schema: schema,
-      method: method,
-      body: body,
+      url: _url,
+      headers: _headers,
+      schema: _schema,
+      method: _method,
+      body: _body,
     )
-      ..maybeEmpty = maybeEmpty
+      .._maybeEmpty = _maybeEmpty
       .._converter = converter;
   }
 
-  /// Sends the request and returns a Future.
-  /// catch any error and returns with status 500
+  /// Sends the request and returns a [PostgrestResponse]
   ///
   /// [head] to trigger a HEAD request
   ///
-  /// [count] if you want to returns the count value. Support exact, planned and estimated count options.
+  /// [count] if you want to returns the count value. Support exact, planned and
+  /// estimated count options.
   ///
   /// For more details about switching schemas: https://postgrest.org/en/stable/api.html#switching-schemas
-  /// Returns {Future} Resolves when the request has completed.
+  ///
+  /// ```dart
+  /// try {
+  ///   final client.from('countries').select().execute();
+  /// } on PostgrestError catch (error) {
+  ///   print(error.code);
+  /// }
+  /// ```
+  @Deprecated('Use async/await or .then instead. Deprecated in 0.2.0')
   Future<PostgrestResponse<T>> execute({
     bool head = false,
     CountOption? count,
   }) async {
-    if (head) {
-      method = 'HEAD';
+    _options = FetchOptions(
+      head: head,
+      count: count ?? _options?.count,
+    );
+    return _execute();
+  }
+
+  Future<PostgrestResponse<T>> _execute() async {
+    if (_options?.head ?? false) {
+      _method = METHOD_HEAD;
     }
 
-    if (count != null) {
-      if (headers['Prefer'] == null) {
-        headers['Prefer'] = 'count=${count.name()}';
+    if (_options?.count != null) {
+      if (_headers['Prefer'] != null) {
+        final oldPreferHeader = _headers['Prefer'];
+        _headers['Prefer'] =
+            '$oldPreferHeader,count=${_options!.count!.name()}';
       } else {
-        headers['Prefer'] = '${headers['Prefer']!},count=${count.name()}';
+        _headers['Prefer'] = 'count=${_options!.count!.name()}';
       }
     }
 
     try {
-      if (method == null) {
-        throw "Missing table operation: select, insert, update or delete";
+      if (_method == null) {
+        throw ArgumentError(
+          'Missing table operation: select, insert, update or delete',
+        );
       }
 
-      final uppercaseMethod = method!.toUpperCase();
+      final uppercaseMethod = _method!.toUpperCase();
       late http.Response response;
 
-      if (schema == null) {
+      if (_schema == null) {
         // skip
-      } else if (['GET', 'HEAD'].contains(method)) {
-        headers['Accept-Profile'] = schema!;
+      } else if ([METHOD_GET, METHOD_HEAD].contains(_method)) {
+        _headers['Accept-Profile'] = _schema!;
       } else {
-        headers['Content-Profile'] = schema!;
+        _headers['Content-Profile'] = _schema!;
       }
-      if (method != 'GET' && method != 'HEAD') {
-        headers['Content-Type'] = 'application/json';
+      if (_method != METHOD_GET && _method != METHOD_HEAD) {
+        _headers['Content-Type'] = 'application/json';
       }
 
-      final bodyStr = json.encode(body);
+      final bodyStr = json.encode(_body);
 
-      if (uppercaseMethod == 'GET') {
-        response = await (httpClient?.get ?? http.get)(
-          url,
-          headers: headers,
+      if (uppercaseMethod == METHOD_GET) {
+        response = await (_httpClient?.get ?? http.get)(
+          _url,
+          headers: _headers,
         );
-      } else if (uppercaseMethod == 'POST') {
-        response = await (httpClient?.post ?? http.post)(
-          url,
-          headers: headers,
+      } else if (uppercaseMethod == METHOD_POST) {
+        response = await (_httpClient?.post ?? http.post)(
+          _url,
+          headers: _headers,
           body: bodyStr,
         );
-      } else if (uppercaseMethod == 'PUT') {
-        response = await (httpClient?.put ?? http.put)(
-          url,
-          headers: headers,
+      } else if (uppercaseMethod == METHOD_PUT) {
+        response = await (_httpClient?.put ?? http.put)(
+          _url,
+          headers: _headers,
           body: bodyStr,
         );
-      } else if (uppercaseMethod == 'PATCH') {
-        response = await (httpClient?.patch ?? http.patch)(
-          url,
-          headers: headers,
+      } else if (uppercaseMethod == METHOD_PATCH) {
+        response = await (_httpClient?.patch ?? http.patch)(
+          _url,
+          headers: _headers,
           body: bodyStr,
         );
-      } else if (uppercaseMethod == 'DELETE') {
-        response = await (httpClient?.delete ?? http.delete)(
-          url,
-          headers: headers,
+      } else if (uppercaseMethod == METHOD_DELETE) {
+        response = await (_httpClient?.delete ?? http.delete)(
+          _url,
+          headers: _headers,
         );
-      } else if (uppercaseMethod == 'HEAD') {
-        response = await (httpClient?.head ?? http.head)(
-          url,
-          headers: headers,
+      } else if (uppercaseMethod == METHOD_HEAD) {
+        response = await (_httpClient?.head ?? http.head)(
+          _url,
+          headers: _headers,
         );
       }
 
       return _parseResponse(response);
-    } catch (e) {
-      final error =
-          PostgrestError(code: e.runtimeType.toString(), message: e.toString());
-      return PostgrestResponse(
-        status: 500,
-        error: error,
-      );
+    } catch (error) {
+      rethrow;
     }
   }
 
@@ -145,7 +186,7 @@ class PostgrestBuilder<T> {
       dynamic body;
       int? count;
 
-      if (response.request!.method != 'HEAD') {
+      if (response.request!.method != METHOD_HEAD) {
         if (response.request!.headers['Accept'] == 'text/csv') {
           body = response.body;
         } else {
@@ -158,7 +199,7 @@ class PostgrestBuilder<T> {
       }
 
       final contentRange = response.headers['content-range'];
-      if (contentRange != null) {
+      if (contentRange != null && contentRange.length > 1) {
         count = contentRange.split('/').last == '*'
             ? null
             : int.parse(contentRange.split('/').last);
@@ -174,30 +215,37 @@ class PostgrestBuilder<T> {
         count: count,
       );
     } else {
-      PostgrestError error;
-      if (response.request!.method != 'HEAD') {
+      late PostgrestError error;
+      if (response.request!.method != METHOD_HEAD) {
         try {
-          final Map<String, dynamic> errorJson =
-              json.decode(response.body) as Map<String, dynamic>;
-          error = PostgrestError.fromJson(errorJson);
+          final errorJson = json.decode(response.body) as Map<String, dynamic>;
+          error = PostgrestError.fromJson(
+            errorJson,
+            message: response.body,
+            code: response.statusCode,
+            details: response.reasonPhrase,
+          );
 
-          if (maybeEmpty) {
+          if (_maybeEmpty) {
             return _handleMaybeEmptyError(response, error);
           }
         } catch (_) {
-          error = PostgrestError(message: response.body);
+          error = PostgrestError(
+            message: response.body,
+            code: '${response.statusCode}',
+            details: response.reasonPhrase,
+          );
         }
       } else {
         error = PostgrestError(
-          code: response.statusCode.toString(),
-          message: 'Error in Postgrest response for method HEAD',
+          code: '${response.statusCode}',
+          message: response.body,
+          details: 'Error in Postgrest response for method HEAD',
+          hint: response.reasonPhrase,
         );
       }
 
-      return PostgrestResponse(
-        status: response.statusCode,
-        error: error,
-      );
+      throw error;
     }
   }
 
@@ -210,30 +258,122 @@ class PostgrestBuilder<T> {
   ) {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
-      return const PostgrestResponse(
+      return PostgrestResponse<T>(
+        data: '' as T,
         status: 200,
         count: 0,
       );
     } else {
-      return PostgrestResponse(
-        status: response.statusCode,
-        error: error,
-      );
+      throw error;
     }
   }
 
   /// Update Uri queryParameters with new key:value
   /// Use lists to allow multiple values for the same key
   void appendSearchParams(String key, String value) {
-    final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
+    final searchParams = Map<String, dynamic>.from(_url.queryParametersAll);
     searchParams[key] = [...searchParams[key] ?? [], value];
-    url = url.replace(queryParameters: searchParams);
+    _url = _url.replace(queryParameters: searchParams);
   }
 
   /// Overrides Uri queryParameters with new key:value
   void overrideSearchParams(String key, String value) {
-    final searchParams = Map<String, dynamic>.from(url.queryParametersAll);
+    final searchParams = Map<String, dynamic>.from(_url.queryParametersAll);
     searchParams[key] = value;
-    url = url.replace(queryParameters: searchParams);
+    _url = _url.replace(queryParameters: searchParams);
+  }
+
+  @override
+  Stream<T?> asStream() {
+    final controller = StreamController<T?>.broadcast();
+
+    then((value) {
+      controller.add(value);
+    }).catchError((Object error, StackTrace stack) {
+      controller.addError(error, stack);
+    }).whenComplete(() {
+      controller.close();
+    });
+
+    return controller.stream;
+  }
+
+  @override
+  Future<T> catchError(Function onError, {bool Function(Object error)? test}) {
+    throw UnimplementedError('catchError should not be called in this future');
+  }
+
+  /// Register callbacks to be called when this future completes.
+  @override
+  Future<R> then<R>(
+    FutureOr<R> Function(T? value) onValue, {
+    Function? onError,
+  }) async {
+    if (onError != null &&
+        onError is! Function(Object, StackTrace) &&
+        onError is! Function(Object)) {
+      throw ArgumentError.value(
+        onError,
+        "onError",
+        "Error handler must accept one Object or one Object and a StackTrace"
+            " as arguments, and return a value of the returned future's type",
+      );
+    }
+
+    try {
+      final response = await _execute();
+      // ignore: null_check_on_nullable_type_parameter
+      final data = response.data;
+
+      if (_converter != null) {
+        assert(
+          !(_options?.forceResponse ?? false),
+          'converter and forceReponse can not be set at the same time',
+        );
+        return onValue(data as T);
+      } else {
+        if ((_options?.forceResponse ?? false) || response.count != null) {
+          return onValue(response as T);
+        } else {
+          return onValue(data as T);
+        }
+      }
+    } catch (error, stack) {
+      if (onError != null) {
+        if (onError is Function(Object, StackTrace)) {
+          onError(error, stack);
+        } else if (onError is Function(Object)) {
+          onError(error);
+        } else {
+          rethrow;
+        }
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<T> timeout(Duration timeLimit, {FutureOr<T?> Function()? onTimeout}) {
+    throw UnimplementedError('timeout should not be called on this future');
+  }
+
+  @override
+  Future<T?> whenComplete(FutureOr<void> Function() action) {
+    return then(
+      (v) {
+        final f2 = action();
+        if (f2 is Future) return f2.then((_) => v);
+        return v;
+      },
+      onError: (Object e) {
+        final f2 = action();
+        if (f2 is Future) {
+          return f2.then((_) {
+            throw e;
+          });
+        }
+        throw e;
+      },
+    );
   }
 }

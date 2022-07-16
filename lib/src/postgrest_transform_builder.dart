@@ -1,14 +1,15 @@
-import 'package:postgrest/src/postgrest_builder.dart';
+part of 'postgrest_builder.dart';
 
-class PostgrestTransformBuilder<T> extends PostgrestBuilder {
-  PostgrestTransformBuilder(PostgrestBuilder builder)
+class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
+  PostgrestTransformBuilder(PostgrestBuilder<T> builder)
       : super(
-          url: builder.url,
-          method: builder.method,
-          headers: builder.headers,
-          schema: builder.schema,
-          body: builder.body,
-          httpClient: builder.httpClient,
+          url: builder._url,
+          method: builder._method,
+          headers: builder._headers,
+          schema: builder._schema,
+          body: builder._body,
+          httpClient: builder._httpClient,
+          options: builder._options,
         );
 
   /// Performs horizontal filtering with SELECT.
@@ -50,7 +51,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
     String? foreignTable,
   }) {
     final key = foreignTable == null ? 'order' : '$foreignTable.order';
-    final existingOrder = url.queryParameters[key];
+    final existingOrder = _url.queryParameters[key];
     final value = '${existingOrder == null ? '' : '$existingOrder,'}'
         '$column.${ascending ? 'asc' : 'desc'}.${nullsFirst ? 'nullsfirst' : 'nullslast'}';
 
@@ -94,7 +95,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select().limit(1).single()
   /// ```
   PostgrestTransformBuilder single() {
-    headers['Accept'] = 'application/vnd.pgrst.object+json';
+    _headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
   }
 
@@ -103,8 +104,8 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// Result must be at most one row or nullable
   /// (e.g. using `eq` on a UNIQUE column), otherwise this will result in an error.
   PostgrestTransformBuilder maybeSingle() {
-    headers['Accept'] = 'application/vnd.pgrst.object+json';
-    maybeEmpty = true;
+    _headers['Accept'] = 'application/vnd.pgrst.object+json';
+    _maybeEmpty = true;
     return this;
   }
 
@@ -115,7 +116,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder {
   /// postgrest.from('users').select().csv()
   /// ```
   PostgrestTransformBuilder csv() {
-    headers['Accept'] = 'text/csv';
+    _headers['Accept'] = 'text/csv';
     return this;
   }
 }
