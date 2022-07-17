@@ -57,7 +57,7 @@ void main() {
 
     test('custom headers', () async {
       final postgrest = PostgrestClient(rootUrl, headers: {'apikey': 'foo'});
-      expect(postgrest..headers['apikey'], 'foo');
+      expect(postgrest.headers['apikey'], 'foo');
     });
 
     test('override X-Client-Info', () async {
