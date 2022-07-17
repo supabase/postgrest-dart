@@ -322,7 +322,6 @@ class PostgrestBuilder<T> implements Future<T?> {
 
     try {
       final response = await _execute();
-      // ignore: null_check_on_nullable_type_parameter
       final data = response.data;
 
       if (_converter != null) {

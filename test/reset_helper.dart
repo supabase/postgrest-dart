@@ -20,7 +20,7 @@ class ResetHelper {
       (await _postgrest.from('messages').select()) as List,
     );
     _reactions = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('reactions').select()).data as List,
+      (await _postgrest.from('reactions').select()) as List,
     );
   }
 
