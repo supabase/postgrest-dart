@@ -74,7 +74,7 @@ void main() {
   });
 
   test("order on foreign table", () async {
-    final response = await postgrest
+    final Map data = await postgrest
         .from("users")
         .select(
           '''
@@ -90,10 +90,8 @@ void main() {
         )
         .eq("username", "supabot")
         .order("created_at", foreignTable: "messages.reactions")
-        .single()
-        .execute();
+        .single();
 
-    final data = response.data as Map;
     final messages = data['messages'] as List;
 
     for (final message in messages) {
@@ -113,7 +111,7 @@ void main() {
   });
 
   test("limit on foreign table", () async {
-    final response = await postgrest
+    final Map data = await postgrest
         .from("users")
         .select(
           '''
@@ -129,10 +127,8 @@ void main() {
         )
         .eq("username", "supabot")
         .limit(1, foreignTable: "messages.reactions")
-        .single()
-        .execute();
+        .single();
 
-    final data = response.data as Map;
     final messages = data['messages'] as List;
 
     for (final message in messages) {
@@ -162,7 +158,7 @@ void main() {
   test("range on foreign table", () async {
     const from = 0;
     const to = 2;
-    final response = await postgrest
+    final Map data = await postgrest
         .from("users")
         .select(
           '''
@@ -179,10 +175,7 @@ void main() {
         .eq("username", "supabot")
         .eq("messages.id", 1)
         .range(from, to, foreignTable: "messages.reactions")
-        .single()
-        .execute();
-
-    final data = response.data as Map;
+        .single();
     final message = (data['messages'] as List)[0];
     final reactions = (message as Map)["reactions"] as List;
     expect(reactions.length, to - (from - 1));
@@ -191,7 +184,7 @@ void main() {
   test("range 1-1 on foreign table", () async {
     const from = 1;
     const to = 1;
-    final response = await postgrest
+    final Map data = await postgrest
         .from("users")
         .select(
           '''
@@ -208,10 +201,8 @@ void main() {
         .eq("username", "supabot")
         .eq("messages.id", 1)
         .range(from, to, foreignTable: "messages.reactions")
-        .single()
-        .execute();
+        .single();
 
-    final data = response.data as Map;
     final message = (data['messages'] as List)[0];
     final reactions = (message as Map)["reactions"] as List;
     expect(reactions.length, to - (from - 1));

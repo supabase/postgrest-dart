@@ -55,35 +55,35 @@ void main() {
       expect(res, isNull);
     });
 
-    // test('custom headers', () async {
-    //   final postgrest = PostgrestClient(rootUrl, headers: {'apikey': 'foo'});
-    //   expect(postgrest.from('users').select().headers['apikey'], 'foo');
-    // });
+    test('custom headers', () async {
+      final postgrest = PostgrestClient(rootUrl, headers: {'apikey': 'foo'});
+      expect(postgrest.headers['apikey'], 'foo');
+    });
 
-    // test('override X-Client-Info', () async {
-    //   final postgrest = PostgrestClient(
-    //     rootUrl,
-    //     headers: {'X-Client-Info': 'supabase-dart/0.0.0'},
-    //   );
-    //   expect(
-    //     postgrest.from('users').select().headers['X-Client-Info'],
-    //     'supabase-dart/0.0.0',
-    //   );
-    // });
+    test('override X-Client-Info', () async {
+      final postgrest = PostgrestClient(
+        rootUrl,
+        headers: {'X-Client-Info': 'supabase-dart/0.0.0'},
+      );
+      expect(
+        postgrest.headers['X-Client-Info'],
+        'supabase-dart/0.0.0',
+      );
+    });
 
-    // test('auth', () async {
-    //   postgrest = PostgrestClient(rootUrl).auth('foo');
-    //   expect(
-    //     postgrest.from('users').select().headers['Authorization'],
-    //     'Bearer foo',
-    //   );
-    // });
+    test('auth', () async {
+      postgrest = PostgrestClient(rootUrl).auth('foo');
+      expect(
+        postgrest.headers['Authorization'],
+        'Bearer foo',
+      );
+    });
 
-    // test('switch schema', () async {
-    //   final postgrest = PostgrestClient(rootUrl, schema: 'personal');
-    //   final res = await postgrest.from('users').select();
-    //   expect((res.data as List).length, 5);
-    // });
+    test('switch schema', () async {
+      final postgrest = PostgrestClient(rootUrl, schema: 'personal');
+      final List res = await postgrest.from('users').select();
+      expect((res).length, 5);
+    });
 
     test('on_conflict upsert', () async {
       final List res = await postgrest.from('users').upsert(
