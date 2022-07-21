@@ -183,7 +183,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   /// Parse request response to json object if possible
-  PostgrestResponse<T> _parseResponse(http.Response response) {
+  Future<PostgrestResponse<T>> _parseResponse(http.Response response) async {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
@@ -193,7 +193,7 @@ class PostgrestBuilder<T> implements Future<T?> {
           body = response.body;
         } else {
           try {
-            body = compute(json.decode, response.body);
+            body = await compute(json.decode, response.body);
           } on FormatException catch (_) {
             body = null;
           }
@@ -221,7 +221,7 @@ class PostgrestBuilder<T> implements Future<T?> {
       if (response.request!.method != METHOD_HEAD) {
         try {
           final errorJson =
-              compute(json.decode, response.body) as Map<String, dynamic>;
+              await compute(json.decode, response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(
             errorJson,
             message: response.body,
