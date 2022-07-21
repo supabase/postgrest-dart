@@ -10,13 +10,13 @@ Future<R> compute<Q, R>(
     isolates.ComputeCallback<Q, R> callback, Q message) async {
   final RawReceivePort port = RawReceivePort();
 
-  void _timeEndAndCleanup() {
+  void cleanup() {
     port.close();
   }
 
   final Completer<dynamic> completer = Completer<dynamic>();
   port.handler = (dynamic msg) {
-    _timeEndAndCleanup();
+    cleanup();
     completer.complete(msg);
   };
 
@@ -33,7 +33,7 @@ Future<R> compute<Q, R>(
       onError: port.sendPort,
     );
   } on Object {
-    _timeEndAndCleanup();
+    cleanup();
     rethrow;
   }
 
