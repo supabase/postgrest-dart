@@ -193,7 +193,7 @@ class PostgrestBuilder<T> implements Future<T?> {
           body = response.body;
         } else {
           try {
-            body = json.decode(response.body);
+            body = compute(json.decode, response.body);
           } on FormatException catch (_) {
             body = null;
           }
@@ -220,7 +220,8 @@ class PostgrestBuilder<T> implements Future<T?> {
       late PostgrestError error;
       if (response.request!.method != METHOD_HEAD) {
         try {
-          final errorJson = json.decode(response.body) as Map<String, dynamic>;
+          final errorJson =
+              compute(json.decode, response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(
             errorJson,
             message: response.body,
