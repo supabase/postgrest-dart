@@ -338,13 +338,29 @@ class PostgrestBuilder<T> implements Future<T?> {
         }
       }
     } catch (error, stack) {
+      final dynamic result;
       if (onError != null) {
         if (onError is Function(Object, StackTrace)) {
-          onError(error, stack);
+          result = onError(error, stack);
         } else if (onError is Function(Object)) {
-          onError(error);
+          result = onError(error);
         } else {
-          rethrow;
+          throw ArgumentError.value(
+            onError,
+            "onError",
+            "Error handler must accept one Object or one Object and a StackTrace"
+                " as arguments, and return a value of the returned future's type",
+          );
+        }
+        // Give better error messages if the result is not a valid
+        // FutureOr<R>.
+        try {
+          return result;
+        } on TypeError {
+          throw ArgumentError(
+              "The error handler of Future.then"
+                  " must return a value of the returned future's type",
+              "onError");
         }
       }
       rethrow;

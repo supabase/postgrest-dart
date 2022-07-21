@@ -169,9 +169,9 @@ void main() {
       }
     });
 
-    test('connection error', () {
+    test('connection error', () async {
       final postgrest = PostgrestClient('http://this.url.does.not.exist');
-      postgrest.from('user').select().then(
+      postgrest.from('user').select().then<dynamic>(
         (value) {
           fail('Success on connection error');
         },
