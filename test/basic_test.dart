@@ -155,7 +155,7 @@ void main() {
 
     test('missing table', () async {
       try {
-        await postgrest.from('missing_table').select().then(
+        await postgrest.from('missing_table').select().then<dynamic>(
           (value) {
             fail('found missing table');
           },
@@ -171,7 +171,7 @@ void main() {
 
     test('connection error', () async {
       final postgrest = PostgrestClient('http://this.url.does.not.exist');
-      postgrest.from('user').select().then<dynamic>(
+      await postgrest.from('user').select().then<dynamic>(
         (value) {
           fail('Success on connection error');
         },
@@ -302,7 +302,7 @@ void main() {
 
     test('row level security error', () async {
       try {
-        await postgrest.from('sample').update({'id': 2}).then(
+        await postgrest.from('sample').update({'id': 2}).then<dynamic>(
           (value) {
             fail('Returned even with row level security');
           },
@@ -336,7 +336,7 @@ void main() {
     });
     test('basic select table', () async {
       try {
-        await postgrestCustomHttpClient.from('users').select().then(
+        await postgrestCustomHttpClient.from('users').select().then<dynamic>(
           (value) {
             fail('Table was able to be selected, even tho it does not exist');
           },
@@ -352,7 +352,7 @@ void main() {
     test('basic stored procedure call', () async {
       try {
         await postgrestCustomHttpClient
-            .rpc('get_status', params: {'name_param': 'supabot'}).then(
+            .rpc('get_status', params: {'name_param': 'supabot'}).then<dynamic>(
           (value) {
             fail(
                 'Stored procedure was able to be called, even tho it does not exist');
