@@ -350,10 +350,21 @@ void main() {
       }
     });
     test('basic stored procedure call', () async {
-      final res = await postgrest.rpc('get_status', params: {
-        'name_param': 'supabot',
-      });
-      expect(res, 'ONLINE');
+      try {
+        await postgrestCustomHttpClient
+            .rpc('get_status', params: {'name_param': 'supabot'}).then(
+          (value) {
+            fail(
+                'Stored procedure was able to be called, even tho it does not exist');
+          },
+          onError: (error) {
+            expect(error, isA<PostgrestError>());
+            expect(error.code, '420');
+          },
+        );
+      } on PostgrestError catch (error) {
+        expect(error.code, '420');
+      }
     });
   });
 }
