@@ -9,6 +9,8 @@ import 'package:http/http.dart';
 import 'package:postgrest/postgrest.dart';
 import 'package:postgrest/src/types.dart';
 
+import 'isolates.dart';
+
 part 'postgrest_filter_builder.dart';
 part 'postgrest_query_builder.dart';
 part 'postgrest_rpc_builder.dart';
@@ -137,7 +139,7 @@ class PostgrestBuilder<T> implements Future<T?> {
         _headers['Content-Type'] = 'application/json';
       }
 
-      final bodyStr = json.encode(_body);
+      final bodyStr = await compute(json.encode, _body);
 
       if (uppercaseMethod == METHOD_GET) {
         response = await (_httpClient?.get ?? http.get)(
