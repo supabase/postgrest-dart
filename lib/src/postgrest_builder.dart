@@ -60,7 +60,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// final User user = await postgrest
   ///     .from('users')
   ///     .select()
-  ///     .withConverter<User>((data) => User.fromJson(json.decode(data)));
+  ///     .withConverter<User>((data) => User.fromJson(data));
   /// ```
   PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
     _converter = converter;
