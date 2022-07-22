@@ -9,6 +9,8 @@ import 'package:http/http.dart';
 import 'package:postgrest/postgrest.dart';
 import 'package:postgrest/src/types.dart';
 
+import 'isolates.dart';
+
 part 'postgrest_filter_builder.dart';
 part 'postgrest_query_builder.dart';
 part 'postgrest_rpc_builder.dart';
@@ -58,7 +60,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// final User user = await postgrest
   ///     .from('users')
   ///     .select()
-  ///     .withConverter<User>((data) => User.fromJson(json.decode(data)));
+  ///     .withConverter<User>((data) => User.fromJson(data));
   /// ```
   PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
     _converter = converter;
@@ -137,7 +139,7 @@ class PostgrestBuilder<T> implements Future<T?> {
         _headers['Content-Type'] = 'application/json';
       }
 
-      final bodyStr = json.encode(_body);
+      final bodyStr = await compute(json.encode, _body);
 
       if (uppercaseMethod == METHOD_GET) {
         response = await (_httpClient?.get ?? http.get)(
@@ -181,7 +183,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   /// Parse request response to json object if possible
-  PostgrestResponse<T> _parseResponse(http.Response response) {
+  Future<PostgrestResponse<T>> _parseResponse(http.Response response) async {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
@@ -191,7 +193,7 @@ class PostgrestBuilder<T> implements Future<T?> {
           body = response.body;
         } else {
           try {
-            body = json.decode(response.body);
+            body = await compute(json.decode, response.body);
           } on FormatException catch (_) {
             body = null;
           }
@@ -218,7 +220,8 @@ class PostgrestBuilder<T> implements Future<T?> {
       late PostgrestError error;
       if (response.request!.method != METHOD_HEAD) {
         try {
-          final errorJson = json.decode(response.body) as Map<String, dynamic>;
+          final errorJson =
+              await compute(json.decode, response.body) as Map<String, dynamic>;
           error = PostgrestError.fromJson(
             errorJson,
             message: response.body,
