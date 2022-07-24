@@ -1,3 +1,28 @@
+## [1.0.0-dev.1]
+
+- BREAKING: `data` is returned directly and error is thrown instead of being returned within a response
+```dart
+try {
+  final data = await client.from('countries').select();
+  print(data);
+} on PostgrestError catch (error, stacktrace) {
+  // handle a PostgrestError
+  print('$error \n $stacktrace');
+} catch (error, stacktrace) {
+  // handle other errors
+  print('$error \n $stracktrace');
+}
+```
+- `count` and `head` can be specified within `FetchOptions()` in `.select()`
+```dart
+final response = await client.from('countries').select('*', FetchOptions(count: CountOption.exact));
+print(response.data);
+print(response.count);
+```
+- DEPRECATED: `.execute()` is not deprecated
+- chore: using [`lints`](https://pub.dev/packages/lints) package for linting
+- fix: Added typesafe HTTP Methods (METHOD_GET, METHOD_HEAD, METHOD_POST, METHOD_PUT, METHOD_PATCH, METHOD_DELETE)
+
 ## [0.1.11]
 
 - fix: `order()` and `limit()` not working as expected with foreign table bug

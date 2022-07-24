@@ -9,6 +9,7 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 
 The usage should be the same as postgrest-js except:
 
+- `data` is directly returned by awaiting the query when count option is not specified.
 - Errors will not be returned within the response, but will be thrown. 
 - `is_` and `in_` filter methods are suffixed with `_` sign to avoid collisions with reserved keywords.
 
