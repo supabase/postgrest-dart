@@ -19,7 +19,7 @@ final response = await client.from('countries').select('*', FetchOptions(count: 
 print(response.data);
 print(response.count);
 ```
-- DEPRECATED: `.execute()` is not deprecated
+- DEPRECATED: `.execute()` is now deprecated
 - chore: using [`lints`](https://pub.dev/packages/lints) package for linting
 - fix: Added typesafe HTTP Methods (METHOD_GET, METHOD_HEAD, METHOD_POST, METHOD_PUT, METHOD_PATCH, METHOD_DELETE)
 
