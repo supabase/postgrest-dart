@@ -9,7 +9,8 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 
 The usage should be the same as postgrest-js except:
 
-- You need to call `execute()` to finish your query chain.
+- `data` is directly returned by awaiting the query when count option is not specified.
+- Errors will not be returned within the response, but will be thrown. 
 - `is_` and `in_` filter methods are suffixed with `_` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.com/docs/reference/dart/select).
@@ -19,9 +20,9 @@ You can find detail documentation from [here](https://supabase.com/docs/referenc
 ```dart
 import 'package:postgrest/postgrest.dart';
 
-var url = 'https://example.com/postgrest/endpoint';
-var client = PostgrestClient(url);
-var response = await client.from('users').select().execute();
+final url = 'https://example.com/postgrest/endpoint';
+final client = PostgrestClient(url);
+final response = await client.from('users').select();
 ```
 
 #### Insert records
@@ -29,13 +30,20 @@ var response = await client.from('users').select().execute();
 ```dart
 import 'package:postgrest/postgrest.dart';
 
-var url = 'https://example.com/postgrest/endpoint';
-var client = PostgrestClient(url);
-var response = await client.from('users')
-      .insert([
-        {'username': 'supabot', 'status': 'ONLINE'}
-      ])
-      .execute();
+final url = 'https://example.com/postgrest/endpoint';
+final client = PostgrestClient(url);
+try {
+  final data = await client.from('users')
+    .insert([
+      {'username': 'supabot', 'status': 'ONLINE'}
+    ]);
+} on PostgrestError catch (error, stacktrace) {
+  // handle a PostgrestError
+  print('$error \n $stacktrace');
+} catch (error, stacktrace) {
+  // handle other errors
+  print('$error \n $stracktrace');
+}
 ```
 
 #### Update a record
@@ -43,12 +51,11 @@ var response = await client.from('users')
 ```dart
 import 'package:postgrest/postgrest.dart';
 
-var url = 'https://example.com/postgrest/endpoint';
-var client = PostgrestClient(url);
-var response = await client.from('users')
+final url = 'https://example.com/postgrest/endpoint';
+final client = PostgrestClient(url);
+final data = await client.from('users')
       .update({'status': 'OFFLINE'})
-      .eq('username', 'dragarcia')
-      .execute();
+      .eq('username', 'dragarcia');
 ```
 
 #### Delete records
@@ -56,12 +63,11 @@ var response = await client.from('users')
 ```dart
 import 'package:postgrest/postgrest.dart';
 
-var url = 'https://example.com/postgrest/endpoint';
-var client = PostgrestClient(url);
-var response = await client.from('users')
+final url = 'https://example.com/postgrest/endpoint';
+final client = PostgrestClient(url);
+final data = await client.from('users')
       .delete()
-      .eq('username', 'supabot')
-      .execute();
+      .eq('username', 'supabot');
 ```
 
 #### Get Count
@@ -69,11 +75,12 @@ var response = await client.from('users')
 ```dart
 import 'package:postgrest/postgrest.dart';
 
-var url = 'https://example.com/postgrest/endpoint';
-var client = PostgrestClient(url);
-var response = await client.from('countries')
-      .select()
-      .execute(count: CountOption.exact, head: true);
+final url = 'https://example.com/postgrest/endpoint';
+final client = PostgrestClient(url);
+final response = await client.from('countries')
+      .select('*', FetchOptions(count: CountOption.exact));
+final data = response.data;
+final count = response.count;
 ```
 
 ## Contributing
