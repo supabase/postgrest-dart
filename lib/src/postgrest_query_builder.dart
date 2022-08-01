@@ -58,46 +58,29 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
-  PostgrestBuilder insert(
-    dynamic values, {
-    ReturningOption returning = ReturningOption.representation,
-    @Deprecated('Use `upsert()` method instead') bool upsert = false,
-    @Deprecated('Use `upsert()` method instead') String? onConflict,
-  }) {
+  PostgrestFilterBuilder insert(dynamic values) {
     _method = METHOD_POST;
-    _headers['Prefer'] = upsert
-        ? 'return=${returning.name()},resolution=merge-duplicates'
-        : 'return=${returning.name()}';
-    if (onConflict != null) {
-      _url = _url.replace(
-        queryParameters: {
-          'on_conflict': onConflict,
-          ..._url.queryParameters,
-        },
-      );
-    }
+    _headers['Prefer'] = '';
     _body = values;
-    return this;
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs an UPSERT into the table.
   ///
-  /// By default the new record is returned. Set [returning] to minimal if you don't need this value.
   /// By specifying the [onConflict] query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
   /// [ignoreDuplicates] Specifies if duplicate rows should be ignored and not inserted.
   /// ```dart
   /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
-  PostgrestBuilder upsert(
+  PostgrestFilterBuilder upsert(
     dynamic values, {
-    ReturningOption returning = ReturningOption.representation,
     String? onConflict,
     bool ignoreDuplicates = false,
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_POST;
     _headers['Prefer'] =
-        'return=${returning.name()},resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
+        'resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
     if (onConflict != null) {
       _url = _url.replace(
         queryParameters: {
@@ -108,22 +91,20 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }
     _body = values;
     _options = options.ensureNotHead();
-    return this;
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs an UPDATE on the table.
   ///
-  /// By default the updated record(s) will be returned. Set [returning] to minimal if you don't need this value.
   /// ```dart
   /// postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo')
   /// ```
   PostgrestFilterBuilder update(
     Map values, {
-    ReturningOption returning = ReturningOption.representation,
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_PATCH;
-    _headers['Prefer'] = 'return=${returning.name()}';
+    _headers['Prefer'] = '';
     _body = values;
     _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);

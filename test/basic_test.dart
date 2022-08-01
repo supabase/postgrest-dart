@@ -89,7 +89,7 @@ void main() {
       final List res = await postgrest.from('users').upsert(
         {'username': 'dragarcia', 'status': 'OFFLINE'},
         onConflict: 'username',
-      );
+      ).select();
       expect(
         (res.first as Map<String, dynamic>)['status'],
         'OFFLINE',
@@ -97,8 +97,12 @@ void main() {
     });
 
     test('upsert', () async {
-      final List res = await postgrest.from('messages').upsert(
-          {'id': 3, 'message': 'foo', 'username': 'supabot', 'channel_id': 2});
+      final List res = await postgrest.from('messages').upsert({
+        'id': 3,
+        'message': 'foo',
+        'username': 'supabot',
+        'channel_id': 2
+      }).select();
       expect((res.first as Map)['id'], 3);
 
       final List resMsg = await postgrest.from('messages').select();
@@ -110,7 +114,7 @@ void main() {
         {'username': 'dragarcia'},
         onConflict: 'username',
         ignoreDuplicates: true,
-      );
+      ).select();
       expect(res, isEmpty);
     });
 
@@ -118,16 +122,41 @@ void main() {
       final List res = await postgrest.from('messages').insert([
         {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
         {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
-      ]);
+      ]).select();
       expect(res.length, 2);
     });
 
     test('basic update', () async {
       final res = await postgrest.from('messages').update(
         {'channel_id': 2},
-        returning: ReturningOption.minimal,
-      );
-      expect(res, null);
+      ).select();
+      expect(res, [
+        {
+          'id': 1,
+          'data': null,
+          'message': 'Hello World 👋',
+          'username': 'supabot',
+          'channel_id': 2,
+          'inserted_at': '2021-06-25T04:28:21.598+00:00'
+        },
+        {
+          'id': 2,
+          'data': null,
+          'message':
+              'Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.',
+          'username': 'supabot',
+          'channel_id': 2,
+          'inserted_at': '2021-06-29T04:28:21.598+00:00'
+        },
+        {
+          'id': 3,
+          'data': null,
+          'message': 'Supabase Launch Week is on fire',
+          'username': 'supabot',
+          'channel_id': 2,
+          'inserted_at': '2021-06-20T04:28:21.598+00:00'
+        }
+      ]);
 
       final Iterable<Map<String, dynamic>> messages = (await postgrest
               .from('messages')
@@ -143,8 +172,18 @@ void main() {
       final res = await postgrest
           .from('messages')
           .delete(returning: ReturningOption.minimal)
-          .eq('message', 'Supabase Launch Week is on fire');
-      expect(res, null);
+          .eq('message', 'Supabase Launch Week is on fire')
+          .select();
+      expect(res, [
+        {
+          'id': 3,
+          'data': null,
+          'message': 'Supabase Launch Week is on fire',
+          'username': 'supabot',
+          'channel_id': 1,
+          'inserted_at': '2021-06-20T04:28:21.598+00:00'
+        }
+      ]);
 
       final List resMsg = await postgrest
           .from('messages')
@@ -179,6 +218,11 @@ void main() {
           expect(error, isA<SocketException>());
         },
       );
+    });
+
+    test('Prefer: return=minimal', () async {
+      final data = await postgrest.from('users').insert({'username': 'bar'});
+      expect(data, null);
     });
 
     test('select with head:true', () async {
@@ -241,15 +285,19 @@ void main() {
         {'username': 'countexact', 'status': 'OFFLINE'},
         onConflict: 'username',
         options: FetchOptions(count: CountOption.exact),
-      );
+      ).select();
       expect(res.count, 1);
     });
 
     test('update with count: exact', () async {
-      final res = await postgrest.from('users').update(
-        {'status': 'ONLINE'},
-        options: FetchOptions(count: CountOption.exact),
-      ).eq('username', 'kiwicopple');
+      final res = await postgrest
+          .from('users')
+          .update(
+            {'status': 'ONLINE'},
+            options: FetchOptions(count: CountOption.exact),
+          )
+          .eq('username', 'kiwicopple')
+          .select();
       expect(res.count, 1);
     });
 
@@ -257,7 +305,8 @@ void main() {
       final res = await postgrest
           .from('users')
           .delete(options: FetchOptions(count: CountOption.exact))
-          .eq('username', 'kiwicopple');
+          .eq('username', 'kiwicopple')
+          .select();
 
       expect(res.count, 1);
     });
@@ -285,7 +334,7 @@ void main() {
     test('insert from uppercase table name', () async {
       final res = await postgrest.from('TestTable').insert([
         {'slug': 'new slug'}
-      ]);
+      ]).select();
       expect(
         (res.first as Map<String, dynamic>)['slug'],
         'new slug',
@@ -296,7 +345,8 @@ void main() {
       final res = await postgrest
           .from('TestTable')
           .delete(options: FetchOptions(count: CountOption.exact))
-          .eq('slug', 'new slug');
+          .eq('slug', 'new slug')
+          .select();
       expect(res.count, 1);
     });
 
