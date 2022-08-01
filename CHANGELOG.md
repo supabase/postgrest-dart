@@ -19,7 +19,12 @@ final response = await client.from('countries').select('*', FetchOptions(count: 
 print(response.data);
 print(response.count);
 ```
+- BREAKING: `returning` option in `.insert()`, `.upsert()`, `.update()` and `.delete()` have been removed. `.select()` should be appended on the query to return the result of those operations.
+```dart
+final data = await client.from('countries').insert({'name': 'France'}).select();
+```
 - DEPRECATED: `.execute()` is now deprecated
+- chore: all deprecated filter methods have been removed
 - chore: using [`lints`](https://pub.dev/packages/lints) package for linting
 - fix: Added typesafe HTTP Methods (METHOD_GET, METHOD_HEAD, METHOD_POST, METHOD_PUT, METHOD_PATCH, METHOD_DELETE)
 
