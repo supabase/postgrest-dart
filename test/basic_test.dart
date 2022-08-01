@@ -125,7 +125,6 @@ void main() {
     test('basic update', () async {
       final res = await postgrest.from('messages').update(
         {'channel_id': 2},
-        returning: ReturningOption.minimal,
       );
       expect(res, null);
 

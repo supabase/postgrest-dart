@@ -32,6 +32,10 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
     }).join();
 
     appendSearchParams('select', cleanedColumns);
+    if (_headers['Prefer'] != null) {
+      _headers['Prefer'] = '${_headers['Prefer']},';
+    }
+    _headers['Prefer'] = '${_headers['Prefer']}return=representation';
     return this;
   }
 
