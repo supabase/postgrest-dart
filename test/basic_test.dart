@@ -181,6 +181,11 @@ void main() {
       );
     });
 
+    test('Prefer: return=minimal', () async {
+      final data = await postgrest.from('users').insert({'username': 'bar'});
+      expect(data, null);
+    });
+
     test('select with head:true', () async {
       final res = await postgrest.from('users').select(
             '*',
