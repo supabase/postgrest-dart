@@ -58,11 +58,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
-  PostgrestBuilder insert(dynamic values) {
+  PostgrestFilterBuilder insert(dynamic values) {
     _method = METHOD_POST;
     _headers['Prefer'] = '';
     _body = values;
-    return this;
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs an UPSERT into the table.
@@ -72,7 +72,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
-  PostgrestBuilder upsert(
+  PostgrestFilterBuilder upsert(
     dynamic values, {
     String? onConflict,
     bool ignoreDuplicates = false,
@@ -91,7 +91,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }
     _body = values;
     _options = options.ensureNotHead();
-    return this;
+    return PostgrestFilterBuilder(this);
   }
 
   /// Performs an UPDATE on the table.

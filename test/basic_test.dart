@@ -89,7 +89,7 @@ void main() {
       final List res = await postgrest.from('users').upsert(
         {'username': 'dragarcia', 'status': 'OFFLINE'},
         onConflict: 'username',
-      );
+      ).select();
       expect(
         (res.first as Map<String, dynamic>)['status'],
         'OFFLINE',
@@ -110,7 +110,7 @@ void main() {
         {'username': 'dragarcia'},
         onConflict: 'username',
         ignoreDuplicates: true,
-      );
+      ).select();
       expect(res, isEmpty);
     });
 
@@ -118,14 +118,14 @@ void main() {
       final List res = await postgrest.from('messages').insert([
         {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
         {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
-      ]);
+      ]).select();
       expect(res.length, 2);
     });
 
     test('basic update', () async {
       final res = await postgrest.from('messages').update(
         {'channel_id': 2},
-      );
+      ).select();
       expect(res, null);
 
       final Iterable<Map<String, dynamic>> messages = (await postgrest
@@ -142,7 +142,8 @@ void main() {
       final res = await postgrest
           .from('messages')
           .delete(returning: ReturningOption.minimal)
-          .eq('message', 'Supabase Launch Week is on fire');
+          .eq('message', 'Supabase Launch Week is on fire')
+          .select();
       expect(res, null);
 
       final List resMsg = await postgrest
@@ -245,15 +246,19 @@ void main() {
         {'username': 'countexact', 'status': 'OFFLINE'},
         onConflict: 'username',
         options: FetchOptions(count: CountOption.exact),
-      );
+      ).select();
       expect(res.count, 1);
     });
 
     test('update with count: exact', () async {
-      final res = await postgrest.from('users').update(
-        {'status': 'ONLINE'},
-        options: FetchOptions(count: CountOption.exact),
-      ).eq('username', 'kiwicopple');
+      final res = await postgrest
+          .from('users')
+          .update(
+            {'status': 'ONLINE'},
+            options: FetchOptions(count: CountOption.exact),
+          )
+          .eq('username', 'kiwicopple')
+          .select();
       expect(res.count, 1);
     });
 
@@ -261,7 +266,8 @@ void main() {
       final res = await postgrest
           .from('users')
           .delete(options: FetchOptions(count: CountOption.exact))
-          .eq('username', 'kiwicopple');
+          .eq('username', 'kiwicopple')
+          .select();
 
       expect(res.count, 1);
     });
@@ -289,7 +295,7 @@ void main() {
     test('insert from uppercase table name', () async {
       final res = await postgrest.from('TestTable').insert([
         {'slug': 'new slug'}
-      ]);
+      ]).select();
       expect(
         (res.first as Map<String, dynamic>)['slug'],
         'new slug',
@@ -300,7 +306,8 @@ void main() {
       final res = await postgrest
           .from('TestTable')
           .delete(options: FetchOptions(count: CountOption.exact))
-          .eq('slug', 'new slug');
+          .eq('slug', 'new slug')
+          .select();
       expect(res.count, 1);
     });
 
