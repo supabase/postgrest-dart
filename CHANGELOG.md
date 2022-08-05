@@ -1,3 +1,7 @@
+## [1.0.0-dev.2]
+
+- BREAKING: rename `PostgrestError` to `PostgrestException`
+
 ## [1.0.0-dev.1]
 
 - BREAKING: `data` is returned directly and error is thrown instead of being returned within a response
