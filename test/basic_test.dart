@@ -220,9 +220,29 @@ void main() {
       );
     });
 
-    test('Prefer: return=minimal', () async {
-      final data = await postgrest.from('users').insert({'username': 'bar'});
+    test('returning: minimal', () async {
+      final data = await postgrest.from('users').insert(
+        {'username': 'bar'},
+        returning: ReturningOption.minimal,
+      );
       expect(data, null);
+    });
+
+    test('returning: representation', () async {
+      final data = await postgrest.from('users').insert(
+        {'username': 'bar'},
+        returning: ReturningOption.representation,
+      );
+      expect(data, [
+        {
+          'username': 'bar',
+          'data': null,
+          'age_range': null,
+          'status': 'ONLINE',
+          'catchphrase': null,
+          'interests': null
+        }
+      ]);
     });
 
     test('select with head:true', () async {
