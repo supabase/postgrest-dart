@@ -76,12 +76,6 @@ enum ReturningOption {
   representation,
 }
 
-extension ReturningOptionName on ReturningOption {
-  String name() {
-    return toString().split('.').last;
-  }
-}
-
 /// The type of tsquery conversion to use on [query].
 enum TextSearchType {
   /// Uses PostgreSQL's plainto_tsquery function.

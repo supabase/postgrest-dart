@@ -58,9 +58,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
-  PostgrestFilterBuilder insert(dynamic values) {
+  PostgrestFilterBuilder insert(
+    dynamic values, {
+    ReturningOption returning = ReturningOption.representation,
+  }) {
     _method = METHOD_POST;
-    _headers['Prefer'] = '';
+    _headers['Prefer'] = 'return=${returning.name}';
     _body = values;
     return PostgrestFilterBuilder(this);
   }
@@ -77,10 +80,12 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     String? onConflict,
     bool ignoreDuplicates = false,
     FetchOptions options = const FetchOptions(),
+    ReturningOption returning = ReturningOption.representation,
   }) {
     _method = METHOD_POST;
     _headers['Prefer'] =
-        'resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates';
+        'resolution=${ignoreDuplicates ? 'ignore' : 'merge'}-duplicates,'
+        'return=${returning.name}';
     if (onConflict != null) {
       _url = _url.replace(
         queryParameters: {
@@ -102,9 +107,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   PostgrestFilterBuilder update(
     Map values, {
     FetchOptions options = const FetchOptions(),
+    ReturningOption returning = ReturningOption.representation,
   }) {
     _method = METHOD_PATCH;
-    _headers['Prefer'] = '';
+    _headers['Prefer'] = 'return=${returning.name}';
     _body = values;
     _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
@@ -121,7 +127,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_DELETE;
-    _headers['Prefer'] = 'return=${returning.name()}';
+    _headers['Prefer'] = 'return=${returning.name}';
     _options = options.ensureNotHead();
     return PostgrestFilterBuilder(this);
   }
