@@ -217,12 +217,12 @@ class PostgrestBuilder<T> implements Future<T?> {
         count: count,
       );
     } else {
-      late PostgrestError error;
+      late PostgrestException error;
       if (response.request!.method != METHOD_HEAD) {
         try {
           final errorJson =
               await compute(json.decode, response.body) as Map<String, dynamic>;
-          error = PostgrestError.fromJson(
+          error = PostgrestException.fromJson(
             errorJson,
             message: response.body,
             code: response.statusCode,
@@ -233,14 +233,14 @@ class PostgrestBuilder<T> implements Future<T?> {
             return _handleMaybeEmptyError(response, error);
           }
         } catch (_) {
-          error = PostgrestError(
+          error = PostgrestException(
             message: response.body,
             code: '${response.statusCode}',
             details: response.reasonPhrase,
           );
         }
       } else {
-        error = PostgrestError(
+        error = PostgrestException(
           code: '${response.statusCode}',
           message: response.body,
           details: 'Error in Postgrest response for method HEAD',
@@ -257,7 +257,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// return PostgrestResponse with null data
   PostgrestResponse<T> _handleMaybeEmptyError(
     http.Response response,
-    PostgrestError error,
+    PostgrestException error,
   ) {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {

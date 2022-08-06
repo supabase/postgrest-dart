@@ -10,7 +10,7 @@ Dart client for [PostgREST](https://postgrest.org). The goal of this library is 
 The usage should be the same as postgrest-js except:
 
 - `data` is directly returned by awaiting the query when count option is not specified.
-- Errors will not be returned within the response, but will be thrown. 
+- Exceptions will not be returned within the response, but will be thrown. 
 - `is_` and `in_` filter methods are suffixed with `_` sign to avoid collisions with reserved keywords.
 
 You can find detail documentation from [here](https://supabase.com/docs/reference/dart/select).
@@ -37,7 +37,7 @@ try {
     .insert([
       {'username': 'supabot', 'status': 'ONLINE'}
     ]);
-} on PostgrestError catch (error, stacktrace) {
+} on PostgrestException catch (error, stacktrace) {
   // handle a PostgrestError
   print('$error \n $stacktrace');
 } catch (error, stacktrace) {

@@ -31,25 +31,25 @@ class ResetHelper {
     await _postgrest.from('users').delete().neq('username', 'dne');
     try {
       await _postgrest.from('users').insert(_users);
-    } on PostgrestError catch (error) {
-      throw 'users table was not properly reset. $error';
+    } on PostgrestException catch (exception) {
+      throw 'users table was not properly reset. $exception';
     }
 
     try {
       await _postgrest.from('channels').insert(_channels);
-    } on PostgrestError catch (error) {
-      throw 'channels table was not properly reset. $error';
+    } on PostgrestException catch (exception) {
+      throw 'channels table was not properly reset. $exception';
     }
     try {
       await _postgrest.from('messages').insert(_messages);
-    } on PostgrestError catch (error) {
-      throw 'messages table was not properly reset. $error';
+    } on PostgrestException catch (exception) {
+      throw 'messages table was not properly reset. $exception';
     }
 
     try {
       await _postgrest.from('reactions').insert(_reactions);
-    } on PostgrestError catch (error) {
-      throw 'reactions table was not properly reset. $error';
+    } on PostgrestException catch (exception) {
+      throw 'reactions table was not properly reset. $exception';
     }
   }
 }

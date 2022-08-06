@@ -1,27 +1,27 @@
 typedef Headers = Map<String, String>;
 typedef PostgrestConverter<S> = S Function(dynamic data);
 
-/// A Postgrest response error
-class PostgrestError {
+/// A Postgrest response exception
+class PostgrestException implements Exception {
   final String message;
   final String? code;
   final dynamic details;
   final String? hint;
 
-  const PostgrestError({
+  const PostgrestException({
     required this.message,
     this.code,
     this.details,
     this.hint,
   });
 
-  factory PostgrestError.fromJson(
+  factory PostgrestException.fromJson(
     Map<String, dynamic> json, {
     String? message,
     int? code,
     String? details,
   }) {
-    return PostgrestError(
+    return PostgrestException(
       message: (json['message'] ?? message) as String,
       code: (json['code'] ?? '$code') as String,
       details: (json['details'] ?? details) as dynamic,
@@ -31,7 +31,7 @@ class PostgrestError {
 
   @override
   String toString() {
-    return 'PostgrestError(message: $message, code: $code, details: $details, hint: $hint)';
+    return 'PostgrestException(message: $message, code: $code, details: $details, hint: $hint)';
   }
 }
 

@@ -199,11 +199,11 @@ void main() {
             fail('found missing table');
           },
           onError: (error) {
-            expect(error, isA<PostgrestError>());
+            expect(error, isA<PostgrestException>());
             expect(error.code, '404');
           },
         );
-      } on PostgrestError catch (error) {
+      } on PostgrestException catch (error) {
         expect(error.code, '404');
       }
     });
@@ -357,11 +357,11 @@ void main() {
             fail('Returned even with row level security');
           },
           onError: (error) {
-            expect(error, isA<PostgrestError>());
+            expect(error, isA<PostgrestException>());
             expect(error.code, '404');
           },
         );
-      } on PostgrestError catch (error) {
+      } on PostgrestException catch (error) {
         expect(error.code, '404');
       }
     });
@@ -391,11 +391,11 @@ void main() {
             fail('Table was able to be selected, even tho it does not exist');
           },
           onError: (error) {
-            expect(error, isA<PostgrestError>());
+            expect(error, isA<PostgrestException>());
             expect(error.code, '420');
           },
         );
-      } on PostgrestError catch (error) {
+      } on PostgrestException catch (error) {
         expect(error.code, '420');
       }
     });
@@ -408,11 +408,11 @@ void main() {
                 'Stored procedure was able to be called, even tho it does not exist');
           },
           onError: (error) {
-            expect(error, isA<PostgrestError>());
+            expect(error, isA<PostgrestException>());
             expect(error.code, '420');
           },
         );
-      } on PostgrestError catch (error) {
+      } on PostgrestException catch (error) {
         expect(error.code, '420');
       }
     });
