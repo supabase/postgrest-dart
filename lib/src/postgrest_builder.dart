@@ -255,16 +255,16 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// on maybeEmpty enable, check for error details contains
   /// 'Results contain 0 rows' then
   /// return PostgrestResponse with null data
-  PostgrestResponse<T> _handleMaybeEmptyError(
+  dynamic _handleMaybeEmptyError(
     http.Response response,
     PostgrestException error,
   ) {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
       return PostgrestResponse<T>(
-        data: '' as T,
+        data: null,
         status: 200,
-        count: 0,
+        count: null,
       );
     } else {
       throw error;

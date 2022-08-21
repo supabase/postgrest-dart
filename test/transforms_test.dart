@@ -218,13 +218,24 @@ void main() {
     expect((res)['status'], 'ONLINE');
   });
 
-  test('maybeSingle', () async {
-    final Map<String, dynamic> user = await postgrest
-        .from('users')
-        .select()
-        .eq('username', 'dragarcia')
-        .maybeSingle();
-    expect(user, isNotNull);
-    expect(user['username'], 'dragarcia');
+  group("maybe single", () {
+    test('maybeSingle with 1 row', () async {
+      final Map<String, dynamic> user = await postgrest
+          .from('users')
+          .select()
+          .eq('username', 'dragarcia')
+          .maybeSingle();
+      expect(user, isNotNull);
+      expect(user['username'], 'dragarcia');
+    });
+
+    test('maybeSingle with 0 rows', () async {
+      final Map<String, dynamic>? user = await postgrest
+          .from('users')
+          .select()
+          .eq('username', 'xxxxx')
+          .maybeSingle();
+      expect(user, isNull);
+    });
   });
 }
