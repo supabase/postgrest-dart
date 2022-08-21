@@ -229,6 +229,16 @@ void main() {
       expect(user['username'], 'dragarcia');
     });
 
+    test('maybeSingle with 0 row and force response', () async {
+      final user = await postgrest
+          .from('users')
+          .select("*", FetchOptions(forceResponse: true))
+          .eq('username', 'xxxxx')
+          .maybeSingle();
+      expect(user, isA<PostgrestResponse>());
+      expect(user.data, isNull);
+    });
+
     test('maybeSingle with 0 rows', () async {
       final Map<String, dynamic>? user = await postgrest
           .from('users')
