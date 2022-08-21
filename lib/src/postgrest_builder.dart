@@ -255,7 +255,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// on maybeEmpty enable, check for error details contains
   /// 'Results contain 0 rows' then
   /// return PostgrestResponse with null data
-  dynamic _handleMaybeEmptyError(
+  PostgrestResponse<T> _handleMaybeEmptyError(
     http.Response response,
     PostgrestException error,
   ) {
@@ -264,7 +264,9 @@ class PostgrestBuilder<T> implements Future<T?> {
       return PostgrestResponse<T>(
         data: null,
         status: 200,
-        count: null,
+        count: (_options?.count != null || (_options?.forceResponse ?? false))
+            ? 0
+            : null,
       );
     } else {
       throw error;
