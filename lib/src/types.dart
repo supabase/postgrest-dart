@@ -23,7 +23,7 @@ class PostgrestException implements Exception {
   }) {
     return PostgrestException(
       message: (json['message'] ?? message) as String,
-      code:  (json['code'] ?? '$code') as String?,
+      code: (json['code'] ?? '$code') as String?,
       details: (json['details'] ?? details) as dynamic,
       hint: json['hint'] as String?,
     );
