@@ -200,7 +200,7 @@ void main() {
           },
           onError: (error) {
             expect(error, isA<PostgrestException>());
-            expect(error.code, '42p01');
+            expect(error.code, '42P01');
           },
         );
       } on PostgrestException catch (error) {
