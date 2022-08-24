@@ -71,25 +71,49 @@ void main() {
     }
   });
 
-  test('eq', () async {
-    final res = await postgrest
-        .from('users')
-        .select('username')
-        .eq('username', 'supabot');
+  group("eq", () {
+    test('eq string', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .eq('username', 'supabot');
 
-    for (final item in res as List) {
-      expect((item as Map)['username'] == ('supabot'), true);
-    }
+      for (final item in res as List) {
+        expect((item as Map)['username'] == ('supabot'), true);
+      }
+    });
+
+    test('eq string', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .eq('interests', ["basketball", "baseball"]);
+
+      for (final item in res as List) {
+        expect((item as Map)['username'] == ('supabot'), true);
+      }
+    });
   });
 
-  test('neq', () async {
-    final res = await postgrest
-        .from('users')
-        .select('username')
-        .neq('username', 'supabot');
-    for (final item in res as List) {
-      expect((item as Map)['username'] == ('supabot'), false);
-    }
+  group("neq", () {
+    test('neq string', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .neq('username', 'supabot');
+      for (final item in res as List) {
+        expect((item as Map)['username'] == ('supabot'), false);
+      }
+    });
+
+    test('neq list', () async {
+      final List res = await postgrest
+          .from('users')
+          .select('username')
+          .neq('interests', ["football"]);
+      final onlyNames = res.map((row) => row["username"]).toList();
+      expect(onlyNames, ["supabot", "awailas"]);
+    });
   });
 
   test('gt', () async {
@@ -247,15 +271,28 @@ void main() {
     expect((res as List).length, 3);
   });
 
-  test('overlaps', () async {
-    final res = await postgrest
-        .from('users')
-        .select('username')
-        .overlaps('age_range', '[2,25)');
-    expect(
-      ((res as List)[0] as Map)['username'],
-      'dragarcia',
-    );
+  group("overlap", () {
+    test('overlaps range', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .overlaps('age_range', '[2,25)');
+      expect(
+        ((res as List)[0] as Map)['username'],
+        'dragarcia',
+      );
+    });
+
+    test('overlaps list', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .overlaps('interests', ["basketball", "baseball"]);
+      expect(
+        ((res as List)[0] as Map)['username'],
+        'supabot',
+      );
+    });
   });
 
   test('textSearch', () async {
