@@ -191,7 +191,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'cd.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'cd.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'cd.{${_cleanFilterArray(value)}}');
     } else {
       // json
       appendSearchParams(column, 'cd.${json.encode(value)}');
