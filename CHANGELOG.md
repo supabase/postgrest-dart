@@ -1,3 +1,7 @@
+## [1.0.0-dev.3]
+
+- fix: maybeSingle [#84](https://github.com/supabase-community/postgrest-dart/pull/84)
+
 ## [1.0.0-dev.2]
 
 - BREAKING: rename `PostgrestError` to `PostgrestException`

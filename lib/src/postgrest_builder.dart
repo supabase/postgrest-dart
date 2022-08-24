@@ -262,9 +262,11 @@ class PostgrestBuilder<T> implements Future<T?> {
     if (error.details is String &&
         error.details.toString().contains('Results contain 0 rows')) {
       return PostgrestResponse<T>(
-        data: '' as T,
+        data: null,
         status: 200,
-        count: 0,
+        count: (_options?.count != null || (_options?.forceResponse ?? false))
+            ? 0
+            : null,
       );
     } else {
       throw error;
