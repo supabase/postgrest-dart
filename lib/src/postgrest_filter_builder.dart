@@ -19,10 +19,17 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder not(String column, String operator, dynamic value) {
     if (value is List) {
-      appendSearchParams(
-        column,
-        'not.$operator.{${_cleanFilterArray(value)}}',
-      );
+      if (operator == "in") {
+        appendSearchParams(
+          column,
+          'not.$operator.(${_cleanFilterArray(value)})',
+        );
+      } else {
+        appendSearchParams(
+          column,
+          'not.$operator.{${_cleanFilterArray(value)}}',
+        );
+      }
     } else {
       appendSearchParams(column, 'not.$operator.$value');
     }
