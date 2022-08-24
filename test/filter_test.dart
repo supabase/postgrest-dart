@@ -160,16 +160,28 @@ void main() {
       );
     }
   });
+  group("contains", () {
+    test('contains range', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .contains('age_range', '[1,2)');
+      expect(
+        ((res as List)[0] as Map)['username'],
+        'supabot',
+      );
+    });
 
-  test('contains', () async {
-    final res = await postgrest
-        .from('users')
-        .select('username')
-        .contains('age_range', '[1,2)');
-    expect(
-      ((res as List)[0] as Map)['username'],
-      'supabot',
-    );
+    test('contains list', () async {
+      final res = await postgrest
+          .from('users')
+          .select('username')
+          .contains('interests', ["basketball", "baseball"]);
+      expect(
+        ((res as List)[0] as Map)['username'],
+        'supabot',
+      );
+    });
   });
 
   test('containedBy', () async {

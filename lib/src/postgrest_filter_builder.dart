@@ -5,7 +5,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
-    if (filter is List<int> || filter is List<double> || filter is List<num>) {
+    if (filter.every((element) => element is num)) {
       return filter.map((s) => '$s').join(',');
     } else {
       return filter.map((s) => '"$s"').join(',');
@@ -171,7 +171,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'cs.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'cs.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'cs.{${_cleanFilterArray(value)}}');
     } else {
       // json
       appendSearchParams(column, 'cs.${json.encode(value)}');
