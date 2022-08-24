@@ -176,7 +176,7 @@ void main() {
     final res = await postgrest
         .from('users')
         .select('username')
-        .containedBy('age_range', '[1,2)');
+        .containedBy('age_range', '[0,3)');
     expect(((res as List)[0] as Map)['username'], 'supabot');
   });
 
