@@ -83,7 +83,7 @@ void main() {
       }
     });
 
-    test('eq string', () async {
+    test('eq list', () async {
       final res = await postgrest
           .from('users')
           .select('username')
@@ -216,7 +216,7 @@ void main() {
       expect(((res as List)[0] as Map)['username'], 'supabot');
     });
 
-    test('containedBy range', () async {
+    test('containedBy list', () async {
       final res = await postgrest
           .from('users')
           .select('username')
