@@ -171,7 +171,7 @@ void main() {
     test('basic delete', () async {
       final res = await postgrest
           .from('messages')
-          .delete(returning: ReturningOption.minimal)
+          .delete()
           .eq('message', 'Supabase Launch Week is on fire')
           .select();
       expect(res, [
