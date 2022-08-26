@@ -300,7 +300,17 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder filter(String column, String operator, dynamic value) {
     if (value is List) {
-      appendSearchParams(column, '$operator.{${_cleanFilterArray(value)}}');
+      if (operator == "in") {
+        appendSearchParams(
+          column,
+          '$operator.(${_cleanFilterArray(value)})',
+        );
+      } else {
+        appendSearchParams(
+          column,
+          '$operator.{${_cleanFilterArray(value)}}',
+        );
+      }
     } else {
       appendSearchParams(column, '$operator.$value');
     }

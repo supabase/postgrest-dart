@@ -345,26 +345,29 @@ void main() {
     expect(((res as List)[0] as Map)['username'], 'supabot');
   });
 
-  test('filter', () async {
-    final res = await postgrest
-        .from('users')
-        .select()
-        .filter('username', 'eq', 'supabot');
-    expect(((res as List)[0] as Map)['username'], 'supabot');
-  });
+  group("filter", () {
+    test('filter', () async {
+      final res = await postgrest
+          .from('users')
+          .select()
+          .filter('username', 'eq', 'supabot');
+      expect(((res as List)[0] as Map)['username'], 'supabot');
+    });
 
-  test('filter cs with List of values', () async {
-    final res = await postgrest
-        .from('users')
-        .select()
-        .filter('interests', 'cs', ['basketball']);
-    expect((res as List).length, 2);
-    for (final item in res) {
-      expect(
-        ((item as Map)['interests'] as List).contains('basketball'),
-        true,
-      );
-    }
+    test('filter in with List of values', () async {
+      final res = await postgrest
+          .from('users')
+          .select()
+          .filter('username', 'in', ['supabot', 'kiwicopple']);
+      expect((res as List).length, 2);
+      for (final item in res) {
+        expect(
+          (item as Map)['username'] == 'supabot' ||
+              item['username'] == 'kiwicopple',
+          true,
+        );
+      }
+    });
   });
 
   test('match', () async {
