@@ -1,6 +1,7 @@
 ## [1.0.0-dev.3]
 
 - fix: maybeSingle [#84](https://github.com/supabase-community/postgrest-dart/pull/84)
+- fix: `List` as value in any filter [#85](https://github.com/supabase-community/postgrest-dart/pull/85)
 
 ## [1.0.0-dev.2]
 

@@ -5,7 +5,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
 
   /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
-    if (filter is List<int> || filter is List<double> || filter is List<num>) {
+    if (filter.every((element) => element is num)) {
       return filter.map((s) => '$s').join(',');
     } else {
       return filter.map((s) => '"$s"').join(',');
@@ -19,16 +19,15 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder not(String column, String operator, dynamic value) {
     if (value is List) {
-      if (operator == 'cs') {
-        // `cs` filter requires postgrest array type `{}`
+      if (operator == "in") {
         appendSearchParams(
           column,
-          'not.$operator.{${_cleanFilterArray(value)}}',
+          'not.$operator.(${_cleanFilterArray(value)})',
         );
       } else {
         appendSearchParams(
           column,
-          'not.$operator.(${_cleanFilterArray(value)})',
+          'not.$operator.{${_cleanFilterArray(value)}}',
         );
       }
     } else {
@@ -55,7 +54,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder eq(String column, dynamic value) {
     if (value is List) {
-      appendSearchParams(column, 'eq.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'eq.{${_cleanFilterArray(value)}}');
     } else {
       appendSearchParams(column, 'eq.$value');
     }
@@ -69,7 +68,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder neq(String column, dynamic value) {
     if (value is List) {
-      appendSearchParams(column, 'neq.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'neq.{${_cleanFilterArray(value)}}');
     } else {
       appendSearchParams(column, 'neq.$value');
     }
@@ -171,7 +170,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'cs.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'cs.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'cs.{${_cleanFilterArray(value)}}');
     } else {
       // json
       appendSearchParams(column, 'cs.${json.encode(value)}');
@@ -191,7 +190,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'cd.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'cd.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'cd.{${_cleanFilterArray(value)}}');
     } else {
       // json
       appendSearchParams(column, 'cd.${json.encode(value)}');
@@ -261,7 +260,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
       appendSearchParams(column, 'ov.$value');
     } else if (value is List) {
       // array
-      appendSearchParams(column, 'ov.(${_cleanFilterArray(value)})');
+      appendSearchParams(column, 'ov.{${_cleanFilterArray(value)}}');
     }
     return this;
   }
@@ -301,11 +300,16 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```
   PostgrestFilterBuilder filter(String column, String operator, dynamic value) {
     if (value is List) {
-      if (operator == 'cs') {
-        // `cs` filter requires postgrest array type `{}`
-        appendSearchParams(column, '$operator.{${_cleanFilterArray(value)}}');
+      if (operator == "in") {
+        appendSearchParams(
+          column,
+          '$operator.(${_cleanFilterArray(value)})',
+        );
       } else {
-        appendSearchParams(column, '$operator.(${_cleanFilterArray(value)})');
+        appendSearchParams(
+          column,
+          '$operator.{${_cleanFilterArray(value)}}',
+        );
       }
     } else {
       appendSearchParams(column, '$operator.$value');

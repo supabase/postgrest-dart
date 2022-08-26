@@ -93,6 +93,7 @@ void main() {
         .single();
 
     final messages = data['messages'] as List;
+    expect(messages, isNotEmpty);
 
     for (final message in messages) {
       final reactions = (message as Map)["reactions"] as List;
@@ -106,8 +107,8 @@ void main() {
   });
 
   test('limit', () async {
-    final res = await postgrest.from('users').select().limit(1);
-    expect((res as List).length, 1);
+    final List res = await postgrest.from('users').select().limit(1);
+    expect((res).length, 1);
   });
 
   test("limit on foreign table", () async {
@@ -130,6 +131,7 @@ void main() {
         .single();
 
     final messages = data['messages'] as List;
+    expect(messages, isNotEmpty);
 
     for (final message in messages) {
       final reactions = (message as Map)["reactions"] as List;

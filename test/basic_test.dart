@@ -127,9 +127,13 @@ void main() {
     });
 
     test('basic update', () async {
-      final res = await postgrest.from('messages').update(
-        {'channel_id': 2},
-      ).select();
+      final res = await postgrest
+          .from('messages')
+          .update(
+            {'channel_id': 2},
+          )
+          .is_("data", null)
+          .select();
       expect(res, [
         {
           'id': 1,
@@ -171,7 +175,7 @@ void main() {
     test('basic delete', () async {
       final res = await postgrest
           .from('messages')
-          .delete(returning: ReturningOption.minimal)
+          .delete()
           .eq('message', 'Supabase Launch Week is on fire')
           .select();
       expect(res, [
