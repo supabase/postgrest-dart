@@ -54,12 +54,19 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an INSERT into the table.
   ///
-  /// By default the new record is returned. Set [returning] to minimal if you don't need this value.
+  /// By default no records are returned. Set [returning] to `representation` if you don't need this value.
+  ///
+  /// Returns nothing (default):
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
+  /// Returns new entry:
+  /// ```dart
+  /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1}, returning: ReturningOption.representation)
+  /// ```
+
   PostgrestFilterBuilder insert(dynamic values,
-      {ReturningOption returning = ReturningOption.representation}) {
+      {ReturningOption returning = ReturningOption.minimal}) {
     _method = METHOD_POST;
     _headers['Prefer'] = 'return=${returning.name()}';
     _body = values;
