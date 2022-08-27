@@ -54,7 +54,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
   /// Performs an INSERT into the table.
   ///
-  /// By default no records are returned. Set [returning] to `representation` if you don't need this value.
+  /// By default no records are returned. Set [returning] to `representation` if you do need this value.
   ///
   /// Returns nothing (default):
   /// ```dart
