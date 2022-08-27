@@ -58,9 +58,10 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
   /// ```
-  PostgrestFilterBuilder insert(dynamic values) {
+  PostgrestFilterBuilder insert(dynamic values,
+      {ReturningOption returning = ReturningOption.representation}) {
     _method = METHOD_POST;
-    _headers['Prefer'] = '';
+    _headers['Prefer'] = 'return=${returning.name()}';
     _body = values;
     return PostgrestFilterBuilder(this);
   }
