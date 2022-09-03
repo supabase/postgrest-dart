@@ -1,3 +1,7 @@
+## [1.0.0-dev.4]
+
+- fix: update insert documentation to reflect new `returning` behavior [#88](https://github.com/supabase-community/postgrest-dart/pull/88)
+
 ## [1.0.0-dev.3]
 
 - fix: maybeSingle [#84](https://github.com/supabase-community/postgrest-dart/pull/84)
