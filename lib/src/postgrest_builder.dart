@@ -145,7 +145,7 @@ class PostgrestBuilder<T> implements Future<T?> {
       if (_method != METHOD_GET && _method != METHOD_HEAD) {
         _headers['Content-Type'] = 'application/json';
       }
-      final bodyStr = await _isolate.encode(_body);
+      final bodyStr = jsonEncode(_body);
       if (uppercaseMethod == METHOD_GET) {
         response = await (_httpClient?.get ?? http.get)(
           _url,
@@ -198,7 +198,11 @@ class PostgrestBuilder<T> implements Future<T?> {
           body = response.body;
         } else {
           try {
-            body = await _isolate.decode(response.body);
+            if ((response.contentLength ?? 0) > 10000) {
+              body = await _isolate.decode(response.body);
+            } else {
+              body = jsonDecode(response.body);
+            }
           } on FormatException catch (_) {
             body = null;
           }
@@ -225,8 +229,7 @@ class PostgrestBuilder<T> implements Future<T?> {
       late PostgrestException error;
       if (response.request!.method != METHOD_HEAD) {
         try {
-          final errorJson =
-              await _isolate.decode(response.body) as Map<String, dynamic>;
+          final errorJson = jsonDecode(response.body) as Map<String, dynamic>;
           error = PostgrestException.fromJson(
             errorJson,
             message: response.body,
