@@ -7,12 +7,14 @@ class PostgrestRpcBuilder extends PostgrestBuilder {
     String? schema,
     Client? httpClient,
     FetchOptions? options,
+    required PostgrestIsolate isolate,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},
           schema: schema,
           httpClient: httpClient,
           options: options,
+          isolate: isolate,
         );
 
   /// Performs stored procedures on the database.

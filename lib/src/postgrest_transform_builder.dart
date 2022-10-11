@@ -10,6 +10,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
           body: builder._body,
           httpClient: builder._httpClient,
           options: builder._options,
+          isolate: builder._isolate,
         );
 
   /// Performs horizontal filtering with SELECT.

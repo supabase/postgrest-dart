@@ -7,6 +7,7 @@ import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:postgrest/postgrest.dart';
+import 'package:postgrest/src/_isolates_io.dart';
 import 'package:postgrest/src/types.dart';
 
 import 'isolates.dart';
@@ -33,6 +34,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   late Uri _url;
   PostgrestConverter? _converter;
   late final Client? _httpClient;
+  late final PostgrestIsolate _isolate;
   // ignore: prefer_final_fields
   FetchOptions? _options;
 
@@ -43,6 +45,7 @@ class PostgrestBuilder<T> implements Future<T?> {
     String? method,
     dynamic body,
     Client? httpClient,
+    required PostgrestIsolate isolate,
     FetchOptions? options,
   }) {
     _url = url;
@@ -51,6 +54,7 @@ class PostgrestBuilder<T> implements Future<T?> {
     _method = method;
     _body = body;
     _httpClient = httpClient;
+    _isolate = isolate;
     _options = options;
   }
 
@@ -70,6 +74,9 @@ class PostgrestBuilder<T> implements Future<T?> {
       schema: _schema,
       method: _method,
       body: _body,
+      isolate: _isolate,
+      httpClient: _httpClient,
+      options: _options,
     )
       .._maybeEmpty = _maybeEmpty
       .._converter = converter;
@@ -138,9 +145,7 @@ class PostgrestBuilder<T> implements Future<T?> {
       if (_method != METHOD_GET && _method != METHOD_HEAD) {
         _headers['Content-Type'] = 'application/json';
       }
-
-      final bodyStr = await compute(json.encode, _body);
-
+      final bodyStr = await _isolate.encode(_body);
       if (uppercaseMethod == METHOD_GET) {
         response = await (_httpClient?.get ?? http.get)(
           _url,
@@ -193,7 +198,7 @@ class PostgrestBuilder<T> implements Future<T?> {
           body = response.body;
         } else {
           try {
-            body = await compute(json.decode, response.body);
+            body = await _isolate.decode(response.body);
           } on FormatException catch (_) {
             body = null;
           }
@@ -221,7 +226,7 @@ class PostgrestBuilder<T> implements Future<T?> {
       if (response.request!.method != METHOD_HEAD) {
         try {
           final errorJson =
-              await compute(json.decode, response.body) as Map<String, dynamic>;
+              await _isolate.decode(response.body) as Map<String, dynamic>;
           error = PostgrestException.fromJson(
             errorJson,
             message: response.body,
