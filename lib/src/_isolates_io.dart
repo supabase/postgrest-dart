@@ -24,6 +24,7 @@ class PostgrestIsolate {
   }
 
   Future<void> dispose() async {
+    await _createdIsolate.future;
     _sendPort.send(null);
     _receivePort.close();
     await _events.cancel();
