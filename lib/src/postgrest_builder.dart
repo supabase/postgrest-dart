@@ -26,7 +26,7 @@ const METHOD_DELETE = 'DELETE';
 /// The base builder class.
 class PostgrestBuilder<T> implements Future<T?> {
   dynamic _body;
-  late final Headers _headers;
+  late final Map<String, String> _headers;
   bool _maybeEmpty = false;
   String? _method;
   late final String? _schema;
@@ -38,7 +38,7 @@ class PostgrestBuilder<T> implements Future<T?> {
 
   PostgrestBuilder({
     required Uri url,
-    required Headers headers,
+    required Map<String, String> headers,
     String? schema,
     String? method,
     dynamic body,
