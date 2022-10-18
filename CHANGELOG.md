@@ -1,3 +1,8 @@
+## [1.0.0]
+
+- chore: v1.0.0 release 🚀
+- BREAKING: set minimum Dart SDK version to 2.15.0 [#92](https://github.com/supabase-community/postgrest-dart/pull/92)
+
 ## [1.0.0-dev.4]
 
 - fix: update insert documentation to reflect new `returning` behavior [#88](https://github.com/supabase-community/postgrest-dart/pull/88)
