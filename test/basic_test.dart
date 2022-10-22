@@ -165,7 +165,7 @@ void main() {
       final Iterable<Map<String, dynamic>> messages = (await postgrest
               .from('messages')
               .select()
-              .withConverter<List>((data) => data as List))!
+              .withConverter<List>((data) => data as List))
           .cast<Map<String, dynamic>>();
       for (final rec in messages) {
         expect(rec['channel_id'], 2);
