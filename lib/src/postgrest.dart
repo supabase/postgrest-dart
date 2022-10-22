@@ -32,9 +32,9 @@ class PostgrestClient {
   }
 
   /// Perform a table operation.
-  PostgrestQueryBuilder from(String table) {
+  PostgrestQueryBuilder<T> from<T>(String table) {
     final url = '${this.url}/$table';
-    return PostgrestQueryBuilder(
+    return PostgrestQueryBuilder<T>(
       url,
       headers: headers,
       schema: schema,

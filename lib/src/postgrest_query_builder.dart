@@ -8,7 +8,7 @@ part of 'postgrest_builder.dart';
 /// * update() - "patch"
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
-class PostgrestQueryBuilder extends PostgrestBuilder {
+class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   PostgrestQueryBuilder(
     String url, {
     Map<String, String>? headers,
@@ -28,7 +28,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestFilterBuilder select([
+  PostgrestFilterBuilder<T> select([
     String columns = '*',
     FetchOptions options = const FetchOptions(),
   ]) {
@@ -49,7 +49,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
 
     appendSearchParams('select', cleanedColumns);
     _options = options;
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs an INSERT into the table.
@@ -65,11 +65,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1}).select()
   /// ```
-  PostgrestFilterBuilder insert(dynamic values) {
+  PostgrestFilterBuilder<T> insert(dynamic values) {
     _method = METHOD_POST;
     _headers['Prefer'] = '';
     _body = values;
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs an UPSERT into the table.
@@ -79,7 +79,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
-  PostgrestFilterBuilder upsert(
+  PostgrestFilterBuilder<T> upsert(
     dynamic values, {
     String? onConflict,
     bool ignoreDuplicates = false,
@@ -98,7 +98,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }
     _body = values;
     _options = options.ensureNotHead();
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs an UPDATE on the table.
@@ -106,7 +106,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder update(
+  PostgrestFilterBuilder<T> update(
     Map values, {
     FetchOptions options = const FetchOptions(),
   }) {
@@ -114,7 +114,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     _headers['Prefer'] = '';
     _body = values;
     _options = options.ensureNotHead();
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs a DELETE on the table.
@@ -123,13 +123,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder delete({
+  PostgrestFilterBuilder<T> delete({
     ReturningOption returning = ReturningOption.representation,
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_DELETE;
     _headers['Prefer'] = 'return=${returning.name()}';
     _options = options.ensureNotHead();
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 }

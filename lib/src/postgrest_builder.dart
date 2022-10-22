@@ -24,14 +24,14 @@ const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
 /// The base builder class.
-class PostgrestBuilder<T> implements Future<T?> {
+class PostgrestBuilder<T, S> implements Future<T> {
   dynamic _body;
   late final Headers _headers;
   bool _maybeEmpty = false;
   String? _method;
   late final String? _schema;
   late Uri _url;
-  PostgrestConverter? _converter;
+  PostgrestConverter<T, S>? _converter;
   late final Client? _httpClient;
   // ignore: prefer_final_fields
   FetchOptions? _options;
@@ -62,9 +62,8 @@ class PostgrestBuilder<T> implements Future<T?> {
   ///     .select()
   ///     .withConverter<User>((data) => User.fromJson(data));
   /// ```
-  PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
-    _converter = converter;
-    return PostgrestBuilder<S>(
+  PostgrestBuilder<R, T> withConverter<R>(PostgrestConverter<R, T> converter) {
+    return PostgrestBuilder<R, T>(
       url: _url,
       headers: _headers,
       schema: _schema,
@@ -289,8 +288,8 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   @override
-  Stream<T?> asStream() {
-    final controller = StreamController<T?>.broadcast();
+  Stream<T> asStream() {
+    final controller = StreamController<T>.broadcast();
 
     then((value) {
       controller.add(value);
@@ -311,7 +310,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// Register callbacks to be called when this future completes.
   @override
   Future<R> then<R>(
-    FutureOr<R> Function(T? value) onValue, {
+    FutureOr<R> Function(T value) onValue, {
     Function? onError,
   }) async {
     if (onError != null &&
@@ -378,7 +377,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   @override
-  Future<T?> whenComplete(FutureOr<void> Function() action) {
+  Future<T> whenComplete(FutureOr<void> Function() action) {
     return then(
       (v) {
         final f2 = action();

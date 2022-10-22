@@ -1,7 +1,7 @@
 part of 'postgrest_builder.dart';
 
-class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
-  PostgrestTransformBuilder(PostgrestBuilder<T> builder)
+class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
+  PostgrestTransformBuilder(PostgrestBuilder<T, T> builder)
       : super(
           url: builder._url,
           method: builder._method,
@@ -17,7 +17,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestTransformBuilder select([String columns = '*']) {
+  PostgrestTransformBuilder<T> select([String columns = '*']) {
     // Remove whitespaces except when quoted
     var quoted = false;
     final re = RegExp(r'\s');
@@ -48,7 +48,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// postgrest.from('users').select().order('username', ascending: false)
   /// postgrest.from('users').select('messages(*)').order('channel_id', foreignTable: 'messages', ascending: false)
   /// ```
-  PostgrestTransformBuilder order(
+  PostgrestTransformBuilder<T> order(
     String column, {
     bool ascending = false,
     bool nullsFirst = false,
@@ -70,7 +70,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// postgrest.from('users').select().limit(1)
   /// postgrest.from('users').select('messages(*)').limit(1, foreignTable: 'messages')
   /// ```
-  PostgrestTransformBuilder limit(int count, {String? foreignTable}) {
+  PostgrestTransformBuilder<T> limit(int count, {String? foreignTable}) {
     final key = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
     appendSearchParams(key, '$count');
@@ -83,7 +83,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// ```dart
   /// postgrest.from('users').select('messages(*)').range(1, 1, foreignTable: 'messages')
   /// ```
-  PostgrestTransformBuilder range(int from, int to, {String? foreignTable}) {
+  PostgrestTransformBuilder<T> range(int from, int to, {String? foreignTable}) {
     final keyOffset = foreignTable == null ? 'offset' : '$foreignTable.offset';
     final keyLimit = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
@@ -98,7 +98,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// ```dart
   /// postgrest.from('users').select().limit(1).single()
   /// ```
-  PostgrestTransformBuilder single() {
+  PostgrestTransformBuilder<T> single() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
   }
@@ -107,7 +107,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   ///
   /// Result must be at most one row or nullable
   /// (e.g. using `eq` on a UNIQUE column), otherwise this will result in an error.
-  PostgrestTransformBuilder maybeSingle() {
+  PostgrestTransformBuilder<T> maybeSingle() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     _maybeEmpty = true;
     return this;
@@ -119,7 +119,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// ```dart
   /// postgrest.from('users').select().csv()
   /// ```
-  PostgrestTransformBuilder csv() {
+  PostgrestTransformBuilder<T> csv() {
     _headers['Accept'] = 'text/csv';
     return this;
   }
