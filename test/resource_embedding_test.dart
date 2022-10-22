@@ -22,129 +22,131 @@ void main() {
   });
 
   test('embedded select', () async {
-    final res = await postgrest.from('users').select('messages(*)');
+    final res = await postgrest
+        .from<PostgrestList<List>>('users')
+        .select('messages(*)');
     expect(
-      (((res as List)[0] as Map)['messages'] as List).length,
+      res[0]['messages']!.length,
       3,
     );
     expect(
-      (((res)[1] as Map)['messages'] as List).length,
+      res[1]['messages']!.length,
       0,
     );
   });
 
   test('embedded eq', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList<List>>('users')
         .select('messages(*)')
         .eq('messages.channel_id', 1);
     expect(
-      (((res as List)[0] as Map)['messages'] as List).length,
+      res[0]['messages']!.length,
       2,
     );
     expect(
-      (((res)[1] as Map)['messages'] as List).length,
+      res[1]['messages']!.length,
       0,
     );
     expect(
-      (((res)[2] as Map)['messages'] as List).length,
+      res[2]['messages']!.length,
       0,
     );
     expect(
-      (((res)[3] as Map)['messages'] as List).length,
+      res[3]['messages']!.length,
       0,
     );
   });
 
   test('embedded order', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList<List<Map>>>('users')
         .select('messages(*)')
         .order('channel_id', foreignTable: 'messages');
     expect(
-      (((res as List)[0] as Map)['messages'] as List).length,
+      res[0]['messages']!.length,
       3,
     );
     expect(
-      (((res)[1] as Map)['messages'] as List).length,
+      res[1]['messages']!.length,
       0,
     );
     expect(
-      ((((res)[0] as Map)['messages'] as List)[0] as Map)['id'],
+      res[0]['messages']![0]['id'],
       2,
     );
   });
 
   test('embedded order on multiple columns', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList>('users')
         .select('username, messages(*)')
         .order('username', ascending: true)
         .order('channel_id', foreignTable: 'messages');
     expect(
-      ((res as List)[0] as Map)['username'],
+      res[0]['username'],
       'awailas',
     );
     expect(
-      ((res)[3] as Map)['username'],
+      res[3]['username'],
       'supabot',
     );
     expect(
-      (((res)[0] as Map)['messages'] as List).length,
+      (res[0]['messages'] as List).length,
       0,
     );
     expect(
-      (((res)[3] as Map)['messages'] as List).length,
+      (res[3]['messages'] as List).length,
       3,
     );
     expect(
-      ((((res)[3] as Map)['messages'] as List)[0] as Map)['id'],
+      (res[3]['messages'] as List<Map>)[0]['id'],
       2,
     );
   });
 
   test('embedded limit', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList<List>>('users')
         .select('messages(*)')
         .limit(1, foreignTable: 'messages');
     expect(
-      (((res as List)[0] as Map)['messages'] as List).length,
+      res[0]['messages']!.length,
       1,
     );
     expect(
-      (((res)[1] as Map)['messages'] as List).length,
+      res[1]['messages']!.length,
       0,
     );
     expect(
-      (((res)[2] as Map)['messages'] as List).length,
+      res[2]['messages']!.length,
       0,
     );
     expect(
-      (((res)[3] as Map)['messages'] as List).length,
+      res[3]['messages']!.length,
       0,
     );
   });
 
   test('embedded range', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList>('users')
         .select('messages(*)')
         .range(1, 1, foreignTable: 'messages');
     expect(
-      (((res as List)[0] as Map)['messages'] as List).length,
+      res[0]['messages']!.length,
       1,
     );
     expect(
-      (((res)[1] as Map)['messages'] as List).length,
+      res[1]['messages']!.length,
       0,
     );
     expect(
-      (((res)[2] as Map)['messages'] as List).length,
+      res[2]['messages']!.length,
       0,
     );
     expect(
-      (((res)[3] as Map)['messages'] as List).length,
+      res[3]['messages']!.length,
       0,
     );
   });
