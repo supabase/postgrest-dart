@@ -22,9 +22,8 @@ void main() {
   });
 
   test('embedded select', () async {
-    final res = await postgrest
-        .from<PostgrestList<List>>('users')
-        .select('messages(*)');
+    final res =
+        await postgrest.from<PostgrestList>('users').select('messages(*)');
     expect(
       res[0]['messages']!.length,
       3,
@@ -37,7 +36,7 @@ void main() {
 
   test('embedded eq', () async {
     final res = await postgrest
-        .from<PostgrestList<List>>('users')
+        .from<PostgrestList>('users')
         .select('messages(*)')
         .eq('messages.channel_id', 1);
     expect(
@@ -60,7 +59,7 @@ void main() {
 
   test('embedded order', () async {
     final res = await postgrest
-        .from<PostgrestList<List<Map>>>('users')
+        .from<PostgrestList>('users')
         .select('messages(*)')
         .order('channel_id', foreignTable: 'messages');
     expect(
@@ -100,14 +99,14 @@ void main() {
       3,
     );
     expect(
-      (res[3]['messages'] as List<Map>)[0]['id'],
+      (res[3]['messages'] as List)[0]['id'],
       2,
     );
   });
 
   test('embedded limit', () async {
     final res = await postgrest
-        .from<PostgrestList<List>>('users')
+        .from<PostgrestList>('users')
         .select('messages(*)')
         .limit(1, foreignTable: 'messages');
     expect(

@@ -23,22 +23,23 @@ void main() {
   });
 
   test('order', () async {
-    final res = await postgrest.from('users').select().order('username');
+    final res =
+        await postgrest.from<PostgrestList>('users').select().order('username');
     expect(
-      ((res as List)[1] as Map)['username'],
+      res[1]['username'],
       'kiwicopple',
     );
-    expect(((res)[3] as Map)['username'], 'awailas');
+    expect(res[3]['username'], 'awailas');
   });
 
   test('order on multiple columns', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList>('users')
         .select()
         .order('status', ascending: true)
         .order('username');
     expect(
-      (res as List).map((row) => (row as Map)['status']),
+      res.map((row) => row['status']),
       [
         'ONLINE',
         'ONLINE',
@@ -47,7 +48,7 @@ void main() {
       ],
     );
     expect(
-      (res).map((row) => (row as Map)['username']),
+      res.map((row) => row['username']),
       [
         'supabot',
         'dragarcia',
@@ -59,13 +60,13 @@ void main() {
 
   test('order with filters on the same column', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestList>('users')
         .select()
         .gt('username', 'b')
         .lt('username', 'r')
         .order('username');
     expect(
-      (res as List).map((row) => (row as Map)['username']),
+      res.map((row) => row['username']),
       [
         'kiwicopple',
         'dragarcia',
@@ -74,8 +75,8 @@ void main() {
   });
 
   test("order on foreign table", () async {
-    final Map data = await postgrest
-        .from("users")
+    final data = await postgrest
+        .from<PostgrestMap>("users")
         .select(
           '''
           username,
@@ -107,13 +108,13 @@ void main() {
   });
 
   test('limit', () async {
-    final List res = await postgrest.from('users').select().limit(1);
-    expect((res).length, 1);
+    final res = await postgrest.from<PostgrestList>('users').select().limit(1);
+    expect(res.length, 1);
   });
 
   test("limit on foreign table", () async {
-    final Map data = await postgrest
-        .from("users")
+    final data = await postgrest
+        .from<PostgrestMap>("users")
         .select(
           '''
             username,
@@ -144,24 +145,26 @@ void main() {
   test('range', () async {
     const from = 1;
     const to = 3;
-    final res = await postgrest.from('users').select().range(from, to);
+    final res =
+        await postgrest.from<PostgrestList>('users').select().range(from, to);
     //from -1 so that the index is included
-    expect((res as List).length, to - (from - 1));
+    expect(res.length, to - (from - 1));
   });
 
   test('range 1-1', () async {
     const from = 1;
     const to = 1;
-    final res = await postgrest.from('users').select().range(from, to);
+    final res =
+        await postgrest.from<PostgrestList>('users').select().range(from, to);
     //from -1 so that the index is included
-    expect((res as List).length, to - (from - 1));
+    expect(res.length, to - (from - 1));
   });
 
   test("range on foreign table", () async {
     const from = 0;
     const to = 2;
-    final Map data = await postgrest
-        .from("users")
+    final data = await postgrest
+        .from<PostgrestMap>("users")
         .select(
           '''
             username,
@@ -186,8 +189,8 @@ void main() {
   test("range 1-1 on foreign table", () async {
     const from = 1;
     const to = 1;
-    final Map data = await postgrest
-        .from("users")
+    final data = await postgrest
+        .from<PostgrestMap>("users")
         .select(
           '''
             username,
@@ -212,28 +215,28 @@ void main() {
 
   test('single', () async {
     final res = await postgrest
-        .from('users')
+        .from<PostgrestMap>('users')
         .select()
         .eq('username', 'supabot')
         .single();
-    expect((res as Map)['username'], 'supabot');
-    expect((res)['status'], 'ONLINE');
+    expect(res['username'], 'supabot');
+    expect(res['status'], 'ONLINE');
   });
 
   group("maybe single", () {
     test('maybeSingle with 1 row', () async {
-      final Map<String, dynamic> user = await postgrest
-          .from('users')
+      final user = await postgrest
+          .from<PostgrestMap?>('users')
           .select()
           .eq('username', 'dragarcia')
           .maybeSingle();
       expect(user, isNotNull);
-      expect(user['username'], 'dragarcia');
+      expect(user?['username'], 'dragarcia');
     });
 
     test('maybeSingle with 0 row and force response', () async {
       final user = await postgrest
-          .from('users')
+          .from<PostgrestResponse>('users')
           .select("*", FetchOptions(forceResponse: true))
           .eq('username', 'xxxxx')
           .maybeSingle();
@@ -242,8 +245,8 @@ void main() {
     });
 
     test('maybeSingle with 0 rows', () async {
-      final Map<String, dynamic>? user = await postgrest
-          .from('users')
+      final user = await postgrest
+          .from<PostgrestMapResponse?>('users')
           .select()
           .eq('username', 'xxxxx')
           .maybeSingle();

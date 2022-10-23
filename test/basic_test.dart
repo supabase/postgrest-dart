@@ -28,7 +28,7 @@ void main() {
     });
 
     test('basic select table', () async {
-      final res = await postgrest.from<List>('users').select();
+      final res = await postgrest.from<PostgrestList>('users').select();
       expect(res.length, 4);
     });
 
@@ -97,7 +97,7 @@ void main() {
     });
 
     test('upsert', () async {
-      final res = await postgrest.from<List<Map>>('messages').upsert({
+      final res = await postgrest.from<PostgrestList>('messages').upsert({
         'id': 3,
         'message': 'foo',
         'username': 'supabot',
@@ -105,12 +105,12 @@ void main() {
       }).select();
       expect((res.first)['id'], 3);
 
-      final resMsg = await postgrest.from<List>('messages').select();
+      final resMsg = await postgrest.from<PostgrestList>('messages').select();
       expect(resMsg.length, 3);
     });
 
     test('ignoreDuplicates upsert', () async {
-      final res = await postgrest.from<List>('users').upsert(
+      final res = await postgrest.from<PostgrestList>('users').upsert(
         {'username': 'dragarcia'},
         onConflict: 'username',
         ignoreDuplicates: true,
@@ -119,7 +119,7 @@ void main() {
     });
 
     test('bulk insert', () async {
-      final res = await postgrest.from<List>('messages').insert([
+      final res = await postgrest.from<PostgrestList>('messages').insert([
         {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
         {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
       ]).select();
@@ -128,7 +128,7 @@ void main() {
 
     test('basic update', () async {
       final res = await postgrest
-          .from<List<Map>>('messages')
+          .from<PostgrestList>('messages')
           .update(
             {'channel_id': 2},
           )
@@ -162,11 +162,8 @@ void main() {
         }
       ]);
 
-      final Iterable<Map<String, dynamic>> messages = (await postgrest
-              .from<List>('messages')
-              .select()
-              .withConverter<List>((data) => data))
-          .cast<Map<String, dynamic>>();
+      final Iterable<Map<String, dynamic>> messages =
+          await postgrest.from<PostgrestList>('messages').select();
       for (final rec in messages) {
         expect(rec['channel_id'], 2);
       }
@@ -198,7 +195,10 @@ void main() {
 
     test('missing table', () async {
       try {
-        await postgrest.from<PostgrestList>('missing_table').select().then(
+        await postgrest
+            .from<PostgrestList>('missing_table')
+            .select()
+            .then<dynamic>(
           (value) {
             fail('found missing table');
           },
@@ -214,7 +214,7 @@ void main() {
 
     test('connection error', () async {
       final postgrest = PostgrestClient('http://this.url.does.not.exist');
-      await postgrest.from('user').select().then(
+      await postgrest.from('user').select().then<dynamic>(
         (value) {
           fail('Success on connection error');
         },
@@ -238,7 +238,7 @@ void main() {
     });
 
     test('select with head:true, count: exact', () async {
-      final res = await postgrest.from<PostgrestListResponse>('users').select(
+      final res = await postgrest.from<PostgrestResponse>('users').select(
             '*',
             FetchOptions(head: true, count: CountOption.exact),
           );
@@ -256,7 +256,7 @@ void main() {
 
     test('select with head:true, count: estimated', () async {
       final res = await postgrest
-          .from<PostgrestListResponse>('users')
+          .from<PostgrestResponse>('users')
           .select('*', FetchOptions(head: true, count: CountOption.estimated));
       expect(res.count, const TypeMatcher<int>());
     });
@@ -356,7 +356,7 @@ void main() {
 
     test('row level security error', () async {
       try {
-        await postgrest.from('sample').update({'id': 2}).then(
+        await postgrest.from('sample').update({'id': 2}).then<dynamic>(
           (value) {
             fail('Returned even with row level security');
           },
@@ -390,7 +390,7 @@ void main() {
     });
     test('basic select table', () async {
       try {
-        await postgrestCustomHttpClient.from('users').select().then(
+        await postgrestCustomHttpClient.from('users').select().then<dynamic>(
           (value) {
             fail('Table was able to be selected, even tho it does not exist');
           },

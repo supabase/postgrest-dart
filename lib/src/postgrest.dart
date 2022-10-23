@@ -32,6 +32,8 @@ class PostgrestClient {
   }
 
   /// Perform a table operation.
+  ///
+  /// [T] can only be [PostgrestList], [PostgrestMap], [PostgrestMap?], [PostgrestListResponse] or [PostgrestMapResponse]
   PostgrestQueryBuilder<T> from<T>(String table) {
     final url = '${this.url}/$table';
     return PostgrestQueryBuilder<T>(

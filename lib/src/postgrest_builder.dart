@@ -23,6 +23,8 @@ const METHOD_PUT = 'PUT';
 const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
+typedef _Nullable<T> = T?;
+
 /// The base builder class.
 class PostgrestBuilder<T, S> implements Future<T> {
   dynamic _body;
@@ -91,7 +93,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
   /// }
   /// ```
   @Deprecated('Use async/await or .then instead. Deprecated in 0.2.0')
-  Future<PostgrestResponse<T>> execute({
+  Future<PostgrestResponse> execute({
     bool head = false,
     CountOption? count,
   }) async {
@@ -102,7 +104,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
     return _execute();
   }
 
-  Future<PostgrestResponse<T>> _execute() async {
+  Future<PostgrestResponse> _execute() async {
     if (_options?.head ?? false) {
       _method = METHOD_HEAD;
     }
@@ -182,7 +184,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
   }
 
   /// Parse request response to json object if possible
-  Future<PostgrestResponse<T>> _parseResponse(http.Response response) async {
+  Future<PostgrestResponse> _parseResponse(http.Response response) async {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
@@ -206,12 +208,46 @@ class PostgrestBuilder<T, S> implements Future<T> {
             : int.parse(contentRange.split('/').last);
       }
 
+      // When using converter [S] is the type of the converter functions's argument. Otherwise [T] should be equal to [S]
+      if (S == PostgrestList) {
+        body = PostgrestList.from(body as Iterable) as S;
+      } else if (S == PostgrestMap) {
+        body = PostgrestMap.from(body as Map) as S;
+
+        //You can't write `S == PostgrestMap?`
+      } else if (S == _Nullable<PostgrestMap>) {
+        if (body == null) {
+          body = null as S;
+        } else {
+          body = PostgrestMap.from(body as Map) as S;
+        }
+      } else if (S == PostgrestListResponse) {
+        body = PostgrestList.from(body as Iterable);
+        if (_converter != null) {
+          body = _converter!(body as S);
+        }
+        return PostgrestResponse<PostgrestList>(
+          data: body,
+          status: response.statusCode,
+          count: count,
+        );
+      } else if (S == PostgrestMapResponse) {
+        body = PostgrestMap.from(body as Map);
+        if (_converter != null) {
+          body = _converter!(body as S);
+        }
+        return PostgrestResponse<PostgrestMap>(
+          data: body,
+          status: response.statusCode,
+          count: count,
+        );
+      }
       if (_converter != null) {
         body = _converter!(body);
       }
 
-      return PostgrestResponse<T>(
-        data: body as T,
+      return PostgrestResponse(
+        data: body,
         status: response.statusCode,
         count: count,
       );
