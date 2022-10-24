@@ -85,6 +85,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
             R == PostgrestMapResponse ||
             R == PostgrestResponse ||
             R == List ||
+            R == (List<Map>) ||
             R == Map ||
             R == dynamic,
         "$R is not allowed as generic for `select<R>()`. Allowed types are: `PostgrestList`, `PostgrestMap`, `PostgrestMap?`, `PostgrestListResponse`, `PostgrestMapResponse`, `PostgrestResponse`, `dynamic`.");
@@ -225,6 +226,8 @@ class PostgrestBuilder<T, S> implements Future<T> {
       // When using converter [S] is the type of the converter functions's argument. Otherwise [T] should be equal to [S]
       if (S == PostgrestList) {
         body = PostgrestList.from(body as Iterable) as S;
+      } else if (S == List<Map>) {
+        body = List<Map>.from(body as Iterable) as S;
       } else if (S == PostgrestMap) {
         body = PostgrestMap.from(body as Map) as S;
 
