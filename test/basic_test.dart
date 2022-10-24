@@ -28,7 +28,7 @@ void main() {
     });
 
     test('basic select table', () async {
-      final res = await postgrest.from<PostgrestList>('users').select();
+      final res = await postgrest.from('users').select<PostgrestList>();
       expect(res.length, 4);
     });
 
@@ -97,43 +97,43 @@ void main() {
     });
 
     test('upsert', () async {
-      final res = await postgrest.from<PostgrestList>('messages').upsert({
+      final res = await postgrest.from('messages').upsert({
         'id': 3,
         'message': 'foo',
         'username': 'supabot',
         'channel_id': 2
-      }).select();
+      }).select<PostgrestList>();
       expect((res.first)['id'], 3);
 
-      final resMsg = await postgrest.from<PostgrestList>('messages').select();
+      final resMsg = await postgrest.from('messages').select<PostgrestList>();
       expect(resMsg.length, 3);
     });
 
     test('ignoreDuplicates upsert', () async {
-      final res = await postgrest.from<PostgrestList>('users').upsert(
+      final res = await postgrest.from('users').upsert(
         {'username': 'dragarcia'},
         onConflict: 'username',
         ignoreDuplicates: true,
-      ).select();
+      ).select<PostgrestList>();
       expect(res, isEmpty);
     });
 
     test('bulk insert', () async {
-      final res = await postgrest.from<PostgrestList>('messages').insert([
+      final res = await postgrest.from('messages').insert([
         {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
         {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
-      ]).select();
+      ]).select<PostgrestList>();
       expect(res.length, 2);
     });
 
     test('basic update', () async {
       final res = await postgrest
-          .from<PostgrestList>('messages')
+          .from('messages')
           .update(
             {'channel_id': 2},
           )
           .is_("data", null)
-          .select();
+          .select<PostgrestList>();
       expect(res, [
         {
           'id': 1,
@@ -163,7 +163,7 @@ void main() {
       ]);
 
       final Iterable<Map<String, dynamic>> messages =
-          await postgrest.from<PostgrestList>('messages').select();
+          await postgrest.from('messages').select<PostgrestList>();
       for (final rec in messages) {
         expect(rec['channel_id'], 2);
       }
@@ -171,10 +171,10 @@ void main() {
 
     test('basic delete', () async {
       final res = await postgrest
-          .from<PostgrestList>('messages')
+          .from('messages')
           .delete()
           .eq('message', 'Supabase Launch Week is on fire')
-          .select();
+          .select<PostgrestList>();
       expect(res, [
         {
           'id': 3,
@@ -187,8 +187,8 @@ void main() {
       ]);
 
       final resMsg = await postgrest
-          .from<PostgrestList>('messages')
-          .select()
+          .from('messages')
+          .select<PostgrestList>()
           .eq('message', 'Supabase Launch Week is on fire');
       expect(resMsg, isEmpty);
     });
@@ -196,8 +196,8 @@ void main() {
     test('missing table', () async {
       try {
         await postgrest
-            .from<PostgrestList>('missing_table')
-            .select()
+            .from('missing_table')
+            .select<PostgrestList>()
             .then<dynamic>(
           (value) {
             fail('found missing table');
@@ -225,8 +225,7 @@ void main() {
     });
 
     test('Prefer: return=minimal', () async {
-      final data = await postgrest.from('users').insert({'username': 'bar'});
-      expect(data, null);
+      await postgrest.from('users').insert({'username': 'bar'});
     });
 
     test('select with head:true', () async {
@@ -238,7 +237,7 @@ void main() {
     });
 
     test('select with head:true, count: exact', () async {
-      final res = await postgrest.from<PostgrestResponse>('users').select(
+      final res = await postgrest.from('users').select<PostgrestResponse>(
             '*',
             FetchOptions(head: true, count: CountOption.exact),
           );
@@ -248,16 +247,14 @@ void main() {
     });
 
     test('select with count: planned', () async {
-      final res = await postgrest
-          .from<PostgrestListResponse>('users')
-          .select('*', FetchOptions(count: CountOption.planned));
+      final res = await postgrest.from('users').select<PostgrestListResponse>(
+          '*', FetchOptions(count: CountOption.planned));
       expect(res.count, isNotNull);
     });
 
     test('select with head:true, count: estimated', () async {
-      final res = await postgrest
-          .from<PostgrestResponse>('users')
-          .select('*', FetchOptions(head: true, count: CountOption.estimated));
+      final res = await postgrest.from('users').select<PostgrestResponse>(
+          '*', FetchOptions(head: true, count: CountOption.estimated));
       expect(res.count, const TypeMatcher<int>());
     });
 
@@ -285,32 +282,32 @@ void main() {
     });
 
     test('insert with count: exact', () async {
-      final res = await postgrest.from<PostgrestListResponse>('users').upsert(
+      final res = await postgrest.from('users').upsert(
         {'username': 'countexact', 'status': 'OFFLINE'},
         onConflict: 'username',
         options: FetchOptions(count: CountOption.exact),
-      ).select();
+      ).select<PostgrestListResponse>();
       expect(res.count, 1);
     });
 
     test('update with count: exact', () async {
       final res = await postgrest
-          .from<PostgrestListResponse>('users')
+          .from('users')
           .update(
             {'status': 'ONLINE'},
             options: FetchOptions(count: CountOption.exact),
           )
           .eq('username', 'kiwicopple')
-          .select();
+          .select<PostgrestListResponse>();
       expect(res.count, 1);
     });
 
     test('delete with count: exact', () async {
       final res = await postgrest
-          .from<PostgrestListResponse>('users')
+          .from('users')
           .delete(options: FetchOptions(count: CountOption.exact))
           .eq('username', 'kiwicopple')
-          .select();
+          .select<PostgrestListResponse>();
 
       expect(res.count, 1);
     });
@@ -331,14 +328,14 @@ void main() {
     });
 
     test('select from uppercase table name', () async {
-      final res = await postgrest.from<PostgrestList>('TestTable').select();
+      final res = await postgrest.from('TestTable').select<PostgrestList>();
       expect(res.length, 2);
     });
 
     test('insert from uppercase table name', () async {
-      final res = await postgrest.from<PostgrestList>('TestTable').insert([
+      final res = await postgrest.from('TestTable').insert([
         {'slug': 'new slug'}
-      ]).select();
+      ]).select<PostgrestList>();
       expect(
         (res.first)['slug'],
         'new slug',
@@ -347,10 +344,10 @@ void main() {
 
     test('delete from uppercase table name', () async {
       final res = await postgrest
-          .from<PostgrestListResponse>('TestTable')
+          .from('TestTable')
           .delete(options: FetchOptions(count: CountOption.exact))
           .eq('slug', 'new slug')
-          .select();
+          .select<PostgrestListResponse>();
       expect(res.count, 1);
     });
 
@@ -372,8 +369,8 @@ void main() {
 
     test('withConverter', () async {
       final res = await postgrest
-          .from<PostgrestList>('users')
-          .select()
+          .from('users')
+          .select<PostgrestList>()
           .withConverter((data) => [data]);
       expect(res, isNotNull);
       expect(res, isNotEmpty);

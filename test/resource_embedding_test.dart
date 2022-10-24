@@ -23,7 +23,7 @@ void main() {
 
   test('embedded select', () async {
     final res =
-        await postgrest.from<PostgrestList>('users').select('messages(*)');
+        await postgrest.from('users').select<PostgrestList>('messages(*)');
     expect(
       res[0]['messages']!.length,
       3,
@@ -36,8 +36,8 @@ void main() {
 
   test('embedded eq', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select('messages(*)')
+        .from('users')
+        .select<PostgrestList>('messages(*)')
         .eq('messages.channel_id', 1);
     expect(
       res[0]['messages']!.length,
@@ -59,8 +59,8 @@ void main() {
 
   test('embedded order', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select('messages(*)')
+        .from('users')
+        .select<PostgrestList>('messages(*)')
         .order('channel_id', foreignTable: 'messages');
     expect(
       res[0]['messages']!.length,
@@ -78,8 +78,8 @@ void main() {
 
   test('embedded order on multiple columns', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select('username, messages(*)')
+        .from('users')
+        .select<PostgrestList>('username, messages(*)')
         .order('username', ascending: true)
         .order('channel_id', foreignTable: 'messages');
     expect(
@@ -106,8 +106,8 @@ void main() {
 
   test('embedded limit', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select('messages(*)')
+        .from('users')
+        .select<PostgrestList>('messages(*)')
         .limit(1, foreignTable: 'messages');
     expect(
       res[0]['messages']!.length,
@@ -129,8 +129,8 @@ void main() {
 
   test('embedded range', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select('messages(*)')
+        .from('users')
+        .select<PostgrestList>('messages(*)')
         .range(1, 1, foreignTable: 'messages');
     expect(
       res[0]['messages']!.length,

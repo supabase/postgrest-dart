@@ -28,7 +28,7 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestFilterBuilder<T> select([
+  PostgrestFilterBuilder<R> select<R>([
     String columns = '*',
     FetchOptions options = const FetchOptions(),
   ]) {
@@ -49,7 +49,15 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
 
     appendSearchParams('select', cleanedColumns);
     _options = options;
-    return PostgrestFilterBuilder<T>(this);
+    return PostgrestFilterBuilder<R>(
+      PostgrestQueryBuilder(
+        _url.toString(),
+        headers: _headers,
+        schema: _schema,
+        httpClient: _httpClient,
+        options: _options,
+      ).._method = _method,
+    );
   }
 
   /// Performs an INSERT into the table.

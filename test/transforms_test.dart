@@ -24,7 +24,7 @@ void main() {
 
   test('order', () async {
     final res =
-        await postgrest.from<PostgrestList>('users').select().order('username');
+        await postgrest.from('users').select<PostgrestList>().order('username');
     expect(
       res[1]['username'],
       'kiwicopple',
@@ -34,8 +34,8 @@ void main() {
 
   test('order on multiple columns', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select()
+        .from('users')
+        .select<PostgrestList>()
         .order('status', ascending: true)
         .order('username');
     expect(
@@ -60,8 +60,8 @@ void main() {
 
   test('order with filters on the same column', () async {
     final res = await postgrest
-        .from<PostgrestList>('users')
-        .select()
+        .from('users')
+        .select<PostgrestList>()
         .gt('username', 'b')
         .lt('username', 'r')
         .order('username');
@@ -76,8 +76,8 @@ void main() {
 
   test("order on foreign table", () async {
     final data = await postgrest
-        .from<PostgrestMap>("users")
-        .select(
+        .from("users")
+        .select<PostgrestMap>(
           '''
           username,
           messages(
@@ -108,14 +108,14 @@ void main() {
   });
 
   test('limit', () async {
-    final res = await postgrest.from<PostgrestList>('users').select().limit(1);
+    final res = await postgrest.from('users').select<PostgrestList>().limit(1);
     expect(res.length, 1);
   });
 
   test("limit on foreign table", () async {
     final data = await postgrest
-        .from<PostgrestMap>("users")
-        .select(
+        .from("users")
+        .select<PostgrestMap>(
           '''
             username,
             messages(
@@ -146,7 +146,7 @@ void main() {
     const from = 1;
     const to = 3;
     final res =
-        await postgrest.from<PostgrestList>('users').select().range(from, to);
+        await postgrest.from('users').select<PostgrestList>().range(from, to);
     //from -1 so that the index is included
     expect(res.length, to - (from - 1));
   });
@@ -155,7 +155,7 @@ void main() {
     const from = 1;
     const to = 1;
     final res =
-        await postgrest.from<PostgrestList>('users').select().range(from, to);
+        await postgrest.from('users').select<PostgrestList>().range(from, to);
     //from -1 so that the index is included
     expect(res.length, to - (from - 1));
   });
@@ -164,8 +164,8 @@ void main() {
     const from = 0;
     const to = 2;
     final data = await postgrest
-        .from<PostgrestMap>("users")
-        .select(
+        .from("users")
+        .select<PostgrestMap>(
           '''
             username,
             messages(
@@ -190,8 +190,8 @@ void main() {
     const from = 1;
     const to = 1;
     final data = await postgrest
-        .from<PostgrestMap>("users")
-        .select(
+        .from("users")
+        .select<PostgrestMap>(
           '''
             username,
             messages(
@@ -215,8 +215,8 @@ void main() {
 
   test('single', () async {
     final res = await postgrest
-        .from<PostgrestMap>('users')
-        .select()
+        .from('users')
+        .select<PostgrestMap>()
         .eq('username', 'supabot')
         .single();
     expect(res['username'], 'supabot');
@@ -226,8 +226,8 @@ void main() {
   group("maybe single", () {
     test('maybeSingle with 1 row', () async {
       final user = await postgrest
-          .from<PostgrestMap?>('users')
-          .select()
+          .from('users')
+          .select<PostgrestMap?>()
           .eq('username', 'dragarcia')
           .maybeSingle();
       expect(user, isNotNull);
@@ -236,8 +236,8 @@ void main() {
 
     test('maybeSingle with 0 row and force response', () async {
       final user = await postgrest
-          .from<PostgrestResponse>('users')
-          .select("*", FetchOptions(forceResponse: true))
+          .from('users')
+          .select<PostgrestResponse>("*", FetchOptions(forceResponse: true))
           .eq('username', 'xxxxx')
           .maybeSingle();
       expect(user, isA<PostgrestResponse>());
@@ -246,8 +246,8 @@ void main() {
 
     test('maybeSingle with 0 rows', () async {
       final user = await postgrest
-          .from<PostgrestMapResponse?>('users')
-          .select()
+          .from('users')
+          .select<PostgrestMapResponse?>()
           .eq('username', 'xxxxx')
           .maybeSingle();
       expect(user, isNull);

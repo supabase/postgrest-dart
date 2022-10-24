@@ -17,7 +17,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
-  PostgrestTransformBuilder<T> select([String columns = '*']) {
+  PostgrestTransformBuilder<R> select<R>([String columns = '*']) {
     // Remove whitespaces except when quoted
     var quoted = false;
     final re = RegExp(r'\s');
@@ -36,7 +36,17 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
       _headers['Prefer'] = '${_headers['Prefer']},';
     }
     _headers['Prefer'] = '${_headers['Prefer']}return=representation';
-    return this;
+    return PostgrestTransformBuilder<R>(
+      PostgrestBuilder(
+        headers: _headers,
+        url: _url,
+        httpClient: _httpClient,
+        options: _options,
+        body: _body,
+        method: _method,
+        schema: _schema,
+      ),
+    );
   }
 
   /// Orders the result with the specified [column].

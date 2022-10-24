@@ -10,10 +10,10 @@ class ResetHelper {
 
   Future<void> initialize(PostgrestClient postgrest) async {
     _postgrest = postgrest;
-    _users = (await _postgrest.from<PostgrestList>('users').select());
-    _channels = await _postgrest.from<PostgrestList>('channels').select();
-    _messages = await _postgrest.from<PostgrestList>('messages').select();
-    _reactions = await _postgrest.from<PostgrestList>('reactions').select();
+    _users = (await _postgrest.from('users').select<PostgrestList>());
+    _channels = await _postgrest.from('channels').select<PostgrestList>();
+    _messages = await _postgrest.from('messages').select<PostgrestList>();
+    _reactions = await _postgrest.from('reactions').select<PostgrestList>();
   }
 
   Future<void> reset() async {
