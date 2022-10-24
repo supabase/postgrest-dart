@@ -29,13 +29,18 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   /// postgrest.from('users').select<PostgrestList>('id, messages');
   /// ```
   ///
+  /// ```dart
+  /// postgrest.from('users').select<PostgrestListResponse>('id, messages', FetchOptions(count: CountOption.exact));
+  /// ```
+  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is `PostgrestResponse<T>`.
+  ///
   /// Allowed types for [R] are:
-  /// - `PostgrestList`
-  /// - `PostgrestMap`
-  /// - `PostgrestMap?`
-  /// - `PostgrestListResponse`
-  /// - `PostgrestMapResponse`
-  /// - `PostgrestResponse`
+  /// - [PostgrestList]
+  /// - [PostgrestMap]
+  /// - [PostgrestMap?]
+  /// - [PostgrestListResponse]
+  /// - [PostgrestMapResponse]
+  /// - [PostgrestResponse]
   PostgrestFilterBuilder<R> select<R>([
     String columns = '*',
     FetchOptions options = const FetchOptions(),

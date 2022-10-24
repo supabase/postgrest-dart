@@ -15,16 +15,21 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// Performs horizontal filtering with SELECT.
   ///
   /// ```dart
-  /// postgrest.from('users').select('id, messages');
+  /// postgrest.from('users').insert().select<PostgrestList>('id, messages');
+  /// ```
+  /// ```dart
+  /// postgrest.from('users').insert().select<PostgrestListResponse>('id, messages', FetchOptions(count: CountOption.exact));
   /// ```
   ///
+  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true` in `upsert`/`update`/`insert`/`delete`, the return type is `PostgrestResponse<T>`.
+  ///
   /// Allowed types for [R] are:
-  /// - `PostgrestList`
-  /// - `PostgrestMap`
-  /// - `PostgrestMap?`
-  /// - `PostgrestListResponse`
-  /// - `PostgrestMapResponse`
-  /// - `PostgrestResponse`
+  /// - [PostgrestList]
+  /// - [PostgrestMap]
+  /// - [PostgrestMap?]
+  /// - [PostgrestListResponse]
+  /// - [PostgrestMapResponse]
+  /// - [PostgrestResponse]
   PostgrestTransformBuilder<R> select<R>([String columns = '*']) {
     _assertCorrectGeneric(R);
     // Remove whitespaces except when quoted
@@ -115,8 +120,12 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   ///
   /// Result must be one row (e.g. using `limit`), otherwise this will result in an error.
   /// ```dart
-  /// postgrest.from('users').select().limit(1).single()
+  /// postgrest.from('users').select<PostgrestMap>().limit(1).single()
   /// ```
+  ///
+  /// Return type is `PostgrestMap`(`Map<String, dynamic>`).
+  ///
+  /// By specifying this type via `.select<PostgrestMap>()` you get more type safety.
   PostgrestTransformBuilder<T> single() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
@@ -126,6 +135,11 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   ///
   /// Result must be at most one row or nullable
   /// (e.g. using `eq` on a UNIQUE column), otherwise this will result in an error.
+  ///
+  ///
+  /// Return type is `PostgrestMap?`(`Map<String, dynamic>?`).
+  ///
+  /// By specifying this type via `.select<PostgrestMap?>()` you get more type safety.
   PostgrestTransformBuilder<T> maybeSingle() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     _maybeEmpty = true;
