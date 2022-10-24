@@ -81,17 +81,17 @@ void main() {
 
     test('switch schema', () async {
       final postgrest = PostgrestClient(rootUrl, schema: 'personal');
-      final List res = await postgrest.from('users').select();
-      expect((res).length, 5);
+      final res = await postgrest.from('users').select<PostgrestList>();
+      expect(res.length, 5);
     });
 
     test('on_conflict upsert', () async {
-      final List res = await postgrest.from('users').upsert(
+      final res = await postgrest.from('users').upsert(
         {'username': 'dragarcia', 'status': 'OFFLINE'},
         onConflict: 'username',
-      ).select();
+      ).select<PostgrestList>();
       expect(
-        (res.first as Map<String, dynamic>)['status'],
+        res.first['status'],
         'OFFLINE',
       );
     });
@@ -103,7 +103,7 @@ void main() {
         'username': 'supabot',
         'channel_id': 2
       }).select<PostgrestList>();
-      expect((res.first)['id'], 3);
+      expect(res.first['id'], 3);
 
       final resMsg = await postgrest.from('messages').select<PostgrestList>();
       expect(resMsg.length, 3);
@@ -162,8 +162,7 @@ void main() {
         }
       ]);
 
-      final Iterable<Map<String, dynamic>> messages =
-          await postgrest.from('messages').select<PostgrestList>();
+      final messages = await postgrest.from('messages').select<PostgrestList>();
       for (final rec in messages) {
         expect(rec['channel_id'], 2);
       }
