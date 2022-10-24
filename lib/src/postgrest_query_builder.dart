@@ -26,12 +26,21 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   /// Performs horizontal filtering with SELECT.
   ///
   /// ```dart
-  /// postgrest.from('users').select('id, messages');
+  /// postgrest.from('users').select<PostgrestList>('id, messages');
   /// ```
+  ///
+  /// Allowed types for [R] are:
+  /// - `PostgrestList`
+  /// - `PostgrestMap`
+  /// - `PostgrestMap?`
+  /// - `PostgrestListResponse`
+  /// - `PostgrestMapResponse`
+  /// - `PostgrestResponse`
   PostgrestFilterBuilder<R> select<R>([
     String columns = '*',
     FetchOptions options = const FetchOptions(),
   ]) {
+    _assertCorrectGeneric(R);
     _method = METHOD_GET;
 
     // Remove whitespaces except when quoted

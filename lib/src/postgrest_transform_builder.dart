@@ -17,7 +17,16 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// ```dart
   /// postgrest.from('users').select('id, messages');
   /// ```
+  ///
+  /// Allowed types for [R] are:
+  /// - `PostgrestList`
+  /// - `PostgrestMap`
+  /// - `PostgrestMap?`
+  /// - `PostgrestListResponse`
+  /// - `PostgrestMapResponse`
+  /// - `PostgrestResponse`
   PostgrestTransformBuilder<R> select<R>([String columns = '*']) {
+    _assertCorrectGeneric(R);
     // Remove whitespaces except when quoted
     var quoted = false;
     final re = RegExp(r'\s');

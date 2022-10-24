@@ -24,6 +24,7 @@ const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
 typedef _Nullable<T> = T?;
+typedef _Void = void;
 
 /// The base builder class.
 class PostgrestBuilder<T, S> implements Future<T> {
@@ -74,6 +75,20 @@ class PostgrestBuilder<T, S> implements Future<T> {
     )
       .._maybeEmpty = _maybeEmpty
       .._converter = converter;
+  }
+
+  void _assertCorrectGeneric(Type R) {
+    assert(
+        R == PostgrestList ||
+            R == PostgrestMap ||
+            R == (_Nullable<PostgrestMap>) ||
+            R == PostgrestListResponse ||
+            R == PostgrestMapResponse ||
+            R == PostgrestResponse ||
+            R == List ||
+            R == Map ||
+            R == dynamic,
+        "$R is not allowed as generic for `select<R>()`. Allowed types are: `PostgrestList`, `PostgrestMap`, `PostgrestMap?`, `PostgrestListResponse`, `PostgrestMapResponse`, `PostgrestResponse`, `dynamic`.");
   }
 
   /// Sends the request and returns a [PostgrestResponse]

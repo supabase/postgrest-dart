@@ -247,7 +247,7 @@ void main() {
     test('maybeSingle with 0 rows', () async {
       final user = await postgrest
           .from('users')
-          .select<PostgrestMapResponse?>()
+          .select<PostgrestMap?>()
           .eq('username', 'xxxxx')
           .maybeSingle();
       expect(user, isNull);
