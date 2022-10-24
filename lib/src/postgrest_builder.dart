@@ -24,7 +24,6 @@ const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
 typedef _Nullable<T> = T?;
-typedef _Void = void;
 
 /// The base builder class.
 class PostgrestBuilder<T, S> implements Future<T> {
