@@ -1,3 +1,7 @@
+## [1.0.1]
+
+- fix: calling `.select()` multiple times will override the previous `.select()` [#95](https://github.com/supabase-community/postgrest-dart/pull/95)
+
 ## [1.0.0]
 
 - chore: v1.0.0 release 🚀
