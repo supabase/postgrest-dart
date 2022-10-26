@@ -47,7 +47,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
       return c;
     }).join();
 
-    appendSearchParams('select', cleanedColumns);
+    overrideSearchParams('select', cleanedColumns);
     _options = options;
     return PostgrestFilterBuilder(this);
   }
