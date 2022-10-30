@@ -32,7 +32,14 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   /// ```dart
   /// postgrest.from('users').select<PostgrestListResponse>('id, messages', FetchOptions(count: CountOption.exact));
   /// ```
-  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is `PostgrestResponse<T>`.
+  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is [PostgrestResponse<T>]. Otherwise it's `T` directly.
+  ///
+  /// The type specification for [R] is optional and enhances the type safety of the return value. But use with care as a wrong type specification will result in a runtime error.
+  ///
+  /// `T` is
+  /// - [List<Map<String, dynamic>>] for queries without `.single()` or `maybeSingle()`
+  /// - [Map<String, dynamic>] for queries with `.single()`
+  /// - [Map<String, dynamic>?] for queries with `.maybeSingle()`
   ///
   /// Allowed types for [R] are:
   /// - [List<Map<String, dynamic>>]
@@ -41,6 +48,9 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   /// - [PostgrestResponse<List<Map<String, dynamic>>>]
   /// - [PostgrestResponse<Map<String, dynamic>>]
   /// - [PostgrestResponse<Map<String, dynamic>?>]
+  /// - [PostgrestResponse]
+  ///
+  /// There are optional typedefs for [R]: [PostgrestMap], [PostgrestList], [PostgrestMapResponse], [PostgrestListResponse]
   PostgrestFilterBuilder<R> select<R>([
     String columns = '*',
     FetchOptions options = const FetchOptions(),

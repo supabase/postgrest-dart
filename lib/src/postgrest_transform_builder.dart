@@ -21,7 +21,14 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// postgrest.from('users').insert().select<PostgrestListResponse>('id, messages', FetchOptions(count: CountOption.exact));
   /// ```
   ///
-  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true` in `upsert`/`update`/`insert`/`delete`, the return type is `PostgrestResponse<T>`.
+  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is [PostgrestResponse<T>]. Otherwise it's `T` directly.
+  ///
+  /// The type specification for [R] is optional and enhances the type safety of the return value. But use with care as a wrong type specification will result in a runtime error.
+  ///
+  /// `T` is
+  /// - [List<Map<String, dynamic>>] for queries without `.single()` or `maybeSingle()`
+  /// - [Map<String, dynamic>] for queries with `.single()`
+  /// - [Map<String, dynamic>?] for queries with `.maybeSingle()`
   ///
   /// Allowed types for [R] are:
   /// - [List<Map<String, dynamic>>]
@@ -30,6 +37,9 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// - [PostgrestResponse<List<Map<String, dynamic>>>]
   /// - [PostgrestResponse<Map<String, dynamic>>]
   /// - [PostgrestResponse<Map<String, dynamic>?>]
+  /// - [PostgrestResponse]
+  ///
+  /// There are optional typedefs for [R]: [PostgrestMap], [PostgrestList], [PostgrestMapResponse], [PostgrestListResponse]
   PostgrestTransformBuilder<R> select<R>([String columns = '*']) {
     _assertCorrectGeneric(R);
     // Remove whitespaces except when quoted
@@ -123,9 +133,9 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// postgrest.from('users').select<PostgrestMap>().limit(1).single()
   /// ```
   ///
-  /// Return type is `PostgrestMap`(`Map<String, dynamic>`).
+  /// Data type is `Map<String, dynamic>`.
   ///
-  /// By specifying this type via `.select<PostgrestMap>()` you get more type safety.
+  /// By specifying this type via `.select<Map<String,dynamic>>()` you get more type safety.
   PostgrestTransformBuilder<T> single() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
@@ -137,9 +147,9 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   /// (e.g. using `eq` on a UNIQUE column), otherwise this will result in an error.
   ///
   ///
-  /// Return type is `PostgrestMap?`(`Map<String, dynamic>?`).
+  /// Data type is `Map<String, dynamic>?`.
   ///
-  /// By specifying this type via `.select<PostgrestMap?>()` you get more type safety.
+  /// By specifying this type via `.select<Map<String,dynamic>?>()` you get more type safety.
   PostgrestTransformBuilder<T> maybeSingle() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     _maybeEmpty = true;
