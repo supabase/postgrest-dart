@@ -35,12 +35,12 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is `PostgrestResponse<T>`.
   ///
   /// Allowed types for [R] are:
-  /// - [PostgrestList]
-  /// - [PostgrestMap]
-  /// - [PostgrestMap?]
-  /// - [PostgrestListResponse]
-  /// - [PostgrestMapResponse]
-  /// - [PostgrestResponse]
+  /// - [List<Map<String, dynamic>>]
+  /// - [Map<String, dynamic>]
+  /// - [Map<String, dynamic>?]
+  /// - [PostgrestResponse<List<Map<String, dynamic>>>]
+  /// - [PostgrestResponse<Map<String, dynamic>>]
+  /// - [PostgrestResponse<Map<String, dynamic>?>]
   PostgrestFilterBuilder<R> select<R>([
     String columns = '*',
     FetchOptions options = const FetchOptions(),
