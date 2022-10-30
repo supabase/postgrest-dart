@@ -83,6 +83,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
             R == (_Nullable<PostgrestMap>) ||
             R == PostgrestListResponse ||
             R == PostgrestMapResponse ||
+            R == (PostgrestResponse<PostgrestMap?>) ||
             R == PostgrestResponse ||
             R == List ||
             R == (List<Map>) ||
@@ -254,6 +255,20 @@ class PostgrestBuilder<T, S> implements Future<T> {
           body = _converter!(body as S);
         }
         return PostgrestResponse<PostgrestMap>(
+          data: body,
+          status: response.statusCode,
+          count: count,
+        );
+      } else if (S == PostgrestResponse<PostgrestMap?>) {
+        if (body == null) {
+          body = null;
+        } else {
+          body = PostgrestMap.from(body as Map);
+        }
+        if (_converter != null) {
+          body = _converter!(body as S);
+        }
+        return PostgrestResponse<PostgrestMap?>(
           data: body,
           status: response.statusCode,
           count: count,
