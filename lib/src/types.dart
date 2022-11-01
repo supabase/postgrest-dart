@@ -1,5 +1,9 @@
 typedef Headers = Map<String, String>;
-typedef PostgrestConverter<S> = S Function(dynamic data);
+typedef PostgrestConverter<S, T> = S Function(T data);
+typedef PostgrestList = List<PostgrestMap>;
+typedef PostgrestMap = Map<String, dynamic>;
+typedef PostgrestListResponse = PostgrestResponse<PostgrestList>;
+typedef PostgrestMapResponse = PostgrestResponse<PostgrestMap>;
 
 /// A Postgrest response exception
 class PostgrestException implements Exception {

@@ -3,25 +3,17 @@ import 'package:postgrest/postgrest.dart';
 class ResetHelper {
   late final PostgrestClient _postgrest;
 
-  late final List<Map<String, dynamic>> _users;
-  late final List<Map<String, dynamic>> _channels;
-  late final List<Map<String, dynamic>> _messages;
-  late final List<Map<String, dynamic>> _reactions;
+  late final PostgrestList _users;
+  late final PostgrestList _channels;
+  late final PostgrestList _messages;
+  late final PostgrestList _reactions;
 
   Future<void> initialize(PostgrestClient postgrest) async {
     _postgrest = postgrest;
-    _users = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('users').select()) as List,
-    );
-    _channels = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('channels').select()) as List,
-    );
-    _messages = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('messages').select()) as List,
-    );
-    _reactions = List<Map<String, dynamic>>.from(
-      (await _postgrest.from('reactions').select()) as List,
-    );
+    _users = (await _postgrest.from('users').select<PostgrestList>());
+    _channels = await _postgrest.from('channels').select<PostgrestList>();
+    _messages = await _postgrest.from('messages').select<PostgrestList>();
+    _reactions = await _postgrest.from('reactions').select<PostgrestList>();
   }
 
   Future<void> reset() async {

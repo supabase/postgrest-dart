@@ -1,7 +1,7 @@
 part of 'postgrest_builder.dart';
 
-class PostgrestFilterBuilder extends PostgrestTransformBuilder {
-  PostgrestFilterBuilder(PostgrestBuilder builder) : super(builder);
+class PostgrestFilterBuilder<T> extends PostgrestTransformBuilder<T> {
+  PostgrestFilterBuilder(PostgrestBuilder<T, T> builder) : super(builder);
 
   /// Convert list filter to query params string
   String _cleanFilterArray(List filter) {
@@ -17,7 +17,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().not('status', 'eq', 'OFFLINE')
   /// ```
-  PostgrestFilterBuilder not(String column, String operator, dynamic value) {
+  PostgrestFilterBuilder<T> not(String column, String operator, dynamic value) {
     if (value is List) {
       if (operator == "in") {
         appendSearchParams(
@@ -41,7 +41,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().or('status.eq.OFFLINE,username.eq.supabot')
   /// ```
-  PostgrestFilterBuilder or(String filters, {String? foreignTable}) {
+  PostgrestFilterBuilder<T> or(String filters, {String? foreignTable}) {
     final key = foreignTable != null ? '"$foreignTable".or' : 'or';
     appendSearchParams(key, '($filters)');
     return this;
@@ -52,7 +52,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().eq('username', 'supabot')
   /// ```
-  PostgrestFilterBuilder eq(String column, dynamic value) {
+  PostgrestFilterBuilder<T> eq(String column, dynamic value) {
     if (value is List) {
       appendSearchParams(column, 'eq.{${_cleanFilterArray(value)}}');
     } else {
@@ -66,7 +66,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().neq('username', 'supabot')
   /// ```
-  PostgrestFilterBuilder neq(String column, dynamic value) {
+  PostgrestFilterBuilder<T> neq(String column, dynamic value) {
     if (value is List) {
       appendSearchParams(column, 'neq.{${_cleanFilterArray(value)}}');
     } else {
@@ -80,7 +80,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('messages').select().gt('id', 1)
   /// ```
-  PostgrestFilterBuilder gt(String column, dynamic value) {
+  PostgrestFilterBuilder<T> gt(String column, dynamic value) {
     appendSearchParams(column, 'gt.$value');
     return this;
   }
@@ -90,7 +90,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('messages').select().gte('id', 1)
   /// ```
-  PostgrestFilterBuilder gte(String column, dynamic value) {
+  PostgrestFilterBuilder<T> gte(String column, dynamic value) {
     appendSearchParams(column, 'gte.$value');
     return this;
   }
@@ -100,7 +100,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('messages').select().lt('id', 2)
   /// ```
-  PostgrestFilterBuilder lt(String column, dynamic value) {
+  PostgrestFilterBuilder<T> lt(String column, dynamic value) {
     appendSearchParams(column, 'lt.$value');
     return this;
   }
@@ -110,7 +110,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('messages').select().lte('id', 2)
   /// ```
-  PostgrestFilterBuilder lte(String column, dynamic value) {
+  PostgrestFilterBuilder<T> lte(String column, dynamic value) {
     appendSearchParams(column, 'lte.$value');
     return this;
   }
@@ -120,7 +120,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().like('username', '%supa%')
   /// ```
-  PostgrestFilterBuilder like(String column, String pattern) {
+  PostgrestFilterBuilder<T> like(String column, String pattern) {
     appendSearchParams(column, 'like.$pattern');
     return this;
   }
@@ -130,7 +130,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().ilike('username', '%SUPA%')
   /// ```
-  PostgrestFilterBuilder ilike(String column, String pattern) {
+  PostgrestFilterBuilder<T> ilike(String column, String pattern) {
     appendSearchParams(column, 'ilike.$pattern');
     return this;
   }
@@ -142,7 +142,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().is_('data', null)
   /// ```
   // ignore: non_constant_identifier_names
-  PostgrestFilterBuilder is_(String column, dynamic value) {
+  PostgrestFilterBuilder<T> is_(String column, dynamic value) {
     appendSearchParams(column, 'is.$value');
     return this;
   }
@@ -153,7 +153,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// postgrest.from('users').select().in_('status', ['ONLINE', 'OFFLINE'])
   /// ```
   // ignore: non_constant_identifier_names
-  PostgrestFilterBuilder in_(String column, List values) {
+  PostgrestFilterBuilder<T> in_(String column, List values) {
     appendSearchParams(column, 'in.(${_cleanFilterArray(values)})');
     return this;
   }
@@ -163,7 +163,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().contains('age_range', '[1,2)')
   /// ```
-  PostgrestFilterBuilder contains(String column, dynamic value) {
+  PostgrestFilterBuilder<T> contains(String column, dynamic value) {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
@@ -183,7 +183,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().containedBy('age_range', '[1,2)')
   /// ```
-  PostgrestFilterBuilder containedBy(String column, dynamic value) {
+  PostgrestFilterBuilder<T> containedBy(String column, dynamic value) {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
@@ -203,7 +203,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().sl('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder rangeLt(String column, String range) {
+  PostgrestFilterBuilder<T> rangeLt(String column, String range) {
     appendSearchParams(column, 'sl.$range');
     return this;
   }
@@ -213,7 +213,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().rangeGt('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder rangeGt(String column, String range) {
+  PostgrestFilterBuilder<T> rangeGt(String column, String range) {
     appendSearchParams(column, 'sr.$range');
     return this;
   }
@@ -223,7 +223,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().rangeGte('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder rangeGte(String column, String range) {
+  PostgrestFilterBuilder<T> rangeGte(String column, String range) {
     appendSearchParams(column, 'nxl.$range');
     return this;
   }
@@ -233,7 +233,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().rangeLte('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder rangeLte(String column, String range) {
+  PostgrestFilterBuilder<T> rangeLte(String column, String range) {
     appendSearchParams(column, 'nxr.$range');
     return this;
   }
@@ -243,7 +243,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().rangeAdjacent('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder rangeAdjacent(String column, String range) {
+  PostgrestFilterBuilder<T> rangeAdjacent(String column, String range) {
     appendSearchParams(column, 'adj.$range');
     return this;
   }
@@ -253,7 +253,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().overlaps('age_range', '[2,25)')
   /// ```
-  PostgrestFilterBuilder overlaps(String column, dynamic value) {
+  PostgrestFilterBuilder<T> overlaps(String column, dynamic value) {
     if (value is String) {
       // range types can be inclusive '[', ']' or exclusive '(', ')' so just
       // keep it simple and accept a string
@@ -270,7 +270,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().textSearch('catchphrase', "'fat' & 'cat'", config: 'english')
   /// ```
-  PostgrestFilterBuilder textSearch(
+  PostgrestFilterBuilder<T> textSearch(
     String column,
     String query, {
 
@@ -298,7 +298,8 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().filter('username', 'eq', 'supabot')
   /// ```
-  PostgrestFilterBuilder filter(String column, String operator, dynamic value) {
+  PostgrestFilterBuilder<T> filter(
+      String column, String operator, dynamic value) {
     if (value is List) {
       if (operator == "in") {
         appendSearchParams(
@@ -323,7 +324,7 @@ class PostgrestFilterBuilder extends PostgrestTransformBuilder {
   /// ```dart
   /// postgrest.from('users').select().match({'username': 'supabot', 'status': 'ONLINE'})
   /// ```
-  PostgrestFilterBuilder match(Map query) {
+  PostgrestFilterBuilder<T> match(Map query) {
     query.forEach((k, v) => appendSearchParams('$k', 'eq.$v'));
     return this;
   }

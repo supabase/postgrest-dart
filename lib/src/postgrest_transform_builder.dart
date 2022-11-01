@@ -1,7 +1,7 @@
 part of 'postgrest_builder.dart';
 
-class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
-  PostgrestTransformBuilder(PostgrestBuilder<T> builder)
+class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
+  PostgrestTransformBuilder(PostgrestBuilder<T, T> builder)
       : super(
           url: builder._url,
           method: builder._method,
@@ -15,9 +15,33 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// Performs horizontal filtering with SELECT.
   ///
   /// ```dart
-  /// postgrest.from('users').select('id, messages');
+  /// postgrest.from('users').insert().select<PostgrestList>('id, messages');
   /// ```
-  PostgrestTransformBuilder select([String columns = '*']) {
+  /// ```dart
+  /// postgrest.from('users').insert().select<PostgrestListResponse>('id, messages', FetchOptions(count: CountOption.exact));
+  /// ```
+  ///
+  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is [PostgrestResponse<T>]. Otherwise it's `T` directly.
+  ///
+  /// The type specification for [R] is optional and enhances the type safety of the return value. But use with care as a wrong type specification will result in a runtime error.
+  ///
+  /// `T` is
+  /// - [List<Map<String, dynamic>>] for queries without `.single()` or `maybeSingle()`
+  /// - [Map<String, dynamic>] for queries with `.single()`
+  /// - [Map<String, dynamic>?] for queries with `.maybeSingle()`
+  ///
+  /// Allowed types for [R] are:
+  /// - [List<Map<String, dynamic>>]
+  /// - [Map<String, dynamic>]
+  /// - [Map<String, dynamic>?]
+  /// - [PostgrestResponse<List<Map<String, dynamic>>>]
+  /// - [PostgrestResponse<Map<String, dynamic>>]
+  /// - [PostgrestResponse<Map<String, dynamic>?>]
+  /// - [PostgrestResponse]
+  ///
+  /// There are optional typedefs for [R]: [PostgrestMap], [PostgrestList], [PostgrestMapResponse], [PostgrestListResponse]
+  PostgrestTransformBuilder<R> select<R>([String columns = '*']) {
+    _assertCorrectGeneric(R);
     // Remove whitespaces except when quoted
     var quoted = false;
     final re = RegExp(r'\s');
@@ -36,7 +60,17 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
       _headers['Prefer'] = '${_headers['Prefer']},';
     }
     _headers['Prefer'] = '${_headers['Prefer']}return=representation';
-    return this;
+    return PostgrestTransformBuilder<R>(
+      PostgrestBuilder(
+        headers: _headers,
+        url: _url,
+        httpClient: _httpClient,
+        options: _options,
+        body: _body,
+        method: _method,
+        schema: _schema,
+      ),
+    );
   }
 
   /// Orders the result with the specified [column].
@@ -48,7 +82,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// postgrest.from('users').select().order('username', ascending: false)
   /// postgrest.from('users').select('messages(*)').order('channel_id', foreignTable: 'messages', ascending: false)
   /// ```
-  PostgrestTransformBuilder order(
+  PostgrestTransformBuilder<T> order(
     String column, {
     bool ascending = false,
     bool nullsFirst = false,
@@ -70,7 +104,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// postgrest.from('users').select().limit(1)
   /// postgrest.from('users').select('messages(*)').limit(1, foreignTable: 'messages')
   /// ```
-  PostgrestTransformBuilder limit(int count, {String? foreignTable}) {
+  PostgrestTransformBuilder<T> limit(int count, {String? foreignTable}) {
     final key = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
     appendSearchParams(key, '$count');
@@ -83,7 +117,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// ```dart
   /// postgrest.from('users').select('messages(*)').range(1, 1, foreignTable: 'messages')
   /// ```
-  PostgrestTransformBuilder range(int from, int to, {String? foreignTable}) {
+  PostgrestTransformBuilder<T> range(int from, int to, {String? foreignTable}) {
     final keyOffset = foreignTable == null ? 'offset' : '$foreignTable.offset';
     final keyLimit = foreignTable == null ? 'limit' : '$foreignTable.limit';
 
@@ -96,9 +130,13 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   ///
   /// Result must be one row (e.g. using `limit`), otherwise this will result in an error.
   /// ```dart
-  /// postgrest.from('users').select().limit(1).single()
+  /// postgrest.from('users').select<PostgrestMap>().limit(1).single()
   /// ```
-  PostgrestTransformBuilder single() {
+  ///
+  /// Data type is `Map<String, dynamic>`.
+  ///
+  /// By specifying this type via `.select<Map<String,dynamic>>()` you get more type safety.
+  PostgrestTransformBuilder<T> single() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     return this;
   }
@@ -107,7 +145,12 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   ///
   /// Result must be at most one row or nullable
   /// (e.g. using `eq` on a UNIQUE column), otherwise this will result in an error.
-  PostgrestTransformBuilder maybeSingle() {
+  ///
+  ///
+  /// Data type is `Map<String, dynamic>?`.
+  ///
+  /// By specifying this type via `.select<Map<String,dynamic>?>()` you get more type safety.
+  PostgrestTransformBuilder<T> maybeSingle() {
     _headers['Accept'] = 'application/vnd.pgrst.object+json';
     _maybeEmpty = true;
     return this;
@@ -119,7 +162,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T> {
   /// ```dart
   /// postgrest.from('users').select().csv()
   /// ```
-  PostgrestTransformBuilder csv() {
+  PostgrestTransformBuilder<T> csv() {
     _headers['Accept'] = 'text/csv';
     return this;
   }
