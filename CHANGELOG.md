@@ -1,3 +1,15 @@
+## [1.1.0]
+
+- fix: implement catchError [#97](https://github.com/supabase-community/postgrest-dart/pull/97)
+- feat: add generic types to `.select()` [#94](https://github.com/supabase-community/postgrest-dart/pull/94)
+  ```dart
+  // data is `List<Map<String, dynamic>>`
+  final data = await supabase.from<List<Map<String, dynamic>>>('users').select();
+
+  // data is `Map<String, dynamic>`
+  final data = await supabase.from<Map<String, dynamic>>('users').select().eq('id', myId).single();
+  ```
+
 ## [1.0.1]
 
 - fix: calling `.select()` multiple times will override the previous `.select()` [#95](https://github.com/supabase-community/postgrest-dart/pull/95)
