@@ -371,8 +371,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
   }
 
   @override
-  Future<T?> catchError(Function onError,
-      {bool Function(Object error)? test}) async {
+  Future<T> catchError(Function onError, {bool Function(Object error)? test}) {
     return then((value) => value).catchError(onError, test: test);
   }
 
@@ -440,7 +439,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
   }
 
   @override
-  Future<T?> timeout(Duration timeLimit, {FutureOr<T?> Function()? onTimeout}) {
+  Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) {
     return then((value) => value).timeout(timeLimit, onTimeout: onTimeout);
   }
 
