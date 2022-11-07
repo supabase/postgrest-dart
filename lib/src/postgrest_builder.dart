@@ -71,6 +71,8 @@ class PostgrestBuilder<T, S> implements Future<T> {
       schema: _schema,
       method: _method,
       body: _body,
+      httpClient: _httpClient,
+      options: _options,
     )
       .._maybeEmpty = _maybeEmpty
       .._converter = converter;
