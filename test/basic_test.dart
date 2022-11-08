@@ -405,17 +405,10 @@ void main() {
         await postgrestCustomHttpClient
             .from('users')
             .select()
-            .withConverter((data) => data)
-            .then<dynamic>(
-          (value) {
+            .withConverter((data) => data);
             fail('Table was able to be selected, even tho it does not exist');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '420');
-          },
-        );
-      } on PostgrestException catch (error) {
+      } catch (error) {
+        expect(error, isA<PostgrestException>());
         expect(error.code, '420');
       }
     });
