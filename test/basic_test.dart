@@ -197,7 +197,7 @@ void main() {
         await postgrest.from('missing_table').select<PostgrestList>();
         fail('found missing table');
       } on PostgrestException catch (error) {
-        expect(error.code, '404');
+        expect(error.code, '42P01');
       }
     });
 
