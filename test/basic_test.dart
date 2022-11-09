@@ -194,33 +194,21 @@ void main() {
 
     test('missing table', () async {
       try {
-        await postgrest
-            .from('missing_table')
-            .select<PostgrestList>()
-            .then<dynamic>(
-          (value) {
-            fail('found missing table');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '42P01');
-          },
-        );
+        await postgrest.from('missing_table').select<PostgrestList>();
+        fail('found missing table');
       } on PostgrestException catch (error) {
-        expect(error.code, '404');
+        expect(error.code, '42P01');
       }
     });
 
     test('connection error', () async {
       final postgrest = PostgrestClient('http://this.url.does.not.exist');
-      await postgrest.from('user').select().then<dynamic>(
-        (value) {
-          fail('Success on connection error');
-        },
-        onError: (error) {
-          expect(error, isA<SocketException>());
-        },
-      );
+      try {
+        await postgrest.from('user').select();
+        fail('Success on connection error');
+      } catch (error) {
+        expect(error, isA<SocketException>());
+      }
     });
 
     test('Prefer: return=minimal', () async {
@@ -313,16 +301,10 @@ void main() {
 
     test('execute without table operation', () async {
       try {
-        await postgrest.from('users').then(
-          (value) {
-            fail('can not execute without table operation');
-          },
-          onError: (error) {
-            expect(error, isA<ArgumentError>());
-          },
-        );
-      } on ArgumentError catch (error) {
-        expect(error, isNotNull);
+        await postgrest.from('users');
+        fail('can not execute without table operation');
+      } catch (e) {
+        expect(e, isA<ArgumentError>());
       }
     });
 
@@ -352,15 +334,8 @@ void main() {
 
     test('row level security error', () async {
       try {
-        await postgrest.from('sample').update({'id': 2}).then<dynamic>(
-          (value) {
-            fail('Returned even with row level security');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '404');
-          },
-        );
+        await postgrest.from('sample').update({'id': 2});
+        fail('Returned even with row level security');
       } on PostgrestException catch (error) {
         expect(error.code, '404');
       }
@@ -386,32 +361,31 @@ void main() {
     });
     test('basic select table', () async {
       try {
-        await postgrestCustomHttpClient.from('users').select().then<dynamic>(
-          (value) {
-            fail('Table was able to be selected, even tho it does not exist');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '420');
-          },
-        );
+        await postgrestCustomHttpClient.from('users').select();
+        fail('Table was able to be selected, even tho it does not exist');
       } on PostgrestException catch (error) {
         expect(error.code, '420');
       }
     });
+
+    test('basic select table with converter', () async {
+      try {
+        await postgrestCustomHttpClient
+            .from('users')
+            .select()
+            .withConverter((data) => data);
+        fail('Table was able to be selected, even tho it does not exist');
+      } on PostgrestException catch (error) {
+        expect(error.code, '420');
+      }
+    });
+
     test('basic stored procedure call', () async {
       try {
         await postgrestCustomHttpClient
-            .rpc('get_status', params: {'name_param': 'supabot'}).then<dynamic>(
-          (value) {
-            fail(
-                'Stored procedure was able to be called, even tho it does not exist');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '420');
-          },
-        );
+            .rpc('get_status', params: {'name_param': 'supabot'});
+        fail(
+            'Stored procedure was able to be called, even tho it does not exist');
       } on PostgrestException catch (error) {
         expect(error.code, '420');
       }
