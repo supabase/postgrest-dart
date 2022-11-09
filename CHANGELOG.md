@@ -1,3 +1,7 @@
+## [1.1.1]
+
+- fix: keep custom http client with converter [#100](https://github.com/supabase/postgrest-dart/pull/100)
+
 ## [1.1.0]
 
 - fix: implement catchError [#97](https://github.com/supabase-community/postgrest-dart/pull/97)
