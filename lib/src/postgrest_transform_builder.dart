@@ -66,6 +66,7 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
         headers: _headers,
         url: _url,
         httpClient: _httpClient,
+        isolate: _isolate,
         options: _options,
         body: _body,
         method: _method,
