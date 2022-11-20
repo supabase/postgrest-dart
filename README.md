@@ -22,7 +22,20 @@ import 'package:postgrest/postgrest.dart';
 
 final url = 'https://example.com/postgrest/endpoint';
 final client = PostgrestClient(url);
-final response = await client.from('users').select();
+final response = await client.from<PostgrestList>('users').select();
+```
+
+#### Reading your data and converting it to an object
+  
+```dart
+import 'package:postgrest/postgrest.dart';
+
+final url = 'https://example.com/postgrest/endpoint';
+final client = PostgrestClient(url);
+final response = await client
+    .from('users')
+    .select<PostgrestList>()
+    .withConverter((data) => data.map(User.fromJson).toList());
 ```
 
 #### Insert records
@@ -33,7 +46,7 @@ import 'package:postgrest/postgrest.dart';
 final url = 'https://example.com/postgrest/endpoint';
 final client = PostgrestClient(url);
 try {
-  final data = await client.from('users')
+  await client.from('users')
     .insert([
       {'username': 'supabot', 'status': 'ONLINE'}
     ]);
@@ -53,7 +66,7 @@ import 'package:postgrest/postgrest.dart';
 
 final url = 'https://example.com/postgrest/endpoint';
 final client = PostgrestClient(url);
-final data = await client.from('users')
+await client.from('users')
       .update({'status': 'OFFLINE'})
       .eq('username', 'dragarcia');
 ```
@@ -65,7 +78,7 @@ import 'package:postgrest/postgrest.dart';
 
 final url = 'https://example.com/postgrest/endpoint';
 final client = PostgrestClient(url);
-final data = await client.from('users')
+await client.from('users')
       .delete()
       .eq('username', 'supabot');
 ```
@@ -78,7 +91,7 @@ import 'package:postgrest/postgrest.dart';
 final url = 'https://example.com/postgrest/endpoint';
 final client = PostgrestClient(url);
 final response = await client.from('countries')
-      .select('*', FetchOptions(count: CountOption.exact));
+      .select<PostgrestResponse>('*', FetchOptions(count: CountOption.exact));
 final data = response.data;
 final count = response.count;
 ```

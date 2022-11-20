@@ -31,7 +31,7 @@ void main() {
     });
 
     test('basic select table', () async {
-      final List res = await postgrest.from('users').select();
+      final res = await postgrest.from('users').select<PostgrestList>();
       expect(res.length, 4);
     });
 
@@ -84,48 +84,48 @@ void main() {
 
     test('switch schema', () async {
       final postgrest = PostgrestClient(rootUrl, schema: 'personal');
-      final List res = await postgrest.from('users').select();
-      expect((res).length, 5);
+      final res = await postgrest.from('users').select<PostgrestList>();
+      expect(res.length, 5);
     });
 
     test('on_conflict upsert', () async {
-      final List res = await postgrest.from('users').upsert(
+      final res = await postgrest.from('users').upsert(
         {'username': 'dragarcia', 'status': 'OFFLINE'},
         onConflict: 'username',
-      ).select();
+      ).select<PostgrestList>();
       expect(
-        (res.first as Map<String, dynamic>)['status'],
+        res.first['status'],
         'OFFLINE',
       );
     });
 
     test('upsert', () async {
-      final List res = await postgrest.from('messages').upsert({
+      final res = await postgrest.from('messages').upsert({
         'id': 3,
         'message': 'foo',
         'username': 'supabot',
         'channel_id': 2
-      }).select();
-      expect((res.first as Map)['id'], 3);
+      }).select<PostgrestList>();
+      expect(res.first['id'], 3);
 
-      final List resMsg = await postgrest.from('messages').select();
+      final resMsg = await postgrest.from('messages').select<PostgrestList>();
       expect(resMsg.length, 3);
     });
 
     test('ignoreDuplicates upsert', () async {
-      final List res = await postgrest.from('users').upsert(
+      final res = await postgrest.from('users').upsert(
         {'username': 'dragarcia'},
         onConflict: 'username',
         ignoreDuplicates: true,
-      ).select();
+      ).select<PostgrestList>();
       expect(res, isEmpty);
     });
 
     test('bulk insert', () async {
-      final List res = await postgrest.from('messages').insert([
+      final res = await postgrest.from('messages').insert([
         {'id': 4, 'message': 'foo', 'username': 'supabot', 'channel_id': 2},
         {'id': 5, 'message': 'foo', 'username': 'supabot', 'channel_id': 1}
-      ]).select();
+      ]).select<PostgrestList>();
       expect(res.length, 2);
     });
 
@@ -136,7 +136,7 @@ void main() {
             {'channel_id': 2},
           )
           .is_("data", null)
-          .select();
+          .select<PostgrestList>();
       expect(res, [
         {
           'id': 1,
@@ -165,11 +165,7 @@ void main() {
         }
       ]);
 
-      final Iterable<Map<String, dynamic>> messages = (await postgrest
-              .from('messages')
-              .select()
-              .withConverter<List>((data) => data as List))!
-          .cast<Map<String, dynamic>>();
+      final messages = await postgrest.from('messages').select<PostgrestList>();
       for (final rec in messages) {
         expect(rec['channel_id'], 2);
       }
@@ -180,7 +176,7 @@ void main() {
           .from('messages')
           .delete()
           .eq('message', 'Supabase Launch Week is on fire')
-          .select();
+          .select<PostgrestList>();
       expect(res, [
         {
           'id': 3,
@@ -192,44 +188,34 @@ void main() {
         }
       ]);
 
-      final List resMsg = await postgrest
+      final resMsg = await postgrest
           .from('messages')
-          .select()
+          .select<PostgrestList>()
           .eq('message', 'Supabase Launch Week is on fire');
       expect(resMsg, isEmpty);
     });
 
     test('missing table', () async {
       try {
-        await postgrest.from('missing_table').select().then<dynamic>(
-          (value) {
-            fail('found missing table');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '42P01');
-          },
-        );
+        await postgrest.from('missing_table').select<PostgrestList>();
+        fail('found missing table');
       } on PostgrestException catch (error) {
-        expect(error.code, '404');
+        expect(error.code, '42P01');
       }
     });
 
     test('connection error', () async {
       final postgrest = PostgrestClient('http://this.url.does.not.exist');
-      await postgrest.from('user').select().then<dynamic>(
-        (value) {
-          fail('Success on connection error');
-        },
-        onError: (error) {
-          expect(error, isA<SocketException>());
-        },
-      );
+      try {
+        await postgrest.from('user').select();
+        fail('Success on connection error');
+      } catch (error) {
+        expect(error, isA<SocketException>());
+      }
     });
 
     test('Prefer: return=minimal', () async {
-      final data = await postgrest.from('users').insert({'username': 'bar'});
-      expect(data, null);
+      await postgrest.from('users').insert({'username': 'bar'});
     });
 
     test('select with head:true', () async {
@@ -252,7 +238,7 @@ void main() {
     });
 
     test('select with head:true, count: exact', () async {
-      final PostgrestResponse res = await postgrest.from('users').select(
+      final res = await postgrest.from('users').select<PostgrestResponse>(
             '*',
             FetchOptions(head: true, count: CountOption.exact),
           );
@@ -262,16 +248,14 @@ void main() {
     });
 
     test('select with count: planned', () async {
-      final PostgrestResponse res = await postgrest
-          .from('users')
-          .select('*', FetchOptions(count: CountOption.planned));
+      final res = await postgrest.from('users').select<PostgrestListResponse>(
+          '*', FetchOptions(count: CountOption.planned));
       expect(res.count, isNotNull);
     });
 
     test('select with head:true, count: estimated', () async {
-      final PostgrestResponse res = await postgrest
-          .from('users')
-          .select('*', FetchOptions(head: true, count: CountOption.estimated));
+      final res = await postgrest.from('users').select<PostgrestResponse>(
+          '*', FetchOptions(head: true, count: CountOption.estimated));
       expect(res.count, const TypeMatcher<int>());
     });
 
@@ -303,7 +287,7 @@ void main() {
         {'username': 'countexact', 'status': 'OFFLINE'},
         onConflict: 'username',
         options: FetchOptions(count: CountOption.exact),
-      ).select();
+      ).select<PostgrestListResponse>();
       expect(res.count, 1);
     });
 
@@ -315,7 +299,7 @@ void main() {
             options: FetchOptions(count: CountOption.exact),
           )
           .eq('username', 'kiwicopple')
-          .select();
+          .select<PostgrestListResponse>();
       expect(res.count, 1);
     });
 
@@ -324,37 +308,31 @@ void main() {
           .from('users')
           .delete(options: FetchOptions(count: CountOption.exact))
           .eq('username', 'kiwicopple')
-          .select();
+          .select<PostgrestListResponse>();
 
       expect(res.count, 1);
     });
 
     test('execute without table operation', () async {
       try {
-        await postgrest.from('users').then(
-          (value) {
-            fail('can not execute without table operation');
-          },
-          onError: (error) {
-            expect(error, isA<ArgumentError>());
-          },
-        );
-      } on ArgumentError catch (error) {
-        expect(error, isNotNull);
+        await postgrest.from('users');
+        fail('can not execute without table operation');
+      } catch (e) {
+        expect(e, isA<ArgumentError>());
       }
     });
 
     test('select from uppercase table name', () async {
-      final res = await postgrest.from('TestTable').select();
-      expect((res as List).length, 2);
+      final res = await postgrest.from('TestTable').select<PostgrestList>();
+      expect(res.length, 2);
     });
 
     test('insert from uppercase table name', () async {
       final res = await postgrest.from('TestTable').insert([
         {'slug': 'new slug'}
-      ]).select();
+      ]).select<PostgrestList>();
       expect(
-        (res.first as Map<String, dynamic>)['slug'],
+        (res.first)['slug'],
         'new slug',
       );
     });
@@ -364,34 +342,27 @@ void main() {
           .from('TestTable')
           .delete(options: FetchOptions(count: CountOption.exact))
           .eq('slug', 'new slug')
-          .select();
+          .select<PostgrestListResponse>();
       expect(res.count, 1);
     });
 
     test('row level security error', () async {
       try {
-        await postgrest.from('sample').update({'id': 2}).then<dynamic>(
-          (value) {
-            fail('Returned even with row level security');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '404');
-          },
-        );
+        await postgrest.from('sample').update({'id': 2});
+        fail('Returned even with row level security');
       } on PostgrestException catch (error) {
         expect(error.code, '404');
       }
     });
 
     test('withConverter', () async {
-      final List? res = await postgrest
+      final res = await postgrest
           .from('users')
-          .select()
-          .withConverter<List>((data) => [data]);
+          .select<PostgrestList>()
+          .withConverter((data) => [data]);
       expect(res, isNotNull);
       expect(res, isNotEmpty);
-      expect(res!.first, isNotEmpty);
+      expect(res.first, isNotEmpty);
       expect(res.first, isA<List>());
     });
   });
@@ -409,15 +380,8 @@ void main() {
 
     test('basic select table', () async {
       try {
-        await postgrestCustomHttpClient.from('users').select().then<dynamic>(
-          (value) {
-            fail('Table was able to be selected, even tho it does not exist');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '420');
-          },
-        );
+        await postgrestCustomHttpClient.from('users').select();
+        fail('Table was able to be selected, even tho it does not exist');
       } on PostgrestException catch (error) {
         expect(error.code, '420');
       }
@@ -427,16 +391,8 @@ void main() {
         await postgrestCustomHttpClient
             .from('users')
             .select()
-            .withConverter((data) => data)
-            .then<dynamic>(
-          (value) {
-            fail('Table was able to be selected, even tho it does not exist');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '420');
-          },
-        );
+            .withConverter((data) => data);
+        fail('Table was able to be selected, even tho it does not exist');
       } on PostgrestException catch (error) {
         expect(error.code, '420');
       }
@@ -444,16 +400,9 @@ void main() {
     test('basic stored procedure call', () async {
       try {
         await postgrestCustomHttpClient
-            .rpc('get_status', params: {'name_param': 'supabot'}).then<dynamic>(
-          (value) {
-            fail(
-                'Stored procedure was able to be called, even tho it does not exist');
-          },
-          onError: (error) {
-            expect(error, isA<PostgrestException>());
-            expect(error.code, '420');
-          },
-        );
+            .rpc('get_status', params: {'name_param': 'supabot'});
+        fail(
+            'Stored procedure was able to be called, even tho it does not exist');
       } on PostgrestException catch (error) {
         expect(error.code, '420');
       }

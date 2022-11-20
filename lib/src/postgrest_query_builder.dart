@@ -8,7 +8,7 @@ part of 'postgrest_builder.dart';
 /// * update() - "patch"
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
-class PostgrestQueryBuilder extends PostgrestBuilder {
+class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   PostgrestQueryBuilder(
     String url, {
     Map<String, String>? headers,
@@ -28,12 +28,36 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// Performs horizontal filtering with SELECT.
   ///
   /// ```dart
-  /// postgrest.from('users').select('id, messages');
+  /// postgrest.from('users').select<PostgrestList>('id, messages');
   /// ```
-  PostgrestFilterBuilder select([
+  ///
+  /// ```dart
+  /// postgrest.from('users').select<PostgrestListResponse>('id, messages', FetchOptions(count: CountOption.exact));
+  /// ```
+  /// By setting [FetchOptions.count] to non null or [FetchOptions.forceResponse] to `true`, the return type is [PostgrestResponse<T>]. Otherwise it's `T` directly.
+  ///
+  /// The type specification for [R] is optional and enhances the type safety of the return value. But use with care as a wrong type specification will result in a runtime error.
+  ///
+  /// `T` is
+  /// - [List<Map<String, dynamic>>] for queries without `.single()` or `maybeSingle()`
+  /// - [Map<String, dynamic>] for queries with `.single()`
+  /// - [Map<String, dynamic>?] for queries with `.maybeSingle()`
+  ///
+  /// Allowed types for [R] are:
+  /// - [List<Map<String, dynamic>>]
+  /// - [Map<String, dynamic>]
+  /// - [Map<String, dynamic>?]
+  /// - [PostgrestResponse<List<Map<String, dynamic>>>]
+  /// - [PostgrestResponse<Map<String, dynamic>>]
+  /// - [PostgrestResponse<Map<String, dynamic>?>]
+  /// - [PostgrestResponse]
+  ///
+  /// There are optional typedefs for [R]: [PostgrestMap], [PostgrestList], [PostgrestMapResponse], [PostgrestListResponse]
+  PostgrestFilterBuilder<R> select<R>([
     String columns = '*',
     FetchOptions options = const FetchOptions(),
   ]) {
+    _assertCorrectGeneric(R);
     _method = METHOD_GET;
 
     // Remove whitespaces except when quoted
@@ -49,9 +73,17 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
       return c;
     }).join();
 
-    appendSearchParams('select', cleanedColumns);
+    overrideSearchParams('select', cleanedColumns);
     _options = options;
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<R>(
+      PostgrestQueryBuilder(
+        _url.toString(),
+        headers: _headers,
+        schema: _schema,
+        httpClient: _httpClient,
+        options: _options,
+      ).._method = _method,
+    );
   }
 
   /// Performs an INSERT into the table.
@@ -67,11 +99,11 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1}).select()
   /// ```
-  PostgrestFilterBuilder insert(dynamic values) {
+  PostgrestFilterBuilder<T> insert(dynamic values) {
     _method = METHOD_POST;
     _headers['Prefer'] = '';
     _body = values;
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs an UPSERT into the table.
@@ -81,7 +113,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
   /// ```
-  PostgrestFilterBuilder upsert(
+  PostgrestFilterBuilder<T> upsert(
     dynamic values, {
     String? onConflict,
     bool ignoreDuplicates = false,
@@ -100,7 +132,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     }
     _body = values;
     _options = options.ensureNotHead();
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs an UPDATE on the table.
@@ -108,7 +140,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder update(
+  PostgrestFilterBuilder<T> update(
     Map values, {
     FetchOptions options = const FetchOptions(),
   }) {
@@ -116,7 +148,7 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
     _headers['Prefer'] = '';
     _body = values;
     _options = options.ensureNotHead();
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 
   /// Performs a DELETE on the table.
@@ -125,13 +157,13 @@ class PostgrestQueryBuilder extends PostgrestBuilder {
   /// ```dart
   /// postgrest.from('messages').delete().eq('message', 'foo')
   /// ```
-  PostgrestFilterBuilder delete({
+  PostgrestFilterBuilder<T> delete({
     ReturningOption returning = ReturningOption.representation,
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_DELETE;
     _headers['Prefer'] = 'return=${returning.name()}';
     _options = options.ensureNotHead();
-    return PostgrestFilterBuilder(this);
+    return PostgrestFilterBuilder<T>(this);
   }
 }

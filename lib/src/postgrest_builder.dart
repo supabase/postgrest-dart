@@ -24,15 +24,17 @@ const METHOD_PUT = 'PUT';
 const METHOD_PATCH = 'PATCH';
 const METHOD_DELETE = 'DELETE';
 
+typedef _Nullable<T> = T?;
+
 /// The base builder class.
-class PostgrestBuilder<T> implements Future<T?> {
+class PostgrestBuilder<T, S> implements Future<T> {
   dynamic _body;
   late final Headers _headers;
   bool _maybeEmpty = false;
   String? _method;
   late final String? _schema;
   late Uri _url;
-  PostgrestConverter? _converter;
+  PostgrestConverter<T, S>? _converter;
   late final Client? _httpClient;
   late final PostgrestIsolate _isolate;
   // ignore: prefer_final_fields
@@ -66,9 +68,8 @@ class PostgrestBuilder<T> implements Future<T?> {
   ///     .select()
   ///     .withConverter<User>((data) => User.fromJson(data));
   /// ```
-  PostgrestBuilder<S> withConverter<S>(PostgrestConverter<S> converter) {
-    _converter = converter;
-    return PostgrestBuilder<S>(
+  PostgrestBuilder<R, T> withConverter<R>(PostgrestConverter<R, T> converter) {
+    return PostgrestBuilder<R, T>(
       url: _url,
       headers: _headers,
       schema: _schema,
@@ -80,6 +81,22 @@ class PostgrestBuilder<T> implements Future<T?> {
     )
       .._maybeEmpty = _maybeEmpty
       .._converter = converter;
+  }
+
+  void _assertCorrectGeneric(Type R) {
+    assert(
+        R == PostgrestList ||
+            R == PostgrestMap ||
+            R == (_Nullable<PostgrestMap>) ||
+            R == PostgrestListResponse ||
+            R == PostgrestMapResponse ||
+            R == (PostgrestResponse<PostgrestMap?>) ||
+            R == PostgrestResponse ||
+            R == List ||
+            R == (List<Map>) ||
+            R == Map ||
+            R == dynamic,
+        "$R is not allowed as generic for `select<R>()`. Allowed types are: `PostgrestList`, `PostgrestMap`, `PostgrestMap?`, `PostgrestListResponse`, `PostgrestMapResponse`, `PostgrestResponse`, `dynamic`.");
   }
 
   /// Sends the request and returns a [PostgrestResponse]
@@ -99,7 +116,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   /// }
   /// ```
   @Deprecated('Use async/await or .then instead. Deprecated in 0.2.0')
-  Future<PostgrestResponse<T>> execute({
+  Future<PostgrestResponse> execute({
     bool head = false,
     CountOption? count,
   }) async {
@@ -110,7 +127,7 @@ class PostgrestBuilder<T> implements Future<T?> {
     return _execute();
   }
 
-  Future<PostgrestResponse<T>> _execute() async {
+  Future<PostgrestResponse> _execute() async {
     if (_options?.head ?? false) {
       _method = METHOD_HEAD;
     }
@@ -188,7 +205,7 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   /// Parse request response to json object if possible
-  Future<PostgrestResponse<T>> _parseResponse(http.Response response) async {
+  Future<PostgrestResponse> _parseResponse(http.Response response) async {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       dynamic body;
       int? count;
@@ -216,12 +233,62 @@ class PostgrestBuilder<T> implements Future<T?> {
             : int.parse(contentRange.split('/').last);
       }
 
+      // When using converter [S] is the type of the converter functions's argument. Otherwise [T] should be equal to [S]
+      if (S == PostgrestList) {
+        body = PostgrestList.from(body as Iterable) as S;
+      } else if (S == List<Map>) {
+        body = List<Map>.from(body as Iterable) as S;
+      } else if (S == PostgrestMap) {
+        body = PostgrestMap.from(body as Map) as S;
+
+        //You can't write `S == PostgrestMap?`
+      } else if (S == _Nullable<PostgrestMap>) {
+        if (body == null) {
+          body = null as S;
+        } else {
+          body = PostgrestMap.from(body as Map) as S;
+        }
+      } else if (S == PostgrestListResponse) {
+        body = PostgrestList.from(body as Iterable);
+        if (_converter != null) {
+          body = _converter!(body as S);
+        }
+        return PostgrestResponse<PostgrestList>(
+          data: body,
+          status: response.statusCode,
+          count: count,
+        );
+      } else if (S == PostgrestMapResponse) {
+        body = PostgrestMap.from(body as Map);
+        if (_converter != null) {
+          body = _converter!(body as S);
+        }
+        return PostgrestResponse<PostgrestMap>(
+          data: body,
+          status: response.statusCode,
+          count: count,
+        );
+      } else if (S == PostgrestResponse<PostgrestMap?>) {
+        if (body == null) {
+          body = null;
+        } else {
+          body = PostgrestMap.from(body as Map);
+        }
+        if (_converter != null) {
+          body = _converter!(body as S);
+        }
+        return PostgrestResponse<PostgrestMap?>(
+          data: body,
+          status: response.statusCode,
+          count: count,
+        );
+      }
       if (_converter != null) {
         body = _converter!(body);
       }
 
-      return PostgrestResponse<T>(
-        data: body as T,
+      return PostgrestResponse(
+        data: body,
         status: response.statusCode,
         count: count,
       );
@@ -297,8 +364,8 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   @override
-  Stream<T?> asStream() {
-    final controller = StreamController<T?>.broadcast();
+  Stream<T> asStream() {
+    final controller = StreamController<T>.broadcast();
 
     then((value) {
       controller.add(value);
@@ -313,13 +380,12 @@ class PostgrestBuilder<T> implements Future<T?> {
 
   @override
   Future<T> catchError(Function onError, {bool Function(Object error)? test}) {
-    throw UnimplementedError('catchError should not be called in this future');
+    return then((value) => value).catchError(onError, test: test);
   }
 
-  /// Register callbacks to be called when this future completes.
   @override
   Future<R> then<R>(
-    FutureOr<R> Function(T? value) onValue, {
+    FutureOr<R> Function(T value) onValue, {
     Function? onError,
   }) async {
     if (onError != null &&
@@ -381,12 +447,12 @@ class PostgrestBuilder<T> implements Future<T?> {
   }
 
   @override
-  Future<T> timeout(Duration timeLimit, {FutureOr<T?> Function()? onTimeout}) {
-    throw UnimplementedError('timeout should not be called on this future');
+  Future<T> timeout(Duration timeLimit, {FutureOr<T> Function()? onTimeout}) {
+    return then((value) => value).timeout(timeLimit, onTimeout: onTimeout);
   }
 
   @override
-  Future<T?> whenComplete(FutureOr<void> Function() action) {
+  Future<T> whenComplete(FutureOr<void> Function() action) {
     return then(
       (v) {
         final f2 = action();
