@@ -7,10 +7,6 @@ import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:postgrest/postgrest.dart';
-import 'package:postgrest/src/_isolates_io.dart';
-import 'package:postgrest/src/types.dart';
-
-import 'isolates.dart';
 
 part 'postgrest_filter_builder.dart';
 part 'postgrest_query_builder.dart';
