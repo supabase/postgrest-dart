@@ -14,6 +14,8 @@ class PostgrestIsolate {
   bool _hasStartedInitialize = false;
 
   Future<void> initialize() async {
+    assert(_hasStartedInitialize == false,
+        'initialize() can only be called once per isolate.');
     _hasStartedInitialize = true;
     await Isolate.spawn(
       _compute,
