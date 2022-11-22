@@ -29,7 +29,7 @@ class PostgrestClient {
     this.httpClient,
     PostgrestIsolate? isolate,
   })  : headers = {...defaultHeaders, if (headers != null) ...headers},
-        _isolate = isolate ?? (PostgrestIsolate()..init()),
+        _isolate = isolate ?? (PostgrestIsolate()..initialize()),
         _hasCustomIsolate = isolate != null;
 
   /// Authenticates the request with JWT.

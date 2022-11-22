@@ -11,10 +11,10 @@ class PostgrestIsolate {
   late final SendPort _sendPort;
   final _createdIsolate = Completer<void>();
   late final _events = StreamQueue(_receivePort);
-  bool _startedInit = false;
+  bool _hasStartedInitialize = false;
 
-  Future<void> init() async {
-    _startedInit = true;
+  Future<void> initialize() async {
+    _hasStartedInitialize = true;
     await Isolate.spawn(
       _compute,
       _receivePort.sendPort,
@@ -34,7 +34,7 @@ class PostgrestIsolate {
 
   Future<dynamic> decode(String json) async {
     if (!_createdIsolate.isCompleted) {
-      if (!_startedInit) init();
+      if (!_hasStartedInitialize) initialize();
       await _createdIsolate.future;
     }
     _sendPort.send([json, false]);
@@ -43,7 +43,7 @@ class PostgrestIsolate {
 
   Future<String> encode(Object? json) async {
     if (!_createdIsolate.isCompleted) {
-      if (!_startedInit) init();
+      if (!_hasStartedInitialize) initialize();
       await _createdIsolate.future;
     }
     _sendPort.send([json, true]);
