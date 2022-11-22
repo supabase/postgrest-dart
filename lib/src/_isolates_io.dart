@@ -1,4 +1,4 @@
-//Modified from package:flutter/foundation/_isolates_io.dart
+//Modified from https://github.com/dart-lang/samples/blob/master/isolates/bin/long_running_isolate.dart
 
 import 'dart:async';
 import 'dart:convert';
@@ -89,23 +89,22 @@ void _compute(SendPort p) async {
     // [event] is a list of [input,method]
     if (event is List) {
       final input = event.first;
-      final method = event.last;
+
+      /// `true` for encoding and `false` for decoding
+      final bool method = event.last;
       late final List<dynamic> computationResult;
 
       try {
-        computationResult = _buildSuccessResponse(() {
-          final dynamic res;
-          if (method == true) {
-            res = jsonEncode(input);
-          } else {
-            res = jsonDecode(input);
-          }
-          return res;
-        }());
+        final dynamic res;
+        if (method == true) {
+          res = jsonEncode(input);
+        } else {
+          res = jsonDecode(input);
+        }
+        computationResult = _buildSuccessResponse(res);
       } catch (e, s) {
         computationResult = _buildErrorResponse(e, s);
       }
-      // `true` for encoding and `false` for decoding
 
       p.send(computationResult);
     } else if (event == null) {
