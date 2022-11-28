@@ -1,3 +1,7 @@
+## [1.2.0]
+
+- feat: use isolates only for huge JSON and reuse isolates [#90](https://github.com/supabase/postgrest-dart/pull/90)
+
 ## [1.1.1]
 
 - fix: keep custom http client with converter [#100](https://github.com/supabase/postgrest-dart/pull/100)
