@@ -7,6 +7,7 @@ import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:postgrest/postgrest.dart';
+import 'package:yet_another_json_isolate/yet_another_json_isolate.dart';
 
 part 'postgrest_filter_builder.dart';
 part 'postgrest_query_builder.dart';
@@ -32,7 +33,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
   late Uri _url;
   PostgrestConverter<T, S>? _converter;
   late final Client? _httpClient;
-  late final PostgrestIsolate _isolate;
+  late final YAJsonIsolate _isolate;
   // ignore: prefer_final_fields
   FetchOptions? _options;
 
@@ -43,7 +44,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
     String? method,
     dynamic body,
     Client? httpClient,
-    required PostgrestIsolate isolate,
+    required YAJsonIsolate isolate,
     FetchOptions? options,
   }) {
     _url = url;

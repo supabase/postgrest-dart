@@ -15,7 +15,7 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
     String? schema,
     Client? httpClient,
     FetchOptions? options,
-    required PostgrestIsolate isolate,
+    required YAJsonIsolate isolate,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},

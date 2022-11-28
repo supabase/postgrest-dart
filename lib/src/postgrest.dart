@@ -1,6 +1,7 @@
 import 'package:http/http.dart';
 import 'package:postgrest/postgrest.dart';
 import 'package:postgrest/src/constants.dart';
+import 'package:yet_another_json_isolate/yet_another_json_isolate.dart';
 
 /// A PostgREST api client written in Dartlang. The goal of this library is to make an "ORM-like" restful interface.
 class PostgrestClient {
@@ -8,7 +9,7 @@ class PostgrestClient {
   final Map<String, String> headers;
   final String? schema;
   final Client? httpClient;
-  final PostgrestIsolate _isolate;
+  final YAJsonIsolate _isolate;
   final bool _hasCustomIsolate;
 
   /// To create a [PostgrestClient], you need to provide an [url] endpoint.
@@ -27,9 +28,9 @@ class PostgrestClient {
     Map<String, String>? headers,
     this.schema,
     this.httpClient,
-    PostgrestIsolate? isolate,
+    YAJsonIsolate? isolate,
   })  : headers = {...defaultHeaders, if (headers != null) ...headers},
-        _isolate = isolate ?? (PostgrestIsolate()..initialize()),
+        _isolate = isolate ?? (YAJsonIsolate()..initialize()),
         _hasCustomIsolate = isolate != null;
 
   /// Authenticates the request with JWT.
