@@ -11,12 +11,15 @@ void main() {
   late PostgrestClient postgrest;
   late PostgrestClient postgrestCustomHttpClient;
   final resetHelper = ResetHelper();
-
   group("Default http client", () {
     setUpAll(() async {
       postgrest = PostgrestClient(rootUrl);
 
       await resetHelper.initialize(postgrest);
+    });
+
+    tearDown(() async {
+      await postgrest.dispose();
     });
 
     setUp(() {
@@ -223,6 +226,17 @@ void main() {
       expect(res, null);
     });
 
+    test('select with head:true with converter', () async {
+      final res = await postgrest
+          .from('users')
+          .select(
+            '*',
+            FetchOptions(head: true),
+          )
+          .withConverter((data) => data);
+      expect(res, null);
+    });
+
     test('select with head:true, count: exact', () async {
       final res = await postgrest.from('users').select<PostgrestResponse>(
             '*',
@@ -353,12 +367,17 @@ void main() {
     });
   });
   group("Custom http client", () {
-    setUpAll(() {
+    setUp(() {
       postgrestCustomHttpClient = PostgrestClient(
         rootUrl,
         httpClient: CustomHttpClient(),
       );
     });
+
+    tearDown(() async {
+      await postgrestCustomHttpClient.dispose();
+    });
+
     test('basic select table', () async {
       try {
         await postgrestCustomHttpClient.from('users').select();
@@ -367,7 +386,6 @@ void main() {
         expect(error.code, '420');
       }
     });
-
     test('basic select table with converter', () async {
       try {
         await postgrestCustomHttpClient
@@ -379,7 +397,6 @@ void main() {
         expect(error.code, '420');
       }
     });
-
     test('basic stored procedure call', () async {
       try {
         await postgrestCustomHttpClient

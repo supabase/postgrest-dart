@@ -15,12 +15,14 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
     String? schema,
     Client? httpClient,
     FetchOptions? options,
+    required YAJsonIsolate isolate,
   }) : super(
           url: Uri.parse(url),
           headers: headers ?? {},
           schema: schema,
           httpClient: httpClient,
           options: options,
+          isolate: isolate,
         );
 
   /// Performs horizontal filtering with SELECT.
@@ -79,6 +81,7 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
         headers: _headers,
         schema: _schema,
         httpClient: _httpClient,
+        isolate: _isolate,
         options: _options,
       ).._method = _method,
     );
