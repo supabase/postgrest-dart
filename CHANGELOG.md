@@ -1,6 +1,10 @@
+## [1.2.1]
+
+- fix: remove the breaking change that was introduced in v1.2.0 [#103](https://github.com/supabase/postgrest-dart/pull/103)
+
 ## [1.2.0]
 
-- feat: use isolates only for huge JSON and reuse isolates [#90](https://github.com/supabase/postgrest-dart/pull/90)
+- BREAKING: use isolates only for huge JSON and reuse isolates [#90](https://github.com/supabase/postgrest-dart/pull/90)
 
 ## [1.1.1]
 
