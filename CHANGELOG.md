@@ -5,6 +5,7 @@
 ## [1.2.0]
 
 - BREAKING: use isolates only for huge JSON and reuse isolates [#90](https://github.com/supabase/postgrest-dart/pull/90)
+  This breaking change has been removed in v1.2.1
 
 ## [1.1.1]
 
