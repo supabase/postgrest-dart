@@ -33,7 +33,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
   late Uri _url;
   PostgrestConverter<T, S>? _converter;
   late final Client? _httpClient;
-  late final YAJsonIsolate _isolate;
+  late final YAJsonIsolate? _isolate;
   // ignore: prefer_final_fields
   FetchOptions? _options;
 
@@ -44,7 +44,7 @@ class PostgrestBuilder<T, S> implements Future<T> {
     String? method,
     dynamic body,
     Client? httpClient,
-    required YAJsonIsolate isolate,
+    YAJsonIsolate? isolate,
     FetchOptions? options,
   }) {
     _url = url;
@@ -212,8 +212,8 @@ class PostgrestBuilder<T, S> implements Future<T> {
           body = response.body;
         } else {
           try {
-            if ((response.contentLength ?? 0) > 10000) {
-              body = await _isolate.decode(response.body);
+            if ((response.contentLength ?? 0) > 10000 && _isolate != null) {
+              body = await _isolate!.decode(response.body);
             } else {
               body = jsonDecode(response.body);
             }
