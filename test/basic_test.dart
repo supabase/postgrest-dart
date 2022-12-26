@@ -171,6 +171,34 @@ void main() {
       }
     });
 
+    test('updating rows that do not exist does not throw', () async {
+      await postgrest.from('messages').update(
+        {'channel_id': 2},
+      ).eq("channel_id", 99);
+    });
+    test('updating rows that do not exist with count', () async {
+      final PostgrestResponse res = await postgrest
+          .from('messages')
+          .update({'channel_id': 2},
+              options: FetchOptions(count: CountOption.exact))
+          .eq("channel_id", 99)
+          .select();
+      expect(res.data, []);
+      expect(res.count, 0);
+      expect(res.status, 204);
+    });
+
+    test('updating rows that do not exist with forceResponse', () async {
+      final PostgrestResponse res = await postgrest
+          .from('messages')
+          .update({'channel_id': 2}, options: FetchOptions(forceResponse: true))
+          .eq("channel_id", 99)
+          .select();
+      expect(res.data, []);
+      expect(res.count, 0);
+      expect(res.status, 204);
+    });
+
     test('basic delete', () async {
       final res = await postgrest
           .from('messages')
@@ -193,6 +221,32 @@ void main() {
           .select<PostgrestList>()
           .eq('message', 'Supabase Launch Week is on fire');
       expect(resMsg, isEmpty);
+    });
+
+    test('deleting rows that do not exist does not throw', () async {
+      await postgrest.from('messages').delete().eq("channel_id", 99);
+    });
+
+    test('deleting rows that do not exist with count', () async {
+      final PostgrestResponse res = await postgrest
+          .from('messages')
+          .delete(options: FetchOptions(count: CountOption.exact))
+          .eq("channel_id", 99)
+          .select();
+      expect(res.data, []);
+      expect(res.count, 0);
+      expect(res.status, 204);
+    });
+
+    test('deleting rows that do not exist with forceResponse', () async {
+      final PostgrestResponse res = await postgrest
+          .from('messages')
+          .delete(options: FetchOptions(forceResponse: true))
+          .eq("channel_id", 99)
+          .select();
+      expect(res.data, []);
+      expect(res.count, 0);
+      expect(res.status, 204);
     });
 
     test('missing table', () async {
