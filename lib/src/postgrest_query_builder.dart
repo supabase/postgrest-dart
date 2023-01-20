@@ -214,6 +214,8 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   ///     .select();
   /// ```
   PostgrestFilterBuilder<T> delete({
+    @Deprecated('Append `.select()` on the query instead')
+        ReturningOption returning = ReturningOption.representation,
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_DELETE;
