@@ -105,11 +105,30 @@ extension TextSearchTypeName on TextSearchType {
   }
 }
 
+/// {@template fetch_options}
+/// Options for querying Supabase.
+///
+/// [count] options can be used to retrieve the total number of rows that satisfies the
+/// query. The value for count respects any filters (e.g. `eq`, `gt`), but ignores
+/// modifiers (e.g. `limit`, `range`).
+///
+/// Set [head] to `true` if you only want the [count] value and not the underlying data.
+///
+/// Set [forceResponse] to `true` if you want to force the return type to be [PostgrestResponse<T>].
+/// {endtemplate}
 class FetchOptions {
+  /// Set [head] to true if you only want the [count] value and not the underlying data.
   final bool head;
+
+  /// [count] options can be used to retrieve the total number of rows that satisfies the
+  /// query. The value for count respects any filters (e.g. eq, gt), but ignores
+  /// modifiers (e.g. limit, range).
   final CountOption? count;
+
+  /// Set [forceResponse] to `true` if you want to force the return type to be [PostgrestResponse<T>].
   final bool forceResponse;
 
+  /// {@macro fetch_options}
   const FetchOptions({
     this.head = false,
     this.count,
