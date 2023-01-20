@@ -1,5 +1,6 @@
 part of 'postgrest_builder.dart';
 
+/// {@template postgrest_query_builder}
 /// The query builder class provides a convenient interface to creating request queries.
 ///
 /// Allows the user to stack the filter functions before they call any of
@@ -8,7 +9,9 @@ part of 'postgrest_builder.dart';
 /// * update() - "patch"
 /// * delete() - "delete"
 /// Once any of these are called the filters are passed down to the Request.
+/// /// {@endtemplate}
 class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
+  /// {@macro postgrest_query_builder}
   PostgrestQueryBuilder(
     String url, {
     Map<String, String>? headers,
@@ -93,12 +96,17 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   ///
   /// Default (not returning data):
   /// ```dart
-  /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1})
+  /// await supabase.from('messages').insert(
+  ///     {'message': 'foo', 'username': 'supabot', 'channel_id': 1});
   /// ```
   ///
   /// Returning data:
   /// ```dart
-  /// postgrest.from('messages').insert({'message': 'foo', 'username': 'supabot', 'channel_id': 1}).select()
+  /// final data = await supabase.from('messages').insert({
+  ///   'message': 'foo',
+  ///   'username': 'supabot',
+  ///   'channel_id': 1
+  /// }).select();
   /// ```
   PostgrestFilterBuilder<T> insert(dynamic values) {
     _method = METHOD_POST;
@@ -111,8 +119,26 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
   ///
   /// By specifying the [onConflict] query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
   /// [ignoreDuplicates] Specifies if duplicate rows should be ignored and not inserted.
+  ///
+  /// By default no data is returned. Use a trailing `select` to return data.
+  ///
+  /// Default (not returning data):
   /// ```dart
-  /// postgrest.from('messages').upsert({'id': 3, message: 'foo', 'username': 'supabot', 'channel_id': 2})
+  /// await supabase.from('messages').upsert({
+  ///   'id': 3,
+  ///   'message': 'foo',
+  ///   'username': 'supabot',
+  ///   'channel_id': 2
+  /// });
+  /// ```
+  ///
+  /// Returning data:
+  /// ```dart
+  /// final data = await supabase.from('messages').upsert({
+  ///   'message': 'foo',
+  ///   'username': 'supabot',
+  ///   'channel_id': 1
+  /// }).select();
   /// ```
   PostgrestFilterBuilder<T> upsert(
     dynamic values, {
@@ -138,8 +164,23 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
 
   /// Performs an UPDATE on the table.
   ///
+  /// By default no data is returned. Use a trailing `select` to return data.
+  ///
+  /// Default (not returning data):
   /// ```dart
-  /// postgrest.from('messages').update({'channel_id': 2}).eq('message', 'foo')
+  /// await supabase
+  ///     .from('messages')
+  ///     .update({'channel_id': 2})
+  ///     .eq('message', 'foo');
+  /// ```
+  ///
+  /// Returning data:
+  /// ```dart
+  /// await supabase
+  ///     .from('messages')
+  ///     .update({'channel_id': 2})
+  ///     .eq('message', 'foo')
+  ///     .select();
   /// ```
   PostgrestFilterBuilder<T> update(
     Map values, {
@@ -154,16 +195,31 @@ class PostgrestQueryBuilder<T> extends PostgrestBuilder<T, T> {
 
   /// Performs a DELETE on the table.
   ///
-  /// By default the deleted record(s) will be returned. Set [returning] to minimal if you don't need this value.
+  /// By default no data is returned. Use a trailing `select` to return data.
+  ///
+  /// Default (not returning data):
   /// ```dart
-  /// postgrest.from('messages').delete().eq('message', 'foo')
+  /// await supabase
+  ///     .from('messages')
+  ///     .delete()
+  ///     .eq('message', 'foo');
+  /// ```
+  ///
+  /// Returning data:
+  /// ```dart
+  /// await supabase
+  ///     .from('messages')
+  ///     .delete()
+  ///     .eq('message', 'foo')
+  ///     .select();
   /// ```
   PostgrestFilterBuilder<T> delete({
-    ReturningOption returning = ReturningOption.representation,
+    @Deprecated('Append `.select()` on the query instead')
+        ReturningOption returning = ReturningOption.representation,
     FetchOptions options = const FetchOptions(),
   }) {
     _method = METHOD_DELETE;
-    _headers['Prefer'] = 'return=${returning.name()}';
+    _headers['Prefer'] = '';
     _options = options.ensureNotHead();
     return PostgrestFilterBuilder<T>(this);
   }

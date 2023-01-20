@@ -79,10 +79,19 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   ///
   /// When [options] has `ascending` value true, the result will be in ascending order.
   /// When [options] has `nullsFirst` value true, `null`s appear first.
+  /// ```dart
+  /// final data = await supabase
+  ///     .from('users')
+  ///     .select()
+  ///     .order('username', ascending: false);
+  /// ````
   /// If [column] is a foreign column, the [options] need to have `foreignTable` value provided
   /// ```dart
-  /// postgrest.from('users').select().order('username', ascending: false)
-  /// postgrest.from('users').select('messages(*)').order('channel_id', foreignTable: 'messages', ascending: false)
+  /// final data = await supabase
+  ///     .from('users')
+  ///     .select('messages(*)')
+  ///     .order('channel_id',
+  ///         foreignTable: 'messages', ascending: false);
   /// ```
   PostgrestTransformBuilder<T> order(
     String column, {
@@ -101,10 +110,16 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
 
   /// Limits the result with the specified `count`.
   ///
+  /// ```dart
+  /// final data = await supabase.from('users').select().limit(1);
+  /// ```
+  ///
   /// If we want to limit a foreign column, the [options] need to have `foreignTable` value provided
   /// ```dart
-  /// postgrest.from('users').select().limit(1)
-  /// postgrest.from('users').select('messages(*)').limit(1, foreignTable: 'messages')
+  /// final data = await supabase
+  ///   .from('users')
+  ///   .select('messages(*)')
+  ///   .limit(1, foreignTable: 'messages');
   /// ```
   PostgrestTransformBuilder<T> limit(int count, {String? foreignTable}) {
     final key = foreignTable == null ? 'limit' : '$foreignTable.limit';
@@ -115,9 +130,19 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
 
   /// Limits the result to rows within the specified range, inclusive.
   ///
+  /// ```dart
+  /// final data = await supabase
+  ///     .from('users')
+  ///     .select('messages(*)')
+  ///     .range(1, 1);
+  /// ```
+  ///
   /// If we want to limit a foreign column, the [options] need to have `foreignTable` value provided
   /// ```dart
-  /// postgrest.from('users').select('messages(*)').range(1, 1, foreignTable: 'messages')
+  /// final data = await supabase
+  ///     .from('users')
+  ///     .select('messages(*)')
+  ///     .range(1, 1, foreignTable: 'messages');
   /// ```
   PostgrestTransformBuilder<T> range(int from, int to, {String? foreignTable}) {
     final keyOffset = foreignTable == null ? 'offset' : '$foreignTable.offset';
@@ -132,7 +157,11 @@ class PostgrestTransformBuilder<T> extends PostgrestBuilder<T, T> {
   ///
   /// Result must be one row (e.g. using `limit`), otherwise this will result in an error.
   /// ```dart
-  /// postgrest.from('users').select<PostgrestMap>().limit(1).single()
+  /// final data = await supabase
+  ///     .from('users')
+  ///     .select<PostgrestMap>()
+  ///     .limit(1)
+  ///     .single();
   /// ```
   ///
   /// Data type is `Map<String, dynamic>`.
