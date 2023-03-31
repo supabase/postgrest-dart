@@ -44,7 +44,7 @@ class PostgrestClient {
     final url = '${this.url}/$table';
     return PostgrestQueryBuilder<void>(
       url,
-      headers: headers,
+      headers: {...headers},
       schema: schema,
       httpClient: httpClient,
       isolate: _isolate,
@@ -64,7 +64,7 @@ class PostgrestClient {
     final url = '${this.url}/rpc/$fn';
     return PostgrestRpcBuilder(
       url,
-      headers: headers,
+      headers: {...headers},
       schema: schema,
       httpClient: httpClient,
       options: options,
