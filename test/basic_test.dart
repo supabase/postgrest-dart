@@ -75,7 +75,7 @@ void main() {
     });
 
     test('auth', () async {
-      postgrest = PostgrestClient(rootUrl).auth('foo');
+      postgrest = PostgrestClient(rootUrl).setAuth('foo');
       expect(
         postgrest.headers['Authorization'],
         'Bearer foo',

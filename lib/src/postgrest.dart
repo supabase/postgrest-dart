@@ -34,8 +34,18 @@ class PostgrestClient {
         _hasCustomIsolate = isolate != null;
 
   /// Authenticates the request with JWT.
+  @Deprecated("Use setAuth() instead")
   PostgrestClient auth(String token) {
     headers['Authorization'] = 'Bearer $token';
+    return this;
+  }
+
+  PostgrestClient setAuth(String? token) {
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    } else {
+      headers.remove('Authorization');
+    }
     return this;
   }
 
