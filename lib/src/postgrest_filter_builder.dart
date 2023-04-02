@@ -336,7 +336,6 @@ class PostgrestFilterBuilder<T> extends PostgrestTransformBuilder<T> {
   PostgrestFilterBuilder<T> textSearch(
     String column,
     String query, {
-
     /// The text search configuration to use.
     String? config,
 

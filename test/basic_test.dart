@@ -75,7 +75,7 @@ void main() {
     });
 
     test('auth', () async {
-      postgrest = PostgrestClient(rootUrl).auth('foo');
+      postgrest = PostgrestClient(rootUrl).setAuth('foo');
       expect(
         postgrest.headers['Authorization'],
         'Bearer foo',
@@ -100,12 +100,16 @@ void main() {
     });
 
     test('upsert', () async {
+      final headersBefore = {...postgrest.headers};
       final res = await postgrest.from('messages').upsert({
         'id': 3,
         'message': 'foo',
         'username': 'supabot',
         'channel_id': 2
       }).select<PostgrestList>();
+      final headersAfter = {...postgrest.headers};
+
+      expect(headersBefore, headersAfter);
       expect(res.first['id'], 3);
 
       final resMsg = await postgrest.from('messages').select<PostgrestList>();

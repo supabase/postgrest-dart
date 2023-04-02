@@ -34,8 +34,18 @@ class PostgrestClient {
         _hasCustomIsolate = isolate != null;
 
   /// Authenticates the request with JWT.
+  @Deprecated("Use setAuth() instead")
   PostgrestClient auth(String token) {
     headers['Authorization'] = 'Bearer $token';
+    return this;
+  }
+
+  PostgrestClient setAuth(String? token) {
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    } else {
+      headers.remove('Authorization');
+    }
     return this;
   }
 
@@ -44,7 +54,7 @@ class PostgrestClient {
     final url = '${this.url}/$table';
     return PostgrestQueryBuilder<void>(
       url,
-      headers: headers,
+      headers: {...headers},
       schema: schema,
       httpClient: httpClient,
       isolate: _isolate,
@@ -64,7 +74,7 @@ class PostgrestClient {
     final url = '${this.url}/rpc/$fn';
     return PostgrestRpcBuilder(
       url,
-      headers: headers,
+      headers: {...headers},
       schema: schema,
       httpClient: httpClient,
       options: options,
