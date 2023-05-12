@@ -1,7 +1,7 @@
 # Postgrest Dart
 
 > **Warning**
-> This repository has been moved [supabase-flutter repo](https://github.com/supabase/supabase-flutter/tree/main/packages/postgrest).
+> This repository has been moved to the [supabase-flutter repo](https://github.com/supabase/supabase-flutter/tree/main/packages/postgrest).
 
 Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface.
 
