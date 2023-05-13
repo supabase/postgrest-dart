@@ -1,9 +1,9 @@
 # Postgrest Dart
 
-Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface.
+> **Warning**
+> This repository has been moved to the [supabase-flutter repo](https://github.com/supabase/supabase-flutter/tree/main/packages/postgrest).
 
-[![pub package](https://img.shields.io/pub/v/postgrest.svg)](https://pub.dev/packages/postgrest)
-[![pub test](https://github.com/supabase/postgrest-dart/workflows/Test/badge.svg)](https://github.com/supabase/postgrest-dart/actions?query=workflow%3ATest)
+Dart client for [PostgREST](https://postgrest.org). The goal of this library is to make an "ORM-like" restful interface.
 
 ## Using
 
